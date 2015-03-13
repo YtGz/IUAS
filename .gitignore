@@ -39,4 +39,4 @@ $RECYCLE.BIN/
 *.lnk
 
 #other gitignore
-*/.gitignore
+bin/classes/.gitignore
