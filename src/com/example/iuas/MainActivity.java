@@ -15,10 +15,10 @@ public class MainActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		// textLog = (TextView) findViewById(R.id.textLog);
+		textLog = (TextView) findViewById(R.id.textLog);
 		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 		connect();
-		com.write(new byte[] {'r', '\r', '\n'});
+		//com.write(new byte[] {'r', '\r', '\n'});
 	}
 
 	public void connect() {
