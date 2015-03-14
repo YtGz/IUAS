@@ -114,4 +114,35 @@ public class MainActivity extends ActionBarActivity {
 	public void squareTestOnClick(View view) {
 		squareTest((byte) 20);
 	}
+	
+	public void retrieveSensorData() {
+		
+		/*
+		 * From the bachelor thesis:
+		 * 	
+		 * 		"Sensor data can be retrieved via the ’q’ command. The onClick method for the Sensor button
+		 * 		(listing 15) will issue this command. The returning string contains measurements of all sensors
+		 *		formated as space separated hex values, each prepended with 0x."
+		 *		
+		 *	and
+		 *
+		 *		"IR sensors output a voltage signal which correlates to the distance between the sensor and an object
+		 *		in front of the sensor. Do note that this correlation is not linear (section 3.6). The provided voltage
+		 *		output is read via an analog to digital converter (ADC) and is then available as digital value which
+		 *		can be passed to the Android application."
+		 *
+		 *	and
+		 *
+		 *		"The IR sensors are used to detect obstacles. This sensor measures the distance using a positive
+		 *		sensitive detector (PSD) and an infrared emitting diode (RED). According to the datasheet [12] its
+		 *		measuring distance ranges from 100 mm to 800 mm .
+		 *		Using this infrared sensor it is easy to measure distances fast and accurate. It is supplied with
+		 *		5 V and provides analog output voltage related to the measured distance. Figure 9 shows this
+		 *		characteristic. Note that the relation between distance and sensor output is not linear.
+		 *		The output of the sensors are read by ADCs on the control board."
+		 *
+		 *	Figure 9 suggests that to check for objects ~8cm away we have to measure if the voltage is higher than 2 or 3 Volt, depending on how big the threshold for the distance shall be.
+		 */
+		
+	}
 }
