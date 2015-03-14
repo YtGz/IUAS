@@ -9,8 +9,19 @@
     tools:context="com.example.iuas.MainActivity" >
 
     <TextView
+        android:id="@+id/textLog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textLog" />  
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/squareTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="126dp"
+        android:text="Square Test" />
 
 </RelativeLayout>

@@ -347,7 +347,7 @@ int id action_menu_presenter 0x7f0b0006
 int id action_mode_bar 0x7f0b002e
 int id action_mode_bar_stub 0x7f0b002d
 int id action_mode_close_button 0x7f0b0020
-int id action_settings 0x7f0b0040
+int id action_settings 0x7f0b0041
 int id activity_chooser_view_content 0x7f0b0021
 int id always 0x7f0b0014
 int id beginning 0x7f0b001b
@@ -391,6 +391,7 @@ int id showCustom 0x7f0b0010
 int id showHome 0x7f0b0011
 int id showTitle 0x7f0b0012
 int id split_action_bar 0x7f0b0004
+int id squareTest 0x7f0b0040
 int id submit_area 0x7f0b003c
 int id tabMode 0x7f0b000c
 int id textLog 0x7f0b003f

@@ -4,6 +4,7 @@ import jp.ksksue.driver.serial.FTDriver;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
 import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity {
@@ -105,5 +106,12 @@ public class MainActivity extends ActionBarActivity {
 			robotDrive(size);
 			robotTurn((byte) 90);
 		}
+	}
+	
+	/*
+	 * The "Square Test"-button issues a square test with size 20 cm.
+	 */
+	public void squareTestOnClick(View view) {
+		squareTest((byte) 20);
 	}
 }
