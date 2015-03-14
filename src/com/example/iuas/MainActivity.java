@@ -1,5 +1,7 @@
 package com.example.iuas;
 
+import java.util.ArrayList;
+
 import jp.ksksue.driver.serial.FTDriver;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
@@ -112,20 +114,32 @@ public class MainActivity extends ActionBarActivity {
 	 * The "Square Test"-button issues a square test with size 20 cm.
 	 */
 	public void squareTestOnClick(View view) {
+		bugStop();
 		squareTest((byte) 20);
 	}
 	
-	public void retrieveSensorData() {
+	public String retrieveSensorData() {
 		
 		/*
 		 * From the bachelor thesis:
 		 * 	
-		 * 		"Sensor data can be retrieved via the ’q’ command. The onClick method for the Sensor button
-		 * 		(listing 15) will issue this command. The returning string contains measurements of all sensors
+		 * 		"Sensor data can be retrieved via the ’q’ command. [...] The returning string contains measurements of all sensors
 		 *		formated as space separated hex values, each prepended with 0x."
-		 *		
-		 *	and
 		 *
+		 */
+		
+		return comReadWrite(new byte[] { 'q', '\r', '\n' });
+	}
+	
+	/**
+	 * Returns true if there is an obstacle roughly ~8cm away from the robot.
+	 * @return
+	 */
+	public boolean detectObstacle() {
+		
+		/*
+		 * From the bachelor thesis:
+		 * 	
 		 *		"IR sensors output a voltage signal which correlates to the distance between the sensor and an object
 		 *		in front of the sensor. Do note that this correlation is not linear (section 3.6). The provided voltage
 		 *		output is read via an analog to digital converter (ADC) and is then available as digital value which
@@ -141,8 +155,71 @@ public class MainActivity extends ActionBarActivity {
 		 *		characteristic. Note that the relation between distance and sensor output is not linear.
 		 *		The output of the sensors are read by ADCs on the control board."
 		 *
-		 *	Figure 9 suggests that to check for objects ~8cm away we have to measure if the voltage is higher than 2 or 3 Volt, depending on how big the threshold for the distance shall be.
+		 *	Figure 9 suggests that to check for objects ~8cm away we have to measure if the voltage is higher than 2 or 3 Volt, 
+		 *  depending on how big the threshold for the distance shall be.
 		 */
-		
+		boolean encounteredAnObstacle = false;
+		String sensorData = retrieveSensorData();
+		ArrayList<Float> volts = parseDataString(sensorData);
+		for(float v : volts) {
+			if(v > 2.5) {
+				encounteredAnObstacle = true;
+			}
+		}
+		return encounteredAnObstacle;
+	}
+	
+	public ArrayList<Float> parseDataString(String dataSring) {
+		String[] tokens = dataSring.trim().split("\\s++");
+		ArrayList<Float> values = new ArrayList<Float>();
+		for(String t : tokens) {
+			values.add(Float.parseFloat(t));
+		}
+		return values;
+	}
+	
+	// Just for the case simultaneous driving and measuring don't work.
+	/**
+	 * Robot stops after once every cm to see if there are obstacles. 
+	 * @param distance_cm
+	 */
+	/*
+	public void robotDriveCareful(byte distance_cm) {
+		while (distance_cm > 1) {
+			comReadWrite(new byte[] { 'k', 1, '\r', '\n' });
+			distance_cm--;
+			if(detectObstacle()) {
+			return;					//Stop when detecting an obstacle
+		}
+		comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' });
+	}
+	*/
+	
+	/*****************************************************************************************************************************************
+	 * Bug algorithms.																														 *
+	 *****************************************************************************************************************************************/
+	public void bugStop() {
+		for(;;) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+			if(detectObstacle()) {
+				robotStop();
+			}
+		}
+	}
+	
+	public void bugZero() {
+		//TODO
+	}
+	
+	public void bugOne() {
+		//TODO
+	}
+	
+	public void bugTwo() {
+		//TODO
 	}
 }
