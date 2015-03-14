@@ -85,13 +85,25 @@ public class MainActivity extends ActionBarActivity {
 	public void robotSetBar(byte value) {
 		comReadWrite(new byte[] { 'o', value, '\r', '\n' });
 	}
-	
+
 	public void robotMoveForward() {
-		comReadWrite(new byte[] {'w', '\r', '\n'});
-	}
-	
-	public void robotStop() {
-		comReadWrite(new byte[] {'s', '\r', '\n'});
+		comReadWrite(new byte[] { 'w', '\r', '\n' });
 	}
 
+	public void robotStop() {
+		comReadWrite(new byte[] { 's', '\r', '\n' });
+	}
+
+	/**
+	 * The square test is used to determine accuracy of odometry
+	 * 
+	 * @param size
+	 *            the side length of the square in cm
+	 */
+	public void squareTest(byte size) {
+		for (int i = 0; i < 4; i++) {
+			robotDrive(size);
+			robotTurn((byte) 90);
+		}
+	}
 }
