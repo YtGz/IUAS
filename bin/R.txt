@@ -347,7 +347,7 @@ int id action_menu_presenter 0x7f0b0006
 int id action_mode_bar 0x7f0b002e
 int id action_mode_bar_stub 0x7f0b002d
 int id action_mode_close_button 0x7f0b0020
-int id action_settings 0x7f0b0041
+int id action_settings 0x7f0b0042
 int id activity_chooser_view_content 0x7f0b0021
 int id always 0x7f0b0014
 int id beginning 0x7f0b001b
@@ -367,6 +367,7 @@ int id homeAsUp 0x7f0b000e
 int id icon 0x7f0b0026
 int id ifRoom 0x7f0b0016
 int id image 0x7f0b0023
+int id lemniscateTest 0x7f0b0041
 int id listMode 0x7f0b000a
 int id list_item 0x7f0b0025
 int id middle 0x7f0b001d
