@@ -18,7 +18,6 @@ public class MainActivity extends ActionBarActivity {
 		textLog = (TextView) findViewById(R.id.textLog);
 		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 		connect();
-		// com.write(new byte[] {'r', '\r', '\n'});
 	}
 
 	public void connect() {
@@ -85,6 +84,14 @@ public class MainActivity extends ActionBarActivity {
 
 	public void robotSetBar(byte value) {
 		comReadWrite(new byte[] { 'o', value, '\r', '\n' });
+	}
+	
+	public void robotMoveForward() {
+		comReadWrite(new byte[] {'w', '\r', '\n'});
+	}
+	
+	public void robotStop() {
+		comReadWrite(new byte[] {'s', '\r', '\n'});
 	}
 
 }
