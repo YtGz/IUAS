@@ -118,23 +118,42 @@ public class MainActivity extends ActionBarActivity {
 		squareTest((byte) 20);
 	}
 
-	/*
+	/**
 	 * If this is not working then have a closer look to:
 	 * http://www.iasj.net/iasj?func=fulltext&aId=94193, page 48
+	 * 
+	 * @param a
+	 *            The length of an arch of the lemniscate.
 	 */
 	public void lemniscateTest(byte a) {
-		// Set bounds wider than coordinates really used
-		double lowerBound = -4d * a;
-		double upperBound = 4d * a;
-		for (double x, y, t = 1d;; t++) {
-			x = (double) ((Math.cos(t) / (1d + Math.sin(t) * Math.sin(t))));
-			y = (double) ((Math.cos(t) * (Math.sin(t))) / (1d + Math.sin(t)
-					* Math.sin(t)));
-			double left = Helper.remap(lowerBound, upperBound, 0d, 100d, x);
-			double right = Helper.remap(lowerBound, lowerBound, 0d, 100d, y);
-			robotSetVelocity((byte) left, (byte) right);
-		}
+		/*
+		 * The smaller this value the more frequently the robot repeats it's
+		 * move & turn cycles along the path. A small value leads to more
+		 * accuracy but the robot will get slower. Number of move & turn cycles:
+		 * 2*pi/resolution.
+		 */
+		double resolution = .1;
 
+		double oldX = 0;
+		double oldY = 0;
+		for (double t = 0; t < 2 * Math.PI; t += resolution) {
+			double newX = a * Math.sqrt(2) * Math.cos(t) / (Math.sin(t) * Math.sin(t) + 1);
+			double newY = a * Math.sqrt(2) * Math.cos(t) * Math.sin(t) / (Math.sin(t) * Math.sin(t) + 1);
+
+			/*
+			 * converting to polar coordinates relative to current robot
+			 * position
+			 */
+			byte r = (byte) Math.sqrt((newX - oldX) * (newX - oldX) + (newY - oldY) * (newY - oldY));
+			byte phi = (byte) Math.atan2((newY - oldY), (newX - oldX));
+			newX = (int) (r * Math.cos(phi)) + oldX;
+			newY = (int) (r * Math.sin(phi)) + oldY;
+			System.out.println("forward movement: " + r + "cm   turn angle: " + phi + "°");
+			robotTurn(phi);
+			robotDrive(r);
+			oldX = newX;
+			oldY = newY;
+		}
 	}
 
 	public String retrieveSensorData() {
