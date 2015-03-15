@@ -1668,7 +1668,7 @@ containing a value of this type.
         public static final int icon=0x7f0b0026;
         public static final int ifRoom=0x7f0b0016;
         public static final int image=0x7f0b0023;
-        public static final int lemniscateTest=0x7f0b0041;
+        public static final int lemniscateTest=0x7f0b0040;
         public static final int listMode=0x7f0b000a;
         public static final int list_item=0x7f0b0025;
         public static final int middle=0x7f0b001d;
@@ -1693,10 +1693,10 @@ containing a value of this type.
         public static final int showHome=0x7f0b0011;
         public static final int showTitle=0x7f0b0012;
         public static final int split_action_bar=0x7f0b0004;
-        public static final int squareTest=0x7f0b0040;
+        public static final int squareTest=0x7f0b003f;
         public static final int submit_area=0x7f0b003c;
         public static final int tabMode=0x7f0b000c;
-        public static final int textLog=0x7f0b003f;
+        public static final int textLog=0x7f0b0041;
         public static final int title=0x7f0b0027;
         public static final int up=0x7f0b0001;
         public static final int useLogo=0x7f0b0013;
