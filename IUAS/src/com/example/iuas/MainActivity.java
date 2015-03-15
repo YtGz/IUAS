@@ -155,6 +155,13 @@ public class MainActivity extends ActionBarActivity {
 			oldY = newY;
 		}
 	}
+	
+	/*
+	 * The "Lemniscate Test"-button issues a lemniscate test with lemniscate arch length of 20 cm.
+	 */
+	public void lemniscateTestOnClick(View view) {
+		lemniscateTest((byte) 20);
+	}
 
 	public String retrieveSensorData() {
 
