@@ -16,7 +16,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="26dp"
         android:text="Square Test"
-        android:onClick="squareTest" />
+        android:onClick="squareTestOnClick" />
 
     <Button
         android:id="@+id/lemniscateTest"
@@ -26,7 +26,7 @@
         android:layout_below="@+id/squareTest"
         android:layout_marginTop="37dp"
         android:text="Lemniscate Test" 
-        android:onClick="lemniscateTest"/>
+        android:onClick="lemniscateTestOnClick"/>
 
     <TextView
         android:id="@+id/textLog"
