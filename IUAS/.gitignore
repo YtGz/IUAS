@@ -40,3 +40,9 @@ $RECYCLE.BIN/
 
 #other gitignore
 bin/classes/.gitignore
+
+#other projects in workspace
+.metadata
+/appcompat_v7/
+/FTDriver/
+/OpenCV Library - 2.4.10/
