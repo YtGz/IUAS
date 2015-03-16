@@ -33,8 +33,8 @@ class Surface extends JPanel {
         	/*Simulating inaccuracy of robot:*/
         	int r = (int) Math.sqrt((newX - oldX)*(newX - oldX) + (newY - oldY)*(newY - oldY));
         	int phi = (int) Math.atan2((newY - oldY), (newX - oldX));
-        	newX = (int) (r * Math.cos(phi)) + oldX;
-        	newY = (int) (r * Math.sin(phi)) + oldY;
+        	newX = (r * Math.cos(phi)) + oldX;
+        	newY = (r * Math.sin(phi)) + oldY;
         	System.out.println("forward movement: " + r + "cm   turn angle: " + phi + "°");
         	
         	g2d.drawLine((int)oldX, (int)oldY, (int)newX, (int)newY);

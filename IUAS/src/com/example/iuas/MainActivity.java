@@ -146,8 +146,8 @@ public class MainActivity extends ActionBarActivity {
 			 */
 			byte r = (byte) Math.sqrt((newX - oldX) * (newX - oldX) + (newY - oldY) * (newY - oldY));
 			byte phi = (byte) Math.atan2((newY - oldY), (newX - oldX));
-			newX = (int) (r * Math.cos(phi)) + oldX;
-			newY = (int) (r * Math.sin(phi)) + oldY;
+			newX = r * Math.cos(phi) + oldX;
+        	newY = r * Math.sin(phi) + oldY;
 			System.out.println("forward movement: " + r + "cm   turn angle: " + phi + "°");
 			robotTurn(phi);
 			robotDrive(r);
