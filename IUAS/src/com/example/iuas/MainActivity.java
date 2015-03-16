@@ -114,7 +114,7 @@ public class MainActivity extends ActionBarActivity {
 	 * The "Square Test"-button issues a square test with size 20 cm.
 	 */
 	public void squareTestOnClick(View view) {
-		bugStop();
+		//bugStop();
 		squareTest((byte) 20);
 	}
 
