@@ -15,7 +15,7 @@ class Surface extends JPanel {
 	 * A small value leads to more accuracy but the robot will get slower.
 	 * Number of move & turn cycles: 2*pi/resolution.
 	 */
-    private double resolution = .1;
+    private double resolution = .01;
     
     
     
