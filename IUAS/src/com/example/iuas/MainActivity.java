@@ -17,6 +17,7 @@ public class MainActivity extends ActionBarActivity {
 	private EditText programId;
 	private final int K = 1;	//offset correction for forward movement
 	private final int L = 1;	//offset correction for turning angle
+	private final byte[] SENSOR_OFFSETS = {1, 1, 1, 1, 1, 1};	//offsets of the individual sensors
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -272,7 +273,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	public void viewSensorOutput() {
-		//System.out.println(retrieveSensorData());
+		//System.out.println(retrieveSensorData());		//if byte[] and not String
 		String text = retrieveSensorData();
 		textLog.append(text);
 		System.out.println(text);
@@ -289,12 +290,22 @@ public class MainActivity extends ActionBarActivity {
 	
 	//Includes obstacle detection
 	public void navigate(byte x, byte y, byte theta) {
-		//TODO
+		byte r = (byte) Math.sqrt(x * x + y * y);
+		byte phi = (byte) Math.atan2(y, x);
+		robotTurn(phi);
+		for(; r > 0; r--) {
+			robotDrive((byte) 1);
+			byte[] t = bugZero(r, phi);
+			r = t[0];
+			phi = t[1];
+		}
+		robotTurn((byte) (theta - phi));
 	}
 
 	/*****************************************************************************************************************************************
 	 * Bug algorithms. *
 	 *****************************************************************************************************************************************/
+	//May not work
 	public void bugStop() {
 		for (;;) {
 			try {
@@ -308,8 +319,50 @@ public class MainActivity extends ActionBarActivity {
 		}
 	}
 
-	public void bugZero() {
-		// TODO
+	/**
+	 * Bug 0 algorithm
+	 * @param r		takes the remaining line to the goal as argument
+	 * @param phi
+	 * @return the new angle & distance to the obstacle
+	 */
+	public byte[] bugZero(byte r, byte phi) {
+		byte[] sensors = retrieveSensorData();
+		byte r2 = r;
+		byte phi2 = phi;
+		for(int i = 0; i < 6; i++) {
+			byte d = (byte) (sensors[i] + SENSOR_OFFSETS[i]);
+			if(d > 10 && d < 80) {
+				if(i == 2 || i == 3) {	//front sensors
+					//bug alg
+					do {
+						robotTurn((byte) 1);
+						phi2 += 1;
+						sensors = retrieveSensorData();
+					} while(sensors[i] < 10 || sensors[i] > 80);	//Turn until 90 degree to obstacle wall
+					do {
+						robotDrive((byte) 1);
+						r2 += 1;
+						sensors = retrieveSensorData();
+					} while(sensors[5] < 10 || sensors[5] > 80);	//check if right (left) sensor still pointing to obstacle wall
+					
+					//recalculate line to goal
+					double x = r * Math.cos(phi);
+					double y = r * Math.sin(phi);
+					double x2 = r2 * Math.cos(phi2);
+					double y2 = r2 * Math.sin(phi2);
+					
+					r = (byte) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
+					phi = (byte) Math.atan2((y2 - y), (x2 - x));
+					
+					robotTurn(phi);		//let robot face the goal again
+					
+					byte[] returnVal = {r, phi};
+					return returnVal;
+				}
+			}
+		}
+		byte[] returnVal = {r, phi};
+		return returnVal;
 	}
 
 	public void bugOne() {
