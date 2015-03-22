@@ -37,5 +37,25 @@
 
         <requestFocus />
     </EditText>
+    
+    <Button
+        android:id="@+id/run"
+        android:layout_width="200dp"
+        android:layout_height="120dp"
+        android:layout_above="@+id/textLog"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="42dp"
+        android:onClick="connect"
+        android:text="Connect" />
+        
+    <Button
+        android:id="@+id/run"
+        android:layout_width="200dp"
+        android:layout_height="120dp"
+        android:layout_above="@+id/textLog"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="42dp"
+        android:onClick="disconnect"
+        android:text="Disconnect" />
 
 </RelativeLayout>
