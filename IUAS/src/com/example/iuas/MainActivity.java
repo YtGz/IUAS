@@ -7,18 +7,21 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity {
 
 	private FTDriver com;
 	private TextView textLog;
+	private EditText programId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		textLog = (TextView) findViewById(R.id.textLog);
+		programId = (EditText) findViewById(R.id.programId);
 		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 		connect();
 	}
@@ -241,6 +244,23 @@ public class MainActivity extends ActionBarActivity {
 	 * if(detectObstacle()) { return; //Stop when detecting an obstacle }
 	 * comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' }); }
 	 */
+	
+	
+	
+	
+	public void runOnClick(View view) {
+		switch (Integer.parseInt(programId.getText().toString())) {
+			case 0:
+				textLog.append("0");
+				break;
+			case 1:
+				textLog.append("1");
+				break;
+			default:
+				textLog.append("The subroutine " + programId.getText().toString() + "does not exist");
+				System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
+		}
+	}
 
 	/*****************************************************************************************************************************************
 	 * Bug algorithms. *
