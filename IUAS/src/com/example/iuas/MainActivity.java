@@ -15,6 +15,8 @@ public class MainActivity extends ActionBarActivity {
 	private FTDriver com;
 	private TextView textLog;
 	private EditText programId;
+	private final int K = 1;	//offset correction for forward movement
+	private final int L = 1;	//offset correction for turning angle
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +79,12 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public void robotDrive(byte distance_cm) {
+		distance_cm *= K;
 		comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' });
 	}
 
 	public void robotTurn(byte degree) {
+		degree *= L;
 		comReadWrite(new byte[] { 'l', degree, '\r', '\n' });
 	}
 
@@ -166,6 +170,7 @@ public class MainActivity extends ActionBarActivity {
 		lemniscateTest((byte) 20);
 	}
 
+	//public byte[] retrieveSensorData() {
 	public String retrieveSensorData() {
 
 		/*
@@ -252,14 +257,39 @@ public class MainActivity extends ActionBarActivity {
 		switch (Integer.parseInt(programId.getText().toString())) {
 			case 0:
 				textLog.append("0");
+				//squareTest((byte) 20);
 				break;
 			case 1:
 				textLog.append("1");
+				//viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
 				break;
 			default:
 				textLog.append("The subroutine " + programId.getText().toString() + "does not exist");
 				System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
+				//robotDrive((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				//robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 		}
+	}
+	
+	public void viewSensorOutput() {
+		//System.out.println(retrieveSensorData());
+		String text = retrieveSensorData();
+		textLog.append(text);
+		System.out.println(text);
+	}
+	
+	//Robot heads straight for the goal, and in the end rotates according to theta
+	public void navigateIgnoringObstacles(byte x, byte y, byte theta) {
+		byte r = (byte) Math.sqrt(x * x + y * y);
+		byte phi = (byte) Math.atan2(y, x);
+		robotTurn(phi);
+		robotDrive(r);
+		robotTurn((byte) (theta - phi));
+	}
+	
+	//Includes obstacle detection
+	public void navigate(byte x, byte y, byte theta) {
+		//TODO
 	}
 
 	/*****************************************************************************************************************************************
