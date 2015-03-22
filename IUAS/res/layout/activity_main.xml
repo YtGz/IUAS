@@ -16,12 +16,31 @@
         android:layout_centerHorizontal="true" />
 
     <Button
+        android:id="@+id/connect"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_alignLeft="@+id/run"
+        android:layout_alignParentTop="true"
+        android:onClick="connect"
+        android:text="Connect" />
+
+    <Button
+        android:id="@+id/disconnect"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_alignLeft="@+id/connect"
+        android:layout_below="@+id/connect"
+        android:layout_marginTop="16dp"
+        android:onClick="disconnect"
+        android:text="Disconnect" />
+
+    <Button
         android:id="@+id/run"
         android:layout_width="200dp"
         android:layout_height="120dp"
-        android:layout_above="@+id/textLog"
+        android:layout_alignBottom="@+id/textLog"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="42dp"
+        android:layout_marginBottom="17dp"
         android:onClick="runOnClick"
         android:text="run" />
 
@@ -31,31 +50,11 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/run"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="46dp"
+        android:layout_marginBottom="15dp"
         android:ems="10"
         android:inputType="number" >
 
         <requestFocus />
     </EditText>
-    
-    <Button
-        android:id="@+id/connect"
-        android:layout_width="200dp"
-        android:layout_height="120dp"
-        android:layout_above="@+id/textLog"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="42dp"
-        android:onClick="connect"
-        android:text="Connect" />
-        
-    <Button
-        android:id="@+id/disconnect"
-        android:layout_width="200dp"
-        android:layout_height="120dp"
-        android:layout_above="@+id/textLog"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="42dp"
-        android:onClick="disconnect"
-        android:text="Disconnect" />
 
 </RelativeLayout>
