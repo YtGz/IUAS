@@ -21,7 +21,7 @@
         android:layout_height="60dp"
         android:layout_alignLeft="@+id/run"
         android:layout_alignParentTop="true"
-        android:onClick="connect"
+        android:onClick="connectOnClick"
         android:text="Connect" />
 
     <Button
@@ -31,7 +31,7 @@
         android:layout_alignLeft="@+id/connect"
         android:layout_below="@+id/connect"
         android:layout_marginTop="16dp"
-        android:onClick="disconnect"
+        android:onClick="disconnectOnClick"
         android:text="Disconnect" />
 
     <Button
