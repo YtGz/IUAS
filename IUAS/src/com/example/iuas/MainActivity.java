@@ -251,8 +251,13 @@ public class MainActivity extends ActionBarActivity {
 	 * comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' }); }
 	 */
 	
+	public void connectOnClick(View view) {
+		connect();
+	}
 	
-	
+	public void disconnectOnClick(View view) {
+		disconnect();
+	}
 	
 	public void runOnClick(View view) {
 		switch (Integer.parseInt(programId.getText().toString())) {
