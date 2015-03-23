@@ -101,7 +101,7 @@ public class MainActivity extends ActionBarActivity {
 			degree -= 127;
 			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -113,14 +113,14 @@ public class MainActivity extends ActionBarActivity {
 		else if (degree == 255) {
 			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -339,8 +339,8 @@ public class MainActivity extends ActionBarActivity {
 				//textLog.append("The subroutine " + programId.getText().toString() + "does not exist");
 				//System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
 				//textLog.append(programId.getText().toString());
-				robotDrive((int) (Integer.parseInt(programId.getText().toString())));			//To calibrate the forward movement (calculate k)
-				//robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
+				//robotDrive((int) (Integer.parseInt(programId.getText().toString())));			//To calibrate the forward movement (calculate k)
+				robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 		}
 	}
 	
