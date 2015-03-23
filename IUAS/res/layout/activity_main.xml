@@ -34,27 +34,22 @@
         android:onClick="disconnectOnClick"
         android:text="Disconnect" />
 
-    <Button
-        android:id="@+id/run"
-        android:layout_width="200dp"
-        android:layout_height="120dp"
-        android:layout_alignBottom="@+id/textLog"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="17dp"
-        android:onClick="runOnClick"
-        android:text="run" />
-
     <EditText
         android:id="@+id/programId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/run"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="15dp"
+        android:layout_centerVertical="true"
         android:ems="10"
-        android:inputType="number" >
+        android:inputType="number" />
 
-        <requestFocus />
-    </EditText>
+    <Button
+        android:id="@+id/run"
+        android:layout_width="200dp"
+        android:layout_height="120dp"
+        android:layout_below="@+id/programId"
+        android:layout_centerHorizontal="true"
+        android:onClick="runOnClick"
+        android:text="run" />
 
 </RelativeLayout>
