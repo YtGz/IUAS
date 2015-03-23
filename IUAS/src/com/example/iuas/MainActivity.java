@@ -15,7 +15,7 @@ public class MainActivity extends ActionBarActivity {
 	private FTDriver com;
 	private TextView textLog;
 	private EditText programId;
-	private final int K = 1;	//offset correction for forward movement
+	private final double K = .7;	//offset correction for forward movement
 	private final int L = 1;	//offset correction for turning angle
 	private final byte[] SENSOR_OFFSETS = {1, 1, 1, 1, 1, 1};	//offsets of the individual sensors
 
@@ -80,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public void robotDrive(int distance_cm) {
-		//distance_cm *= K;
+		distance_cm = (int) Math.ceil(distance_cm * K);
 		comReadWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
 	}
 
@@ -316,11 +316,11 @@ public class MainActivity extends ActionBarActivity {
 		switch (Integer.parseInt(programId.getText().toString())) {
 			case 0:
 				textLog.append("0");
-				//squareTest((byte) 20);
+				squareTest((byte) 20);
 				break;
 			case 1:
-				textLog.append("1");
-				//viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
+				//textLog.append("1");
+				viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
 				break;
 			case 2:
 				//lemniscateTest((byte) 20);
