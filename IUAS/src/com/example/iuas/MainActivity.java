@@ -336,8 +336,7 @@ public class MainActivity extends ActionBarActivity {
 				//System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
 				//textLog.append(programId.getText().toString());
 				//robotDrive((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
-				robotMoveForward();
-				//robotDrive((byte) 10);
+				robotDrive((byte) 10);
 				//robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 		}
 	}
