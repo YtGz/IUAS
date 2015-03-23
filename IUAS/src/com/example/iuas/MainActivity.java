@@ -15,8 +15,8 @@ public class MainActivity extends ActionBarActivity {
 	private FTDriver com;
 	private TextView textLog;
 	private EditText programId;
-	private final double K = .7;	//offset correction for forward movement
-	private final int L = 1;	//offset correction for turning angle
+	private final double K = 2;	//offset correction for forward movement
+	private final double L = 1.14;	//offset correction for turning angle
 	private final byte[] SENSOR_OFFSETS = {1, 1, 1, 1, 1, 1};	//offsets of the individual sensors
 
 	@Override
@@ -81,12 +81,16 @@ public class MainActivity extends ActionBarActivity {
 
 	public void robotDrive(int distance_cm) {
 		distance_cm = (int) Math.ceil(distance_cm * K);
+		if (distance_cm == 10)	distance_cm = 11;
 		comReadWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
 	}
 
 	public void robotTurn(int degree) {
-		//degree *= L;
+		degree = (int) Math.ceil(degree * L);
 		
+		if (degree == 10) {
+			degree = 11;
+		}
 		// case 1: Turn right
 		if (degree > 255 && degree < 360) {
 			degree -= 104;
@@ -97,7 +101,7 @@ public class MainActivity extends ActionBarActivity {
 			degree -= 127;
 			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -109,14 +113,14 @@ public class MainActivity extends ActionBarActivity {
 		else if (degree == 255) {
 			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
