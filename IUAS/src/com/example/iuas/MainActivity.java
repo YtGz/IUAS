@@ -79,9 +79,9 @@ public class MainActivity extends ActionBarActivity {
 		comReadWrite(new byte[] { 'u', red, blue, '\r', '\n' });
 	}
 
-	public void robotDrive(byte distance_cm) {
+	public void robotDrive(int distance_cm) {
 		//distance_cm *= K;
-		comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' });
+		comReadWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
 	}
 
 	public void robotTurn(byte degree) {
@@ -336,7 +336,7 @@ public class MainActivity extends ActionBarActivity {
 				//System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
 				//textLog.append(programId.getText().toString());
 				//robotDrive((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
-				robotDrive((byte) 10);
+				robotDrive(20);
 				//robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 		}
 	}
