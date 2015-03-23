@@ -31,7 +31,7 @@ public class MainActivity extends ActionBarActivity {
 
 	public void connect() {
 		if (com.begin(FTDriver.BAUD9600)) {
-			textLog.append("Connected\n");
+			textLog.append("Connected\nWillkommen in der Unterwelt!\n");
 		} else {
 			textLog.append("Not connected\n");
 		}
@@ -40,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
 	public void disconnect() {
 		com.end();
 		if (!com.isConnected()) {
-			textLog.append("disconnected\n");
+			textLog.append("Disconnected\n");
 		}
 	}
 
@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity {
 		if (com.isConnected()) {
 			com.write(data);
 		} else {
-			textLog.append("not connected\n");
+			textLog.append("Not connected\n");
 		}
 	}
 
@@ -84,7 +84,7 @@ public class MainActivity extends ActionBarActivity {
 		comReadWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
 	}
 
-	public void robotTurn(byte degree) {
+	public void robotTurn(int degree) {
 		//degree *= L;
 		
 		// case 1: Turn right
@@ -95,38 +95,38 @@ public class MainActivity extends ActionBarActivity {
 		// case 2: Turn left 2 times
 		else if (degree > 127 && degree < 255) {
 			degree -= 127;
-			comReadWrite(new byte[] { 'l', 127, '\r', '\n' });
+			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			comReadWrite(new byte[] { 'l', degree, '\r', '\n' });
+			comReadWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
 		}
 		
 		// case 3: Turn left 3 times
 		else if (degree == 255) {
-			comReadWrite(new byte[] { 'l', 127, '\r', '\n' });
+			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			comReadWrite(new byte[] { 'l', 127, '\r', '\n' });
+			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			comReadWrite(new byte[] { 'l', 1, '\r', '\n' });
+			comReadWrite(new byte[] { 'l', (byte) (1), '\r', '\n' });
 		}
 		
 		// case 4: Turn left
 		else {
-			comReadWrite(new byte[] { 'l', degree, '\r', '\n' });
+			comReadWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
 		}
 	}
 
@@ -152,7 +152,7 @@ public class MainActivity extends ActionBarActivity {
 	 * @param size
 	 *            the side length of the square in cm
 	 */
-	public void squareTest(byte size) {
+	public void squareTest(int size) {
 		for (int i = 0; i < 4; i++) {
 			robotDrive(size);
 			try {
@@ -161,7 +161,7 @@ public class MainActivity extends ActionBarActivity {
 				// TODO Automatisch generierter Erfassungsblock
 				e.printStackTrace();
 			}
-			robotTurn((byte) 90);
+			robotTurn((byte) (90));
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
@@ -176,7 +176,7 @@ public class MainActivity extends ActionBarActivity {
 	 */
 	public void squareTestOnClick(View view) {
 		//bugStop();
-		squareTest((byte) 20);
+		squareTest((byte) (20));
 	}
 
 	/**
@@ -335,8 +335,7 @@ public class MainActivity extends ActionBarActivity {
 				//textLog.append("The subroutine " + programId.getText().toString() + "does not exist");
 				//System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
 				//textLog.append(programId.getText().toString());
-				//robotDrive((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
-				robotDrive(20);
+				robotDrive((int) (Integer.parseInt(programId.getText().toString())));			//To calibrate the forward movement (calculate k)
 				//robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 		}
 	}
