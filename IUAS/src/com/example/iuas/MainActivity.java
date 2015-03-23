@@ -80,13 +80,54 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public void robotDrive(byte distance_cm) {
-		distance_cm *= K;
+		//distance_cm *= K;
 		comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' });
 	}
 
 	public void robotTurn(byte degree) {
-		degree *= L;
-		comReadWrite(new byte[] { 'l', degree, '\r', '\n' });
+		//degree *= L;
+		
+		// case 1: Turn right
+		if (degree > 255 && degree < 360) {
+			degree -= 104;
+		}
+		
+		// case 2: Turn left 2 times
+		else if (degree > 127 && degree < 255) {
+			degree -= 127;
+			comReadWrite(new byte[] { 'l', 127, '\r', '\n' });
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			comReadWrite(new byte[] { 'l', degree, '\r', '\n' });
+		}
+		
+		// case 3: Turn left 3 times
+		else if (degree == 255) {
+			comReadWrite(new byte[] { 'l', 127, '\r', '\n' });
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			comReadWrite(new byte[] { 'l', 127, '\r', '\n' });
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			comReadWrite(new byte[] { 'l', 1, '\r', '\n' });
+		}
+		
+		// case 4: Turn left
+		else {
+			comReadWrite(new byte[] { 'l', degree, '\r', '\n' });
+		}
 	}
 
 	public void robotSetVelocity(byte left, byte right) {
@@ -293,7 +334,10 @@ public class MainActivity extends ActionBarActivity {
 			default:
 				//textLog.append("The subroutine " + programId.getText().toString() + "does not exist");
 				//System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
-				robotDrive((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				//textLog.append(programId.getText().toString());
+				//robotDrive((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				robotMoveForward();
+				//robotDrive((byte) 10);
 				//robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 		}
 	}
