@@ -114,7 +114,19 @@ public class MainActivity extends ActionBarActivity {
 	public void squareTest(byte size) {
 		for (int i = 0; i < 4; i++) {
 			robotDrive(size);
+			try {
+				Thread.sleep(size*500);
+			} catch (InterruptedException e) {
+				// TODO Automatisch generierter Erfassungsblock
+				e.printStackTrace();
+			}
 			robotTurn((byte) 90);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Automatisch generierter Erfassungsblock
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -269,10 +281,19 @@ public class MainActivity extends ActionBarActivity {
 				textLog.append("1");
 				//viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
 				break;
+			case 2:
+				//lemniscateTest((byte) 20);
+				break;
+			case 3:
+				//navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
+				break;
+			case 4:
+				//navigate((byte) 4 , (byte) 5, (byte) 0);
+				break;
 			default:
-				textLog.append("The subroutine " + programId.getText().toString() + "does not exist");
-				System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
-				//robotDrive((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				//textLog.append("The subroutine " + programId.getText().toString() + "does not exist");
+				//System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
+				robotDrive((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
 				//robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 		}
 	}
