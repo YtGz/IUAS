@@ -321,9 +321,9 @@ public class MainActivity extends ActionBarActivity {
 		robotTurn(phi);
 		for(; r > 0; r--) {
 			robotDrive((byte) 1);
-			byte[] t = bugZero(r, phi);
+			/*byte[] t = bugZero(r, phi);
 			r = t[0];
-			phi = t[1];
+			phi = t[1];*/
 		}
 		robotTurn((byte) (theta - phi));
 	}
@@ -351,7 +351,7 @@ public class MainActivity extends ActionBarActivity {
 	 * @param phi
 	 * @return the new angle & distance to the obstacle
 	 */
-	public byte[] bugZero(byte r, byte phi) {
+	/*public byte[] bugZero(byte r, byte phi) {
 		byte[] sensors = retrieveSensorData();
 		byte r2 = r;
 		byte phi2 = phi;
@@ -389,7 +389,7 @@ public class MainActivity extends ActionBarActivity {
 		}
 		byte[] returnVal = {r, phi};
 		return returnVal;
-	}
+	}*/
 
 	public void bugOne() {
 		// TODO
