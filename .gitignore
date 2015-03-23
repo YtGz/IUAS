@@ -1,6 +1,8 @@
 # Ignore Play! working directory #
 /bin/
 /db/
+/gen/
+.project.properties
 .eclipse/
 .project/
 .classpath/
