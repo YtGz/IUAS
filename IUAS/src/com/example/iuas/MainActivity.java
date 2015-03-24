@@ -215,7 +215,19 @@ public class MainActivity extends ActionBarActivity {
         	newY = r * Math.sin(phi) + oldY;
 			System.out.println("forward movement: " + r + "cm   turn angle: " + phi + "°");
 			robotTurn(phi);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			robotDrive(r);
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			oldX = newX;
 			oldY = newY;
 		}
@@ -275,23 +287,27 @@ public class MainActivity extends ActionBarActivity {
 		 * measure if the voltage is higher than 2 or 3 Volt, depending on how
 		 * big the threshold for the distance shall be.
 		 */
-		boolean encounteredAnObstacle = false;
+		/*boolean encounteredAnObstacle = false;
 		String sensorData = retrieveSensorData();
 		ArrayList<Float> volts = parseDataString(sensorData);
 		for (float v : volts) {
 			if (v > 2.5) {
 				encounteredAnObstacle = true;
 			}
-		}
-		return encounteredAnObstacle;
+		}*/
+		return false;
 	}
 
-	public ArrayList<Float> parseDataString(String dataSring) {
+	public int[] parseDataString(String dataSring) {
 		String[] tokens = dataSring.trim().split("\\s++");
-		ArrayList<Float> values = new ArrayList<Float>();
-		for (String t : tokens) {
-			values.add(Float.parseFloat(t));
+		for(int i = 0; i < tokens.length; i++){
+			tokens[i] = tokens[i].substring(2);
 		}
+		
+		int[] values = new int[3];
+		values [0] = (int) Integer.valueOf(tokens[6],16);
+		values [1] = (int) Integer.valueOf(tokens[7],16);
+		values [2] = (int) Integer.valueOf(tokens[8],16);
 		return values;
 	}
 
@@ -346,9 +362,8 @@ public class MainActivity extends ActionBarActivity {
 	
 	public void viewSensorOutput() {
 		//System.out.println(retrieveSensorData());		//if byte[] and not String
-		String text = retrieveSensorData();
-		textLog.append(text);
-		System.out.println(text);
+		int [] temp = parseDataString(retrieveSensorData());
+		textLog.setText(String.valueOf(temp[0])+ " " + String.valueOf(temp[1]) + " " + String.valueOf(temp[2]));
 	}
 	
 	//Robot heads straight for the goal, and in the end rotates according to theta
@@ -356,7 +371,19 @@ public class MainActivity extends ActionBarActivity {
 		byte r = (byte) Math.sqrt(x * x + y * y);
 		byte phi = (byte) Math.atan2(y, x);
 		robotTurn(phi);
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		robotDrive(r);
+		try {
+			Thread.sleep(r*1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		robotTurn((byte) (theta - phi));
 	}
 	
