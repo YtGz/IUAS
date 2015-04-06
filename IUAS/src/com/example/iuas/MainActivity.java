@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import jp.ksksue.driver.serial.FTDriver;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.EditText;
@@ -15,10 +16,12 @@ public class MainActivity extends ActionBarActivity {
 	private FTDriver com;
 	private TextView textLog;
 	private EditText programId;
-	private final double K = 2;	//offset correction for forward movement
+	private final double K = 1.358;	//offset correction for forward movement
 	private final double L = 1.14;	//offset correction for turning angle
-	private final byte[] SENSOR_OFFSETS = {1, 1, 1, 1, 1, 1};	//offsets of the individual sensors
-
+	private final byte[] SENSOR_OFFSETS = {1, 1, 1};	//offsets of the individual sensors
+	private final int R_TIME = 1500;	//The number of milliseconds to wait for a rotation of max. 127°
+	private final double M_SPEED = 14.2;	//The default velocity of the robot in cm/s
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -28,6 +31,14 @@ public class MainActivity extends ActionBarActivity {
 		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 		connect();
 	}
+	
+	
+	
+	
+	
+	/**************************************************************************************************************************************
+	 * Basic robot commands.																											  *
+	 **************************************************************************************************************************************/
 
 	public void connect() {
 		if (com.begin(FTDriver.BAUD9600)) {
@@ -81,56 +92,88 @@ public class MainActivity extends ActionBarActivity {
 
 	public void robotDrive(int distance_cm) {
 		distance_cm = (int) Math.ceil(distance_cm * K);
-		if (distance_cm == 10)	distance_cm = 11;
-		comReadWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
+		
+		if(distance_cm < 0) {
+			distance_cm = Math.abs(distance_cm);
+			while(distance_cm > 127) {
+				comWrite(new byte[] { 'k', (byte) (129), '\r', '\n' });
+				distance_cm -= 127;						
+				try {
+					Thread.sleep((long) Math.ceil(127*1000/K/M_SPEED));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			comWrite(new byte[] { 'k', (byte) (256-distance_cm), '\r', '\n' });
+			try {
+				Thread.sleep((long) Math.ceil(distance_cm*1000/K/M_SPEED));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			while(distance_cm > 127) {
+				comWrite(new byte[] { 'k', (byte) (127), '\r', '\n' });
+				distance_cm -= 127;
+				try {
+					Thread.sleep((long) Math.ceil(127*1000/K/M_SPEED));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			if (distance_cm == 10) {
+				distance_cm = 11;
+			}
+			comWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
+			try {
+				Thread.sleep((long) Math.ceil(distance_cm*1000/K/M_SPEED));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}	
+		}
 	}
 
 	public void robotTurn(int degree) {
 		degree = (int) Math.ceil(degree * L);
 		
-		if (degree == 10) {
-			degree = 11;
-		}
-		// case 1: Turn right
-		if (degree > 255 && degree < 360) {
-			degree -= 104;
-		}
-		
-		// case 2: Turn left 2 times
-		else if (degree > 127 && degree < 255) {
-			degree -= 127;
-			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
+		if(degree < 0) {
+			degree = Math.abs(degree);
+			while(degree > 127) {
+				comWrite(new byte[] { 'l', (byte) (129), '\r', '\n' });
+				degree -= 127;
+				try {
+					Thread.sleep(R_TIME);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			comWrite(new byte[] { 'l', (byte) (256-degree), '\r', '\n' });
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(R_TIME);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			comReadWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
 		}
 		
-		// case 3: Turn left 3 times
-		else if (degree == 255) {
-			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			comReadWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			comReadWrite(new byte[] { 'l', (byte) (1), '\r', '\n' });
-		}
-		
-		// case 4: Turn left
 		else {
-			comReadWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
+			while(degree > 127) {
+				comWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
+				degree -= 127;
+				try {
+					Thread.sleep(R_TIME);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			if (degree == 10) {
+				degree = 11;
+			}
+			comWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
+			try {
+				Thread.sleep(R_TIME);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -150,6 +193,19 @@ public class MainActivity extends ActionBarActivity {
 		comReadWrite(new byte[] { 's', '\r', '\n' });
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	/*************************************************************************************************************************************************
+	 * Exercise 2																																	 *
+	 *************************************************************************************************************************************************/
+	
+	
+	
 	/**
 	 * The square test is used to determine accuracy of odometry
 	 * 
@@ -159,28 +215,8 @@ public class MainActivity extends ActionBarActivity {
 	public void squareTest(int size) {
 		for (int i = 0; i < 4; i++) {
 			robotDrive(size);
-			try {
-				Thread.sleep(size*500);
-			} catch (InterruptedException e) {
-				// TODO Automatisch generierter Erfassungsblock
-				e.printStackTrace();
-			}
-			robotTurn((byte) (90));
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Automatisch generierter Erfassungsblock
-				e.printStackTrace();
-			}
+			robotTurn(90);
 		}
-	}
-
-	/*
-	 * The "Square Test"-button issues a square test with size 20 cm.
-	 */
-	public void squareTestOnClick(View view) {
-		//bugStop();
-		squareTest((byte) (20));
 	}
 
 	/**
@@ -190,7 +226,7 @@ public class MainActivity extends ActionBarActivity {
 	 * @param a
 	 *            The length of an arch of the lemniscate.
 	 */
-	public void lemniscateTest(byte a) {
+	public void lemniscateTest(int a) {
 		/*
 		 * The smaller this value the more frequently the robot repeats it's
 		 * move & turn cycles along the path. A small value leads to more
@@ -210,41 +246,29 @@ public class MainActivity extends ActionBarActivity {
 			 * position
 			 */
 			byte r = (byte) Math.sqrt((newX - oldX) * (newX - oldX) + (newY - oldY) * (newY - oldY));
-			byte phi = (byte) Math.atan2((newY - oldY), (newX - oldX));
+			byte phi = (byte) Math.ceil(Math.atan2((newY - oldY), (newX - oldX)));
 			newX = r * Math.cos(phi) + oldX;
         	newY = r * Math.sin(phi) + oldY;
-			System.out.println("forward movement: " + r + "cm   turn angle: " + phi + "°");
+			textLog.setText(String.valueOf("forward movement: " + r + "cm   turn angle: " + phi + "°"));
 			robotTurn(phi);
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			robotDrive(r);
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			oldX = newX;
 			oldY = newY;
 		}
 	}
 	
-	/*
-	 * The "Lemniscate Test"-button issues a lemniscate test with lemniscate arch length of 20 cm.
-	 */
-	public void lemniscateTestOnClick(View view) {
-		lemniscateTest((byte) 20);
-	}
+	
+	
+	
+	
+	/********************************************************************************************************************************************************
+	 * Exercise 3																																			*
+	 ********************************************************************************************************************************************************/
 
-	//public byte[] retrieveSensorData() {
+	
 	public String retrieveSensorData() {
-
-		/*
-		 * From the bachelor thesis:
+		
+		/* From the bachelor thesis:
 		 * 
 		 * "Sensor data can be retrieved via the ’q’ command. [...] The
 		 * returning string contains measurements of all sensors formated as
@@ -254,6 +278,24 @@ public class MainActivity extends ActionBarActivity {
 		return comReadWrite(new byte[] { 'q', '\r', '\n' });
 	}
 
+	public int[] parseDataString(String dataSring) {
+		String[] tokens = dataSring.trim().split("\\s++");
+		for(int i = 0; i < tokens.length; i++){
+			tokens[i] = tokens[i].substring(2);
+		}
+		
+		int[] values = new int[3];
+		values [0] = (int) Integer.valueOf(tokens[6],16);
+		values [1] = (int) Integer.valueOf(tokens[7],16);
+		values [2] = (int) Integer.valueOf(tokens[8],16);
+		return values;
+	}
+
+	public void viewSensorOutput() {
+		int [] temp = parseDataString(retrieveSensorData());
+		textLog.setText(String.valueOf(temp[0])+ " " + String.valueOf(temp[1]) + " " + String.valueOf(temp[2]));
+	}
+	
 	/**
 	 * Returns true if there is an obstacle roughly ~8cm away from the robot.
 	 * 
@@ -297,20 +339,7 @@ public class MainActivity extends ActionBarActivity {
 		}*/
 		return false;
 	}
-
-	public int[] parseDataString(String dataSring) {
-		String[] tokens = dataSring.trim().split("\\s++");
-		for(int i = 0; i < tokens.length; i++){
-			tokens[i] = tokens[i].substring(2);
-		}
-		
-		int[] values = new int[3];
-		values [0] = (int) Integer.valueOf(tokens[6],16);
-		values [1] = (int) Integer.valueOf(tokens[7],16);
-		values [2] = (int) Integer.valueOf(tokens[8],16);
-		return values;
-	}
-
+	
 	// Just for the case simultaneous driving and measuring don't work.
 	/**
 	 * Robot stops after once every cm to see if there are obstacles.
@@ -323,48 +352,7 @@ public class MainActivity extends ActionBarActivity {
 	 * if(detectObstacle()) { return; //Stop when detecting an obstacle }
 	 * comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' }); }
 	 */
-	
-	public void connectOnClick(View view) {
-		connect();
-	}
-	
-	public void disconnectOnClick(View view) {
-		disconnect();
-	}
-	
-	public void runOnClick(View view) {
-		switch (Integer.parseInt(programId.getText().toString())) {
-			case 0:
-				textLog.append("0");
-				squareTest((byte) 20);
-				break;
-			case 1:
-				//textLog.append("1");
-				viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
-				break;
-			case 2:
-				//lemniscateTest((byte) 20);
-				break;
-			case 3:
-				//navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
-				break;
-			case 4:
-				//navigate((byte) 4 , (byte) 5, (byte) 0);
-				break;
-			default:
-				//textLog.append("The subroutine " + programId.getText().toString() + "does not exist");
-				//System.out.println("The subroutine " + programId.getText().toString() + "does not exist");
-				//textLog.append(programId.getText().toString());
-				//robotDrive((int) (Integer.parseInt(programId.getText().toString())));			//To calibrate the forward movement (calculate k)
-				robotTurn((byte)Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
-		}
-	}
-	
-	public void viewSensorOutput() {
-		//System.out.println(retrieveSensorData());		//if byte[] and not String
-		int [] temp = parseDataString(retrieveSensorData());
-		textLog.setText(String.valueOf(temp[0])+ " " + String.valueOf(temp[1]) + " " + String.valueOf(temp[2]));
-	}
+
 	
 	//Robot heads straight for the goal, and in the end rotates according to theta
 	public void navigateIgnoringObstacles(byte x, byte y, byte theta) {
@@ -401,8 +389,13 @@ public class MainActivity extends ActionBarActivity {
 		robotTurn((byte) (theta - phi));
 	}
 
+	
+	
+	
+	
+	
 	/*****************************************************************************************************************************************
-	 * Bug algorithms. *
+	 * Bug algorithms. 																														 *
 	 *****************************************************************************************************************************************/
 	//May not work
 	public void bugStop() {
@@ -424,25 +417,25 @@ public class MainActivity extends ActionBarActivity {
 	 * @param phi
 	 * @return the new angle & distance to the obstacle
 	 */
-	/*public byte[] bugZero(byte r, byte phi) {
-		byte[] sensors = retrieveSensorData();
+	public byte[] bugZero(byte r, byte phi) {
+		int[] sensors = parseDataString(retrieveSensorData());
 		byte r2 = r;
 		byte phi2 = phi;
-		for(int i = 0; i < 6; i++) {
+		for(int i = 0; i < 3; i++) {
 			byte d = (byte) (sensors[i] + SENSOR_OFFSETS[i]);
 			if(d > 10 && d < 80) {
-				if(i == 2 || i == 3) {	//front sensors
+				if(i == 1) {	//front sensors
 					//bug alg
 					do {
 						robotTurn((byte) 1);
 						phi2 += 1;
-						sensors = retrieveSensorData();
+						sensors = parseDataString(retrieveSensorData());
 					} while(sensors[i] < 10 || sensors[i] > 80);	//Turn until 90 degree to obstacle wall
 					do {
 						robotDrive((byte) 1);
 						r2 += 1;
-						sensors = retrieveSensorData();
-					} while(sensors[5] < 10 || sensors[5] > 80);	//check if right (left) sensor still pointing to obstacle wall
+						sensors = parseDataString(retrieveSensorData());
+					} while(sensors[2] < 10 || sensors[2] > 80);	//check if right (left) sensor still pointing to obstacle wall
 					
 					//recalculate line to goal
 					double x = r * Math.cos(phi);
@@ -462,7 +455,7 @@ public class MainActivity extends ActionBarActivity {
 		}
 		byte[] returnVal = {r, phi};
 		return returnVal;
-	}*/
+	}
 
 	public void bugOne() {
 		// TODO
@@ -470,5 +463,45 @@ public class MainActivity extends ActionBarActivity {
 
 	public void bugTwo() {
 		// TODO
+	}
+	
+	
+	
+	
+	
+	
+	/***************************************************************************************************************************************************
+	 *	UI methods																																	   *
+	 ***************************************************************************************************************************************************/
+	
+	public void connectOnClick(View view) {
+		connect();
+	}
+	
+	public void disconnectOnClick(View view) {
+		disconnect();
+	}
+	
+	public void runOnClick(View view) {
+		switch (Integer.parseInt(programId.getText().toString())) {
+			case 0:
+				squareTest(20);
+				break;
+			case 1:
+				viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
+				break;
+			case 2:
+				lemniscateTest(20);
+				break;
+			case 3:
+				//navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
+				break;
+			case 4:
+				//navigate((byte) 4 , (byte) 5, (byte) 0);
+				break;
+			default:
+				robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				//robotTurn(Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
+		}
 	}
 }
