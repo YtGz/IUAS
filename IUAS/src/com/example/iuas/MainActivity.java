@@ -21,6 +21,7 @@ public class MainActivity extends ActionBarActivity {
 	private final byte[] SENSOR_OFFSETS = {1, 1, 1};	//offsets of the individual sensors
 	private final int R_TIME = 1500;	//The number of milliseconds to wait for a rotation of max. 127°
 	private final double M_SPEED = 14.2;	//The default velocity of the robot in cm/s
+	private final int WHEEL_SPACING = 19;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +88,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public void robotSetLeds(byte red, byte blue) {
-		comReadWrite(new byte[] { 'u', red, blue, '\r', '\n' });
+		comWrite(new byte[] { 'u', red, blue, '\r', '\n' });
 	}
 
 	public void robotDrive(int distance_cm) {
@@ -256,6 +257,37 @@ public class MainActivity extends ActionBarActivity {
 			oldY = newY;
 		}
 	}
+
+	
+	/**
+	 * Not very accurate, but works.
+	 * Robot drives two circles, not a real lemniscate.
+	 * 
+	 * @param a  The length of an arch of the lemniscate.
+	 */
+	public void lemniscateTestVer3(int a) {
+		double r = (WHEEL_SPACING + a) / 2;		//the radius of the circle of the outer wheel
+		double s = 2 * Math.PI * (r - WHEEL_SPACING/2);
+		double s1 = 2 * Math.PI * (r - WHEEL_SPACING);
+		double s2 = 2 * Math.PI * r;
+		int v = 14;		//how fast the robot should drive
+		double t = s/v;
+		byte v1 = (byte) Math.round(s1/t);
+		byte v2 = (byte) Math.round(s2/t);
+		robotSetVelocity(v1, v2);
+		try {
+			Thread.sleep((long) t * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		robotSetVelocity(v2, v1);
+		try {
+			Thread.sleep((long) t * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		robotSetVelocity((byte) 0, (byte) 0);
+	}
 	
 	
 	
@@ -278,8 +310,8 @@ public class MainActivity extends ActionBarActivity {
 		return comReadWrite(new byte[] { 'q', '\r', '\n' });
 	}
 
-	public int[] parseDataString(String dataSring) {
-		String[] tokens = dataSring.trim().split("\\s++");
+	public int[] parseDataString(String dataString) {
+		String[] tokens = dataString.trim().split("\\s++");
 		for(int i = 0; i < tokens.length; i++){
 			tokens[i] = tokens[i].substring(2);
 		}
@@ -488,10 +520,11 @@ public class MainActivity extends ActionBarActivity {
 				squareTest(20);
 				break;
 			case 1:
-				viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
+				textLog.setText(retrieveSensorData());
+				//viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
 				break;
 			case 2:
-				lemniscateTest(20);
+				lemniscateTestVer3(80);
 				break;
 			case 3:
 				//navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
@@ -500,8 +533,9 @@ public class MainActivity extends ActionBarActivity {
 				//navigate((byte) 4 , (byte) 5, (byte) 0);
 				break;
 			default:
-				robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				//robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
 				//robotTurn(Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
+				lemniscateTestVer3(Integer.parseInt(programId.getText().toString()));
 		}
 	}
 }
