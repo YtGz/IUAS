@@ -179,19 +179,19 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public void robotSetVelocity(byte left, byte right) {
-		comReadWrite(new byte[] { 'i', left, right, '\r', '\n' });
+		comWrite(new byte[] { 'i', left, right, '\r', '\n' });
 	}
 
 	public void robotSetBar(byte value) {
-		comReadWrite(new byte[] { 'o', value, '\r', '\n' });
+		comWrite(new byte[] { 'o', value, '\r', '\n' });
 	}
 
 	public void robotMoveForward() {
-		comReadWrite(new byte[] { 'w', '\r', '\n' });
+		comWrite(new byte[] { 'w', '\r', '\n' });
 	}
 
 	public void robotStop() {
-		comReadWrite(new byte[] { 's', '\r', '\n' });
+		comWrite(new byte[] { 's', '\r', '\n' });
 	}
 
 	
@@ -265,7 +265,7 @@ public class MainActivity extends ActionBarActivity {
 	 * 
 	 * @param a  The length of an arch of the lemniscate.
 	 */
-	public void lemniscateTestVer3(int a) {
+	public void lemniscateTestVer2(int a) {
 		double r = (WHEEL_SPACING + a) / 2;		//the radius of the circle of the outer wheel
 		double s = 2 * Math.PI * (r - WHEEL_SPACING/2);
 		double s1 = 2 * Math.PI * (r - WHEEL_SPACING);
@@ -334,42 +334,15 @@ public class MainActivity extends ActionBarActivity {
 	 * @return
 	 */
 	public boolean detectObstacle() {
-
-		/*
-		 * From the bachelor thesis:
-		 * 
-		 * "IR sensors output a voltage signal which correlates to the distance
-		 * between the sensor and an object in front of the sensor. Do note that
-		 * this correlation is not linear (section 3.6). The provided voltage
-		 * output is read via an analog to digital converter (ADC) and is then
-		 * available as digital value which can be passed to the Android
-		 * application."
-		 * 
-		 * and
-		 * 
-		 * "The IR sensors are used to detect obstacles. This sensor measures
-		 * the distance using a positive sensitive detector (PSD) and an
-		 * infrared emitting diode (RED). According to the datasheet [12] its
-		 * measuring distance ranges from 100 mm to 800 mm . Using this infrared
-		 * sensor it is easy to measure distances fast and accurate. It is
-		 * supplied with 5 V and provides analog output voltage related to the
-		 * measured distance. Figure 9 shows this characteristic. Note that the
-		 * relation between distance and sensor output is not linear. The output
-		 * of the sensors are read by ADCs on the control board."
-		 * 
-		 * Figure 9 suggests that to check for objects ~8cm away we have to
-		 * measure if the voltage is higher than 2 or 3 Volt, depending on how
-		 * big the threshold for the distance shall be.
-		 */
-		/*boolean encounteredAnObstacle = false;
+		boolean encounteredAnObstacle = false;
 		String sensorData = retrieveSensorData();
-		ArrayList<Float> volts = parseDataString(sensorData);
-		for (float v : volts) {
-			if (v > 2.5) {
+		int[] dst = parseDataString(sensorData);
+		for (int i = 0; i < 3; i++) {
+			if (dst[i] > 10 && dst[i] < 30) {
 				encounteredAnObstacle = true;
 			}
-		}*/
-		return false;
+		}
+		return encounteredAnObstacle;
 	}
 	
 	// Just for the case simultaneous driving and measuring don't work.
@@ -385,6 +358,33 @@ public class MainActivity extends ActionBarActivity {
 	 * comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' }); }
 	 */
 
+	public void stopAndGo(int distance) {
+		robotDrive(distance);
+		/*for(;;) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if(detectObstacle()) {
+				robotStop();
+				for(int i = 0; i < 4; i++) {
+					robotSetLeds((byte) 0, (byte) 1);
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					robotSetLeds((byte) 1, (byte) 0);
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}*/
+	}
 	
 	//Robot heads straight for the goal, and in the end rotates according to theta
 	public void navigateIgnoringObstacles(byte x, byte y, byte theta) {
@@ -507,11 +507,33 @@ public class MainActivity extends ActionBarActivity {
 	 ***************************************************************************************************************************************************/
 	
 	public void connectOnClick(View view) {
-		connect();
+		//connect();
+		if(detectObstacle()) {
+			//robotStop();
+			for(int i = 0; i < 4; i++) {
+				robotSetLeds((byte) 0, (byte) 128);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				robotSetLeds((byte) 255, (byte) 0);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			robotSetLeds((byte) 0, (byte) 0);
+		}
+		
 	}
 	
 	public void disconnectOnClick(View view) {
-		disconnect();
+		//disconnect();
+		if(detectObstacle()) {
+			robotSetBar((byte) 255);
+		}
 	}
 	
 	public void runOnClick(View view) {
@@ -520,11 +542,11 @@ public class MainActivity extends ActionBarActivity {
 				squareTest(20);
 				break;
 			case 1:
-				textLog.setText(retrieveSensorData());
-				//viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
+				//textLog.setText(retrieveSensorData());
+				viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
 				break;
 			case 2:
-				lemniscateTestVer3(80);
+				lemniscateTestVer2(50);
 				break;
 			case 3:
 				//navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
@@ -533,9 +555,9 @@ public class MainActivity extends ActionBarActivity {
 				//navigate((byte) 4 , (byte) 5, (byte) 0);
 				break;
 			default:
-				//robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
 				//robotTurn(Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
-				lemniscateTestVer3(Integer.parseInt(programId.getText().toString()));
-		}
+				//stopAndGo(Integer.parseInt(programId.getText().toString()));
+			}
 	}
 }
