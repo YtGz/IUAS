@@ -367,14 +367,21 @@ public class MainActivity extends ActionBarActivity {
 			distance -= 12;
 			if(detectObstacle()) {
 				robotStop();
+				distance = 0;
 				for(int i = 0; i < 4; i++) {
-					robotSetLeds((byte) 0, (byte) 1);
+					robotSetLeds((byte) 0, (byte) 128);
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					robotSetLeds((byte) 1, (byte) 0);
+					robotSetLeds((byte) 255, (byte) 0);
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					robotSetLeds((byte) 0, (byte) 0);
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -534,7 +541,9 @@ public class MainActivity extends ActionBarActivity {
 			default:
 				//robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
 				//robotTurn(Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
-				stopAndGo(Integer.parseInt(programId.getText().toString()));
+				//stopAndGo(Integer.parseInt(programId.getText().toString()));
+				for(int i = 0; i < Integer.parseInt(programId.getText().toString()); i++)
+				robotDrive(1);
 			}
 	}
 }
