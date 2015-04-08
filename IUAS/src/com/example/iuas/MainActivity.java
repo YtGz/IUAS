@@ -99,38 +99,22 @@ public class MainActivity extends ActionBarActivity {
 			while(distance_cm > 127) {
 				comWrite(new byte[] { 'k', (byte) (129), '\r', '\n' });
 				distance_cm -= 127;						
-				try {
-					Thread.sleep((long) Math.ceil(127*1000/K/M_SPEED));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				waitUntilReady();
 			}
 			comWrite(new byte[] { 'k', (byte) (256-distance_cm), '\r', '\n' });
-			try {
-				Thread.sleep((long) Math.ceil(distance_cm*1000/K/M_SPEED));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			waitUntilReady();
 		}
 		else {
 			while(distance_cm > 127) {
 				comWrite(new byte[] { 'k', (byte) (127), '\r', '\n' });
 				distance_cm -= 127;
-				try {
-					Thread.sleep((long) Math.ceil(127*1000/K/M_SPEED));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				waitUntilReady();
 			}
 			if (distance_cm == 10) {
 				distance_cm = 11;
 			}
 			comWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
-			try {
-				Thread.sleep((long) Math.ceil(distance_cm*1000/K/M_SPEED));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}	
+			waitUntilReady();
 		}
 	}
 
@@ -142,39 +126,23 @@ public class MainActivity extends ActionBarActivity {
 			while(degree > 127) {
 				comWrite(new byte[] { 'l', (byte) (129), '\r', '\n' });
 				degree -= 127;
-				try {
-					Thread.sleep(R_TIME);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				waitUntilReady();
 			}
 			comWrite(new byte[] { 'l', (byte) (256-degree), '\r', '\n' });
-			try {
-				Thread.sleep(R_TIME);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			waitUntilReady();
 		}
 		
 		else {
 			while(degree > 127) {
 				comWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 				degree -= 127;
-				try {
-					Thread.sleep(R_TIME);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				waitUntilReady();
 			}
 			if (degree == 10) {
 				degree = 11;
 			}
 			comWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
-			try {
-				Thread.sleep(R_TIME);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			waitUntilReady();
 		}
 	}
 
@@ -194,7 +162,15 @@ public class MainActivity extends ActionBarActivity {
 		comWrite(new byte[] { 's', '\r', '\n' });
 	}
 
-	
+	public void waitUntilReady() {
+		while(!retrieveSensorData().contains("0x")) {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	
 	
@@ -311,15 +287,19 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public int[] parseDataString(String dataString) {
+		int[] values = new int[3];
 		String[] tokens = dataString.trim().split("\\s++");
 		for(int i = 0; i < tokens.length; i++){
-			tokens[i] = tokens[i].substring(2);
+			if(tokens[i].contains("0x")) {
+				for(int j = i; j < tokens.length; j++){
+					tokens[j] = tokens[j].substring(2);
+				}
+				values [0] = (int) Integer.valueOf(tokens[i+3],16);
+				values [1] = (int) Integer.valueOf(tokens[i+4],16);
+				values [2] = (int) Integer.valueOf(tokens[i+5],16);
+				return values;
+			}
 		}
-		
-		int[] values = new int[3];
-		values [0] = (int) Integer.valueOf(tokens[6],16);
-		values [1] = (int) Integer.valueOf(tokens[7],16);
-		values [2] = (int) Integer.valueOf(tokens[8],16);
 		return values;
 	}
 
@@ -334,9 +314,9 @@ public class MainActivity extends ActionBarActivity {
 	 * @return
 	 */
 	public boolean detectObstacle() {
-		boolean encounteredAnObstacle = true;
+		boolean encounteredAnObstacle = false;
 		String sensorData = retrieveSensorData();
-		if(!sensorData.equalsIgnoreCase("") && !sensorData.equalsIgnoreCase("command execution marked")) {
+		if(!sensorData.equalsIgnoreCase("") && sensorData.contains("0x")) {
 			int[] dst = parseDataString(sensorData);
 			for (int i = 0; i < 3; i++) {
 				if (dst[i] > 10 && dst[i] < 30) {
@@ -361,13 +341,10 @@ public class MainActivity extends ActionBarActivity {
 	 */
 
 	public void stopAndGo(int distance) {
-		robotDrive(distance);
-		/*for(;;) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		
+		while(distance > 1) {
+			robotDrive(1);
+			distance -= 1;
 			if(detectObstacle()) {
 				robotStop();
 				for(int i = 0; i < 4; i++) {
@@ -385,7 +362,7 @@ public class MainActivity extends ActionBarActivity {
 					}
 				}
 			}
-		}*/
+		}
 	}
 	
 	//Robot heads straight for the goal, and in the end rotates according to theta
@@ -509,33 +486,11 @@ public class MainActivity extends ActionBarActivity {
 	 ***************************************************************************************************************************************************/
 	
 	public void connectOnClick(View view) {
-		//connect();
-		if(detectObstacle()) {
-			//robotStop();
-			for(int i = 0; i < 4; i++) {
-				robotSetLeds((byte) 0, (byte) 128);
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				robotSetLeds((byte) 255, (byte) 0);
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			robotSetLeds((byte) 0, (byte) 0);
-		}
-		
+		connect();		
 	}
 	
 	public void disconnectOnClick(View view) {
-		//disconnect();
-		if(detectObstacle()) {
-			robotSetBar((byte) 255);
-		}
+		disconnect();
 	}
 	
 	public void runOnClick(View view) {
@@ -544,8 +499,8 @@ public class MainActivity extends ActionBarActivity {
 				squareTest(20);
 				break;
 			case 1:
-				//textLog.setText(retrieveSensorData());
-				viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
+				textLog.setText(retrieveSensorData());
+				//viewSensorOutput();			//To (1) calibrate the sensors and (2) see if data is byte array or String and if it is in cm or V
 				break;
 			case 2:
 				lemniscateTestVer2(50);
@@ -557,9 +512,9 @@ public class MainActivity extends ActionBarActivity {
 				//navigate((byte) 4 , (byte) 5, (byte) 0);
 				break;
 			default:
-				robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				//robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
 				//robotTurn(Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
-				//stopAndGo(Integer.parseInt(programId.getText().toString()));
+				stopAndGo(Integer.parseInt(programId.getText().toString()));
 			}
 	}
 }
