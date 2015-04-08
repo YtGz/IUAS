@@ -411,7 +411,8 @@ public class MainActivity extends ActionBarActivity {
 	//Robot heads straight for the goal, and in the end rotates according to theta
 	public void navigateIgnoringObstacles(int x, int y, int theta) {
 		int r = (int) Math.sqrt(x * x + y * y);
-		int phi = (int) Math.atan2(y, x);
+		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
+		phi *= -1;
 		robotTurn(phi);
 		robotDrive(r);
 		robotTurn(theta - phi);
@@ -420,10 +421,12 @@ public class MainActivity extends ActionBarActivity {
 	//Includes obstacle detection
 	public void navigate(int x, int y, int theta) {
 		int r = (int) Math.sqrt(x * x + y * y);
-		int phi = (int) Math.atan2(y, x);
+		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
+		phi *= -1;
 		robotTurn(phi);
-		for(; r > 0; r--) {
-			robotDrive(1);
+		while(r > 0) {
+			robotDrive(DELTA_M);
+			r -= DELTA_M;
 			int[] t = bugZero(r, phi);
 			r = t[0];
 			phi = t[1];
@@ -463,24 +466,48 @@ public class MainActivity extends ActionBarActivity {
 		int r2 = r;
 		int phi2 = phi;
 		if(detectObstacle()) {
+			for(int i = 0; i < 4; i++) {
+				robotSetLeds((byte) 0, (byte) 128);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				robotSetLeds((byte) 255, (byte) 0);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				robotSetLeds((byte) 0, (byte) 0);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 			do {
-				robotTurn(5);
-				phi2 += 5;
+				robotTurn(DELTA_M);
+				phi2 += DELTA_M;
 			} while(!checkAngleToObstacle());	//Turn until 90 degree to obstacle wall
-			do {
-				robotDrive(5);
-				r2 += 5;
+			/*do {
+				robotDrive(DELTA_M);
+				r2 += DELTA_M;
 			} while(rightSensor());	//check if right (left) sensor still pointing to obstacle wall
+			*/
 			
 			//recalculate line to goal
-			double x = r * Math.cos(phi);
-			double y = r * Math.sin(phi);
-			double x2 = r2 * Math.cos(phi2);
-			double y2 = r2 * Math.sin(phi2);
+			double x = r * Math.cos(Math.toRadians(phi));
+			double y = r * Math.sin(Math.toRadians(phi));
+			double x2 = r2 * Math.cos(Math.toRadians(phi2));
+			double y2 = r2 * Math.sin(Math.toRadians(phi2));
+			
+			//textLog.append(String.valueOf("x: " + x + "y: " + y + "x2: " + x2 + "y2: " + y2 + "\n"));
 			
 			r = (int) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
-			phi = (int) Math.atan2((y2 - y), (x2 - x));
+			phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2((y2 - y), (x2 - x)));
 			
+			textLog.append(String.valueOf("phi: " + phi));
 			robotTurn(phi);		//let robot face the goal again
 		}
 		int[] returnVal = {r, phi};
@@ -515,7 +542,7 @@ public class MainActivity extends ActionBarActivity {
 	public void runOnClick(View view) {
 		switch (Integer.parseInt(programId.getText().toString())) {
 			case 0:
-				navigateIgnoringObstacles(40, 60, 90);
+				navigate(0, 60, 0);
 				break;
 			case 1:
 				textLog.setText(retrieveSensorData());
