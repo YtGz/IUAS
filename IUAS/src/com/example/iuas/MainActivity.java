@@ -99,22 +99,38 @@ public class MainActivity extends ActionBarActivity {
 			while(distance_cm > 127) {
 				comWrite(new byte[] { 'k', (byte) (129), '\r', '\n' });
 				distance_cm -= 127;						
-				waitUntilReady();
+				try {
+					Thread.sleep((long) Math.ceil(127*1000/K/M_SPEED));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			comWrite(new byte[] { 'k', (byte) (256-distance_cm), '\r', '\n' });
-			waitUntilReady();
+			try {
+				Thread.sleep((long) Math.ceil(distance_cm*1000/K/M_SPEED));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		else {
 			while(distance_cm > 127) {
 				comWrite(new byte[] { 'k', (byte) (127), '\r', '\n' });
 				distance_cm -= 127;
-				waitUntilReady();
+				try {
+					Thread.sleep((long) Math.ceil(127*1000/K/M_SPEED));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			if (distance_cm == 10) {
 				distance_cm = 11;
 			}
 			comWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
-			waitUntilReady();
+			try {
+				Thread.sleep((long) Math.ceil(distance_cm*1000/K/M_SPEED));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}	
 		}
 	}
 
@@ -126,23 +142,39 @@ public class MainActivity extends ActionBarActivity {
 			while(degree > 127) {
 				comWrite(new byte[] { 'l', (byte) (129), '\r', '\n' });
 				degree -= 127;
-				waitUntilReady();
+				try {
+					Thread.sleep(R_TIME);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			comWrite(new byte[] { 'l', (byte) (256-degree), '\r', '\n' });
-			waitUntilReady();
+			try {
+				Thread.sleep(R_TIME);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		else {
 			while(degree > 127) {
 				comWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
 				degree -= 127;
-				waitUntilReady();
+				try {
+					Thread.sleep(R_TIME);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			if (degree == 10) {
 				degree = 11;
 			}
 			comWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
-			waitUntilReady();
+			try {
+				Thread.sleep(R_TIME);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -161,18 +193,6 @@ public class MainActivity extends ActionBarActivity {
 	public void robotStop() {
 		comWrite(new byte[] { 's', '\r', '\n' });
 	}
-
-	public void waitUntilReady() {
-		while(!retrieveSensorData().contains("0x")) {
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	
 	
 	
 	
@@ -342,9 +362,9 @@ public class MainActivity extends ActionBarActivity {
 
 	public void stopAndGo(int distance) {
 		
-		while(distance > 1) {
-			robotDrive(1);
-			distance -= 1;
+		while(distance > 12) {
+			robotDrive(12);
+			distance -= 12;
 			if(detectObstacle()) {
 				robotStop();
 				for(int i = 0; i < 4; i++) {
