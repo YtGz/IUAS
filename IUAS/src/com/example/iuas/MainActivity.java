@@ -22,6 +22,7 @@ public class MainActivity extends ActionBarActivity {
 	private final int R_TIME = 1500;	//The number of milliseconds to wait for a rotation of max. 127°
 	private final double M_SPEED = 14.2;	//The default velocity of the robot in cm/s
 	private final int WHEEL_SPACING = 19;
+	private final int DELTA_M = 15;		//The distance to travel until robot measures for obstacle
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -346,28 +347,41 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return encounteredAnObstacle;
 	}
-	
-	// Just for the case simultaneous driving and measuring don't work.
-	/**
-	 * Robot stops after once every cm to see if there are obstacles.
-	 * 
-	 * @param distance_cm
-	 */
-	/*
-	 * public void robotDriveCareful(byte distance_cm) { while (distance_cm > 1)
-	 * { comReadWrite(new byte[] { 'k', 1, '\r', '\n' }); distance_cm--;
-	 * if(detectObstacle()) { return; //Stop when detecting an obstacle }
-	 * comReadWrite(new byte[] { 'k', distance_cm, '\r', '\n' }); }
-	 */
 
+	
+	public boolean checkAngleToObstacle() {
+		boolean retVal = true;
+		String sensorData = retrieveSensorData();
+		if(!sensorData.equalsIgnoreCase("") && sensorData.contains("0x")) {
+			int[] dst = parseDataString(sensorData);
+			for (int i = 0; i < 2; i++) {
+				if (dst[i] > 10 && dst[i] < 30) {
+					retVal = false;
+				}
+			}
+		}
+		return retVal;	
+	}
+	
+	public boolean rightSensor() {
+		boolean retVal = false;
+		String sensorData = retrieveSensorData();
+		if(!sensorData.equalsIgnoreCase("") && sensorData.contains("0x")) {
+			int[] dst = parseDataString(sensorData);
+			if (dst[3] > 10 && dst[3] < 30) {
+				retVal = true;
+			}
+		}
+		return retVal;	
+	}
+	
 	public void stopAndGo(int distance) {
 		
-		while(distance > 12) {
-			robotDrive(12);
-			distance -= 12;
+		while(distance > DELTA_M) {
+			robotDrive(DELTA_M);
+			distance -= DELTA_M;
 			if(detectObstacle()) {
 				robotStop();
-				distance = 0;
 				for(int i = 0; i < 4; i++) {
 					robotSetLeds((byte) 0, (byte) 128);
 					try {
@@ -388,43 +402,33 @@ public class MainActivity extends ActionBarActivity {
 						e.printStackTrace();
 					}
 				}
+				return;
 			}
 		}
+		robotDrive(distance);
 	}
 	
 	//Robot heads straight for the goal, and in the end rotates according to theta
-	public void navigateIgnoringObstacles(byte x, byte y, byte theta) {
-		byte r = (byte) Math.sqrt(x * x + y * y);
-		byte phi = (byte) Math.atan2(y, x);
+	public void navigateIgnoringObstacles(int x, int y, int theta) {
+		int r = (int) Math.sqrt(x * x + y * y);
+		int phi = (int) Math.atan2(y, x);
 		robotTurn(phi);
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		robotDrive(r);
-		try {
-			Thread.sleep(r*1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		robotTurn((byte) (theta - phi));
+		robotTurn(theta - phi);
 	}
 	
 	//Includes obstacle detection
-	public void navigate(byte x, byte y, byte theta) {
-		byte r = (byte) Math.sqrt(x * x + y * y);
-		byte phi = (byte) Math.atan2(y, x);
+	public void navigate(int x, int y, int theta) {
+		int r = (int) Math.sqrt(x * x + y * y);
+		int phi = (int) Math.atan2(y, x);
 		robotTurn(phi);
 		for(; r > 0; r--) {
-			robotDrive((byte) 1);
-			/*byte[] t = bugZero(r, phi);
+			robotDrive(1);
+			int[] t = bugZero(r, phi);
 			r = t[0];
-			phi = t[1];*/
+			phi = t[1];
 		}
-		robotTurn((byte) (theta - phi));
+		robotTurn(theta - phi);
 	}
 
 	
@@ -455,43 +459,31 @@ public class MainActivity extends ActionBarActivity {
 	 * @param phi
 	 * @return the new angle & distance to the obstacle
 	 */
-	public byte[] bugZero(byte r, byte phi) {
-		int[] sensors = parseDataString(retrieveSensorData());
-		byte r2 = r;
-		byte phi2 = phi;
-		for(int i = 0; i < 3; i++) {
-			byte d = (byte) (sensors[i] + SENSOR_OFFSETS[i]);
-			if(d > 10 && d < 80) {
-				if(i == 1) {	//front sensors
-					//bug alg
-					do {
-						robotTurn((byte) 1);
-						phi2 += 1;
-						sensors = parseDataString(retrieveSensorData());
-					} while(sensors[i] < 10 || sensors[i] > 80);	//Turn until 90 degree to obstacle wall
-					do {
-						robotDrive((byte) 1);
-						r2 += 1;
-						sensors = parseDataString(retrieveSensorData());
-					} while(sensors[2] < 10 || sensors[2] > 80);	//check if right (left) sensor still pointing to obstacle wall
-					
-					//recalculate line to goal
-					double x = r * Math.cos(phi);
-					double y = r * Math.sin(phi);
-					double x2 = r2 * Math.cos(phi2);
-					double y2 = r2 * Math.sin(phi2);
-					
-					r = (byte) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
-					phi = (byte) Math.atan2((y2 - y), (x2 - x));
-					
-					robotTurn(phi);		//let robot face the goal again
-					
-					byte[] returnVal = {r, phi};
-					return returnVal;
-				}
-			}
+	public int[] bugZero(int r, int phi) {
+		int r2 = r;
+		int phi2 = phi;
+		if(detectObstacle()) {
+			do {
+				robotTurn(5);
+				phi2 += 5;
+			} while(!checkAngleToObstacle());	//Turn until 90 degree to obstacle wall
+			do {
+				robotDrive(5);
+				r2 += 5;
+			} while(rightSensor());	//check if right (left) sensor still pointing to obstacle wall
+			
+			//recalculate line to goal
+			double x = r * Math.cos(phi);
+			double y = r * Math.sin(phi);
+			double x2 = r2 * Math.cos(phi2);
+			double y2 = r2 * Math.sin(phi2);
+			
+			r = (int) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
+			phi = (int) Math.atan2((y2 - y), (x2 - x));
+			
+			robotTurn(phi);		//let robot face the goal again
 		}
-		byte[] returnVal = {r, phi};
+		int[] returnVal = {r, phi};
 		return returnVal;
 	}
 
@@ -523,7 +515,7 @@ public class MainActivity extends ActionBarActivity {
 	public void runOnClick(View view) {
 		switch (Integer.parseInt(programId.getText().toString())) {
 			case 0:
-				squareTest(20);
+				navigateIgnoringObstacles(40, 60, 90);
 				break;
 			case 1:
 				textLog.setText(retrieveSensorData());
@@ -539,11 +531,9 @@ public class MainActivity extends ActionBarActivity {
 				//navigate((byte) 4 , (byte) 5, (byte) 0);
 				break;
 			default:
-				//robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
+				robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
 				//robotTurn(Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 				//stopAndGo(Integer.parseInt(programId.getText().toString()));
-				for(int i = 0; i < Integer.parseInt(programId.getText().toString()); i++)
-				robotDrive(1);
 			}
 	}
 }
