@@ -334,12 +334,14 @@ public class MainActivity extends ActionBarActivity {
 	 * @return
 	 */
 	public boolean detectObstacle() {
-		boolean encounteredAnObstacle = false;
+		boolean encounteredAnObstacle = true;
 		String sensorData = retrieveSensorData();
-		int[] dst = parseDataString(sensorData);
-		for (int i = 0; i < 3; i++) {
-			if (dst[i] > 10 && dst[i] < 30) {
-				encounteredAnObstacle = true;
+		if(!sensorData.equalsIgnoreCase("") && !sensorData.equalsIgnoreCase("command execution marked")) {
+			int[] dst = parseDataString(sensorData);
+			for (int i = 0; i < 3; i++) {
+				if (dst[i] > 10 && dst[i] < 30) {
+					encounteredAnObstacle = true;
+				}
 			}
 		}
 		return encounteredAnObstacle;
