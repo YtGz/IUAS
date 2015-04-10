@@ -18,7 +18,7 @@ public class MainActivity extends ActionBarActivity {
 	private EditText programId;
 	private final double K = 1.358;	//offset correction for forward movement
 	private final double L = 1.14;	//offset correction for turning angle
-	private final double L_DETAIL = 0.95;		//offset correction for turning angle of 15°
+	private final double L_DETAIL = 1.05;		//offset correction for turning angle of 15°
 	private final byte[] SENSOR_OFFSETS = {1, 1, 1};	//offsets of the individual sensors
 	private final double R_SPEED = 72;	//The default turning speed of the robot in °/s
 	private final double M_SPEED = 14.2;	//The default velocity of the robot in cm/s
@@ -533,7 +533,6 @@ public class MainActivity extends ActionBarActivity {
 			
 			r = (int) Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y));
 			phi = (int) Math.toDegrees(Math.toRadians(90 + phi2) - Math.atan2((y2 - y), (x2 - x)));
-			phi *= -1;
 			
 			textLog.append(String.valueOf("phi: " + phi));
 			robotTurn(phi);		//let robot face the goal again*/
@@ -543,12 +542,12 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	
-	public int[] rotTest(int r, int phi) {
+	public int rotTest(int r) {
 		int r2 = 0;
-		int phi2 = 0;
+		int phi = 0;
 			for(int i = 1; i <= 60; i+=DELTA_R) {
 				robotTurn(DELTA_R, L_DETAIL);
-				phi2 += DELTA_R;
+				phi += DELTA_R;
 			}
 			
 			for(int i = 0; i < O; i += DELTA_M) {		//Drive past the corner
@@ -557,21 +556,20 @@ public class MainActivity extends ActionBarActivity {
 			}
 			
 			//recalculate line to goal
-			double x = r * Math.cos(Math.toRadians(90 + phi));
-			double y = r * Math.sin(Math.toRadians(90 + phi));
-			double x2 = r2 * Math.cos(Math.toRadians(90 + phi2));
-			double y2 = r2 * Math.sin(Math.toRadians(90 + phi2));
+			double x = r * Math.cos(Math.toRadians(90));
+			double y = r * Math.sin(Math.toRadians(90));
+			double x2 = r2 * Math.cos(Math.toRadians(90 + phi));
+			double y2 = r2 * Math.sin(Math.toRadians(90 + phi));
 			
-			//textLog.append(String.valueOf("x: " + x + "y: " + y + "x2: " + x2 + "y2: " + y2 + "\n"));
+			//System.out.println(String.valueOf("x: " + x + "y: " + y + "x2: " + x2 + "y2: " + y2 + "\n"));
 			
 			r = (int) Math.sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2));
-			phi = (int) Math.ceil(Math.toDegrees(Math.toRadians(phi2) - Math.atan2((y - y2), (x - x2))));
+			System.out.println(Math.toDegrees( Math.atan2((y - y2), (x - x2))));
+			phi = (int) Math.ceil(Math.toDegrees(Math.toRadians(90) - Math.atan2((y - y2), (x - x2)))) + phi;
 			phi *= -1;
 			
 			robotTurn(phi);		//let robot face the goal again*/
-			textLog.append(String.valueOf("phi: " + phi + " r: " + r));
-			phi = 0;
-		int[] returnVal = {r, phi};
+		int returnVal = r;
 		return returnVal;
 	}
 
@@ -653,6 +651,18 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	
+	
+	/***************************************************************************************************************************************************
+	 *  Calibration																																	   *
+	 ***************************************************************************************************************************************************/
+	
+	public void calibrateLDetail(int calib) {
+		double c = 1 + calib/100.0;
+		for(int i = 1; i <= 360; i+=DELTA_R) {
+			robotTurn(DELTA_R, c);
+		}
+	}
+	
 	/***************************************************************************************************************************************************
 	 *	UI methods																																	   *
 	 ***************************************************************************************************************************************************/
@@ -669,7 +679,7 @@ public class MainActivity extends ActionBarActivity {
 		switch (Integer.parseInt(programId.getText().toString())) {
 			case 0:
 				//navigate(0, 60, 0);
-				rotTest(0, 60);
+				rotTest(60);
 				break;
 			case 1:
 				textLog.setText(retrieveSensorData());
@@ -689,6 +699,7 @@ public class MainActivity extends ActionBarActivity {
 				//robotDrive(Integer.parseInt(programId.getText().toString()));			//To calibrate the forward movement (calculate k)
 				//robotTurn(Integer.parseInt(programId.getText().toString()));			//To calibrate the turning angle
 				//stopAndGo(Integer.parseInt(programId.getText().toString()));
+				calibrateLDetail(Integer.parseInt(programId.getText().toString()));
 			}
 	}
 }
