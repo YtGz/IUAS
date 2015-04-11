@@ -605,7 +605,7 @@ public class MainActivity extends ActionBarActivity {
 	public void runOnClick(View view) {
 		switch (Integer.parseInt(programId.getText().toString())) {
 			case 0:
-				navigate(0, 60, 0);
+				navigate(20, 120, 60);
 				//rotTest(60);
 				break;
 			case 1:
