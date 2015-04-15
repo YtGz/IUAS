@@ -8,6 +8,7 @@ import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
 
 import jp.ksksue.driver.serial.FTDriver;
+import android.content.Intent;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -53,6 +54,11 @@ public class MainActivity extends ActionBarActivity {
 		programId = (EditText) findViewById(R.id.programId);
 		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 		connect();
+	}
+	
+	public void switchActivity(View view) {
+		Intent intent = new Intent(this, ColorBlobDetectionActivity.class);
+		startActivity(intent);
 	}
 
 	/**************************************************************************************************************************************

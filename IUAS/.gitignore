@@ -48,3 +48,4 @@ bin/classes/.gitignore
 /appcompat_v7/
 /FTDriver/
 /OpenCV Library - 2.4.10/
+/OpenCV*
