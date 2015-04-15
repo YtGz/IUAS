@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="22" />
+        android:targetSdkVersion="19" />
 
     <uses-feature android:name="android.hardware.usb.host" />
     
@@ -41,6 +41,12 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" >
             </meta-data>
+        </activity>
+        <activity android:name="com.example.iuas.ColorBlobDetectionActivity"
+                  android:label="@string/color_blob_detection"
+                  android:parentActivityName="com.example.iuas.MainActivity"
+                  android:screenOrientation="landscape"
+                  android:configChanges="keyboardHidden|orientation">
         </activity>
     </application>
 

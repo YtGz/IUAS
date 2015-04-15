@@ -18,6 +18,7 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.imgproc.Imgproc;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -78,7 +79,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
 
     @Override
     public void onPause()
-    {
+    {   
         super.onPause();
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
@@ -111,7 +112,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         mRgba.release();
     }
 
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean onTouch(View v, MotionEvent event) {  	
         int cols = mRgba.cols();
         int rows = mRgba.rows();
 
@@ -186,5 +187,11 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
 
         return new Scalar(pointMatRgba.get(0, 0));
+    }
+    
+    public void backButtonOnClick(View view) {
+    	Intent intent = new Intent();
+        intent.putExtra("test", "hallo");
+        setResult(RESULT_OK, intent);
     }
 }
