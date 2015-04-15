@@ -58,7 +58,14 @@ public class MainActivity extends ActionBarActivity {
 	
 	public void switchActivity(View view) {
 		Intent intent = new Intent(this, ColorBlobDetectionActivity.class);
-		startActivity(intent);
+		final int result=1;
+		startActivityForResult(intent, result);
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		System.out.println(data.getStringExtra("test"));
 	}
 
 	/**************************************************************************************************************************************
