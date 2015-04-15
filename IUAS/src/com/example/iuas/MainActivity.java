@@ -1,17 +1,17 @@
 package com.example.iuas;
 
 import java.io.File;
-
-import jp.ksksue.driver.serial.FTDriver;
+import java.util.ArrayList;
 
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
 
-import android.content.Intent;
+import jp.ksksue.driver.serial.FTDriver;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.EditText;
@@ -53,11 +53,6 @@ public class MainActivity extends ActionBarActivity {
 		programId = (EditText) findViewById(R.id.programId);
 		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 		connect();
-	}
-	
-	public void switchActivity(View view) {
-		Intent intent = new Intent(this, ColorBlobDetectionActivity.class);
-		startActivity(intent);
 	}
 
 	/**************************************************************************************************************************************
