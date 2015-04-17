@@ -24,6 +24,7 @@ public class MainActivity extends ActionBarActivity {
 	private TextView textLog;
 	private EditText programId;
 	private final double K = 1.358; // offset correction for forward movement
+	private final double K_DETAIL_SENSOR = 0; // offset correction for forward movement while measuring for obstacles
 	private final double L = 1.14; // offset correction for turning angle
 	private final double L_DETAIL = 1.05; // offset correction for turning angle
 											// of 15°
@@ -483,10 +484,11 @@ public class MainActivity extends ActionBarActivity {
 		int r = (int) Math.sqrt(x * x + y * y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
 		phi *= -1;
-		robotTurn(phi);
+		robotTurn(phi, L_DETAIL_SENSOR);
+		detectObstacle(new boolean[] { false, false, true }); //temporary
 		phi = 0;
 		while (r > 0) {
-			robotDrive(DELTA_M);
+			robotDrive(DELTA_M, K_DETAIL_SENSOR);
 			r -= DELTA_M;
 			int[] t = bugZero(r, phi);
 			r = t[0];
@@ -533,7 +535,7 @@ public class MainActivity extends ActionBarActivity {
 					new int[] { 100, 255 })); // Turn until 90 degree to
 												// obstacle wall
 			do {
-				robotDrive(DELTA_M);
+				robotDrive(DELTA_M, K_DETAIL_SENSOR);
 				r2 += DELTA_M;
 				/*
 				 * if(detectObstacle(new boolean[] {true, true, false})) { r2 =
@@ -552,6 +554,7 @@ public class MainActivity extends ActionBarActivity {
 			for (int i = 0; i < O; i += DELTA_M) { // Drive past the corner
 				robotDrive(DELTA_M);
 				r2 += DELTA_M;
+				detectObstacle(new boolean[] { false, false, true }); //temporary
 				/*
 				 * if(detectObstacle(new boolean[] {true, true, true})) { r2 =
 				 * bugZero(r2); //What to do here? }
@@ -571,7 +574,8 @@ public class MainActivity extends ActionBarActivity {
 					+ phi2;
 			psi *= -1;
 			System.out.println(psi);
-			robotTurn(psi); // let robot face the goal again
+		robotTurn(psi,L_DETAIL_SENSOR); // let robot face the goal again
+			detectObstacle(new boolean[] { false, false, true }); //temporary
 			phi += phi2 + psi;
 		}
 		int[] returnVal = { r, phi };
