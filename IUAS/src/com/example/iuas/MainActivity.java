@@ -117,9 +117,12 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return comRead();
 	}
-
-	public void robotDrive(int distance_cm) {
-		distance_cm = (int) Math.ceil(distance_cm * K);
+	
+	public void robotDrive(int distance_cm){
+		robotDrive(distance_cm, K);
+	}
+	public void robotDrive(int distance_cm, double calib) {
+		distance_cm = (int) Math.ceil(distance_cm * calib);
 
 		if (distance_cm < 0) {
 			distance_cm = Math.abs(distance_cm);
@@ -127,14 +130,14 @@ public class MainActivity extends ActionBarActivity {
 				comWrite(new byte[] { 'k', (byte) (129), '\r', '\n' });
 				distance_cm -= 127;
 				try {
-					Thread.sleep((long) Math.ceil(127 * 1000 / K / M_SPEED));
+					Thread.sleep((long) Math.ceil(127 * 1000 / calib / M_SPEED));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 			comWrite(new byte[] { 'k', (byte) (256 - distance_cm), '\r', '\n' });
 			try {
-				Thread.sleep((long) Math.ceil(distance_cm * 1000 / K / M_SPEED));
+				Thread.sleep((long) Math.ceil(distance_cm * 1000 / calib / M_SPEED));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -143,7 +146,7 @@ public class MainActivity extends ActionBarActivity {
 				comWrite(new byte[] { 'k', (byte) (127), '\r', '\n' });
 				distance_cm -= 127;
 				try {
-					Thread.sleep((long) Math.ceil(127 * 1000 / K / M_SPEED));
+					Thread.sleep((long) Math.ceil(127 * 1000 / calib / M_SPEED));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -153,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
 			}
 			comWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
 			try {
-				Thread.sleep((long) Math.ceil(distance_cm * 1000 / K / M_SPEED));
+				Thread.sleep((long) Math.ceil(distance_cm * 1000 / calib / M_SPEED));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -640,6 +643,16 @@ public class MainActivity extends ActionBarActivity {
 					100, 255 });
 		}
 	}
+	
+	public void calibrateDistance(int calib){
+		double c = 1 + calib /100.0;
+		for(int i =1 ; i <= 60; i += DELTA_M){
+			robotDrive(DELTA_M, c);
+			detectObstacle(new boolean[] { true, true, false }, new int[] {
+					100, 255 });
+			
+		}
+	}
 
 	/***************************************************************************************************************************************************
 	 * UI methods *
@@ -680,7 +693,8 @@ public class MainActivity extends ActionBarActivity {
 			// robotTurn(Integer.parseInt(programId.getText().toString())); //To
 			// calibrate the turning angle
 			// stopAndGo(Integer.parseInt(programId.getText().toString()));
-			calibrateLDetail(Integer.parseInt(programId.getText().toString()));
+			//calibrateLDetail(Integer.parseInt(programId.getText().toString()));
+			calibrateDistance(Integer.parseInt(programId.getText().toString()));
 		}
 	}
 }
