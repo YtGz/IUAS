@@ -34,6 +34,7 @@
         android:onClick="switchActivity"
         android:text="Choose Color" />
 
+    <!-- 
     <EditText
         android:id="@+id/programId"
         android:layout_width="wrap_content"
@@ -43,14 +44,48 @@
         android:ems="10"
         android:text="0"
         android:inputType="numberSigned" />
+        -->
+    
+     <EditText
+        android:id="@+id/x"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:ems="10"
+        android:text="0"
+        android:inputType="numberSigned" />
+     
+      <EditText
+        android:id="@+id/y"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_below="@+id/x"
+        android:ems="10"
+        android:text="0"
+        android:inputType="numberSigned" />
+      
+      <EditText
+        android:id="@+id/phi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_below="@+id/y"
+        android:ems="10"
+        android:text="0"
+        android:inputType="numberSigned" />
 
     <Button
         android:id="@+id/run"
         android:layout_width="200dp"
         android:layout_height="120dp"
-        android:layout_below="@+id/programId"
+        android:layout_below="@+id/phi"
         android:layout_centerHorizontal="true"
         android:onClick="runOnClick"
         android:text="run" />
+            <!-- android:layout_below="@+id/programId" -->
 
 </RelativeLayout>

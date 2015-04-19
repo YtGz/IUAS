@@ -22,20 +22,23 @@ public class MainActivity extends ActionBarActivity {
 
 	private FTDriver com;
 	private TextView textLog;
-	private EditText programId; 
+	//private EditText programId; 
+	private EditText xIn;
+	private EditText yIn;
+	private EditText phiIn;
 	private final double K = 1.358; // offset correction for forward movement
 	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
 	private final double L = 1.14; // offset correction for turning angle
 	private final double L_DETAIL = 1.05; // offset correction for turning angle
-											// of 15°
+											// of 15ï¿½
 	private final double L_DETAIL_SENSOR = 1.467; // offset correction for
-													// turning angle of 15°
+													// turning angle of 15ï¿½
 													// while measuring for
 													// obstacles
 	private final byte[] SENSOR_OFFSETS = { 1, 1, 1 }; // offsets of the
 														// individual sensors
 	private final double R_SPEED = 72; // The default turning speed of the robot
-										// in °/s
+										// in ï¿½/s
 	private final double M_SPEED = 14.2; // The default velocity of the robot in
 											// cm/s
 	private final int WHEEL_SPACING = 19;
@@ -52,7 +55,10 @@ public class MainActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		textLog = (TextView) findViewById(R.id.textLog);
-		programId = (EditText) findViewById(R.id.programId);
+		//programId = (EditText) findViewById(R.id.programId);
+		xIn = (EditText) findViewById(R.id.x);
+		yIn = (EditText) findViewById(R.id.y);
+		phiIn = (EditText) findViewById(R.id.phi);
 		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 		connect();
 	}
@@ -487,7 +493,6 @@ public class MainActivity extends ActionBarActivity {
 		robotTurn(phi, L_DETAIL_SENSOR);
 		
 		detectObstacle(new boolean[] { false, false, true }); //temporary
-		phi = 0;
 		while (r > 0) {
 			int[] t = bugZero(r, phi);
 			r = t[0];
@@ -673,7 +678,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public void runOnClick(View view) {
-		switch (Integer.parseInt(programId.getText().toString())) {
+		/*switch (Integer.parseInt(programId.getText().toString())) {
 		case 0:
 			//calibrateLDetail(100);
 			navigate(0, 120, 0);
@@ -701,8 +706,10 @@ public class MainActivity extends ActionBarActivity {
 			// calibrate the turning angle
 			// stopAndGo(Integer.parseInt(programId.getText().toString()));
 			//calibrateLDetail(Integer.parseInt(programId.getText().toString()));
-			calibrateDistance(Integer.parseInt(programId.getText().toString()));
+			//calibrateDistance(Integer.parseInt(programId.getText().toString()));
 			//rotTest(Integer.parseInt(programId.getText().toString()));
 		}
+		*/
+		navigate(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
 	}
 }
