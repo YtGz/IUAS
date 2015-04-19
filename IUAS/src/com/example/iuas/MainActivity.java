@@ -430,7 +430,7 @@ public class MainActivity extends ActionBarActivity {
 	 * @return
 	 */
 	public boolean detectObstacle(boolean[] sensors) {
-		return detectObstacle(sensors, new int[] { 10, 30 });
+		return detectObstacle(sensors, new int[] { 10, 50 });
 	}
 
 	public boolean detectObstacle(boolean[] sensors, int[] range) {
@@ -489,12 +489,13 @@ public class MainActivity extends ActionBarActivity {
 		detectObstacle(new boolean[] { false, false, true }); //temporary
 		phi = 0;
 		while (r > 0) {
-			robotDrive(DELTA_M, K_DETAIL_SENSOR);
-			r -= DELTA_M;
 			int[] t = bugZero(r, phi);
 			r = t[0];
 			phi = t[1];
-			System.out.println("r: " + r);
+			if (!detectObstacle(new boolean[] { true, true, true })) {
+				robotDrive(DELTA_M, K_DETAIL_SENSOR);
+				r -= DELTA_M;
+			}
 		}
 		robotTurn(theta - phi);
 	}
@@ -553,7 +554,7 @@ public class MainActivity extends ActionBarActivity {
 																			// obstacle
 																			// wall
 			for (int i = 0; i < O; i += DELTA_M) { // Drive past the corner
-				robotDrive(DELTA_M);
+				robotDrive(DELTA_M, K_DETAIL_SENSOR);
 				r2 += DELTA_M;
 				detectObstacle(new boolean[] { false, false, true }); //temporary
 				/*
@@ -674,8 +675,8 @@ public class MainActivity extends ActionBarActivity {
 	public void runOnClick(View view) {
 		switch (Integer.parseInt(programId.getText().toString())) {
 		case 0:
-			calibrateLDetail(100);
-			//navigate(0, 120, 0);
+			//calibrateLDetail(100);
+			navigate(0, 120, 0);
 			// rotTest(60);
 			break;
 		case 1:
