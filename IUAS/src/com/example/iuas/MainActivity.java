@@ -22,13 +22,13 @@ public class MainActivity extends ActionBarActivity {
 
 	private FTDriver com;
 	private TextView textLog;
-	private EditText programId;
+	private EditText programId; 
 	private final double K = 1.358; // offset correction for forward movement
-	private final double K_DETAIL_SENSOR = 0; // offset correction for forward movement while measuring for obstacles
+	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
 	private final double L = 1.14; // offset correction for turning angle
 	private final double L_DETAIL = 1.05; // offset correction for turning angle
 											// of 15°
-	private final double L_DETAIL_SENSOR = 1.535; // offset correction for
+	private final double L_DETAIL_SENSOR = 1.467; // offset correction for
 													// turning angle of 15°
 													// while measuring for
 													// obstacles
@@ -39,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
 	private final double M_SPEED = 14.2; // The default velocity of the robot in
 											// cm/s
 	private final int WHEEL_SPACING = 19;
-	private final int DELTA_M = 5; // The distance to travel until robot
+	private final int DELTA_M = 10; // The distance to travel until robot
 									// measures for obstacle
 	private final int DELTA_R = 15; // The degrees to rotate until robot
 									// measures for obstacle
@@ -123,7 +123,7 @@ public class MainActivity extends ActionBarActivity {
 		robotDrive(distance_cm, K);
 	}
 	public void robotDrive(int distance_cm, double calib) {
-		distance_cm = (int) Math.ceil(distance_cm * calib);
+		distance_cm = ((int) Math.ceil(distance_cm * calib));
 
 		if (distance_cm < 0) {
 			distance_cm = Math.abs(distance_cm);
@@ -485,6 +485,7 @@ public class MainActivity extends ActionBarActivity {
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
 		phi *= -1;
 		robotTurn(phi, L_DETAIL_SENSOR);
+		
 		detectObstacle(new boolean[] { false, false, true }); //temporary
 		phi = 0;
 		while (r > 0) {
@@ -673,7 +674,8 @@ public class MainActivity extends ActionBarActivity {
 	public void runOnClick(View view) {
 		switch (Integer.parseInt(programId.getText().toString())) {
 		case 0:
-			navigate(0, 120, 0);
+			calibrateLDetail(100);
+			//navigate(0, 120, 0);
 			// rotTest(60);
 			break;
 		case 1:
@@ -686,7 +688,7 @@ public class MainActivity extends ActionBarActivity {
 			break;
 		case 3:
 			robotFlashLed(0);
-			// navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
+			navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
 			break;
 		case 4:
 			// navigate((byte) 4 , (byte) 5, (byte) 0);
@@ -699,6 +701,7 @@ public class MainActivity extends ActionBarActivity {
 			// stopAndGo(Integer.parseInt(programId.getText().toString()));
 			//calibrateLDetail(Integer.parseInt(programId.getText().toString()));
 			calibrateDistance(Integer.parseInt(programId.getText().toString()));
+			//rotTest(Integer.parseInt(programId.getText().toString()));
 		}
 	}
 }
