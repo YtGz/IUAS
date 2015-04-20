@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 
 import jp.ksksue.driver.serial.FTDriver;
@@ -50,6 +51,10 @@ public class MainActivity extends ActionBarActivity {
 								// sensor doesn't see the obstacle's edge
 								// anymore
 
+	private Scalar mBlobColorRgba;
+	
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -72,7 +77,11 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		System.out.println(data.getStringExtra("test"));
+		double[] color = data.getDoubleArrayExtra("color");
+		for (double c : color) {
+			System.out.println(c);
+		}
+		mBlobColorRgba = new Scalar(color);
 	}
 
 	/**************************************************************************************************************************************
@@ -634,13 +643,7 @@ public class MainActivity extends ActionBarActivity {
 	/***************************************************************************************************************************************************
 	 * Exercise 4
 	 ***************************************************************************************************************************************************/
-	public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-		Mat myFrame = inputFrame.rgba();
-		File sdCardDirectory = Environment.getExternalStorageDirectory();
-		File myFile = new File(sdCardDirectory, "myFrame.png");
-		Boolean done = Highgui.imwrite(myFile.toString(), myFrame);
-		return myFrame;
-	}
+	
 
 	/***************************************************************************************************************************************************
 	 * Calibration *

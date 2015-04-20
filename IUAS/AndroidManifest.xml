@@ -42,7 +42,7 @@
                 android:resource="@xml/device_filter" >
             </meta-data>
         </activity>
-        <activity android:name="com.example.iuas.ColorBlobDetectionActivity"
+        <activity android:name="ColorBlobDetectionActivity"
                   android:label="@string/color_blob_detection"
                   android:parentActivityName="com.example.iuas.MainActivity"
                   android:screenOrientation="landscape"
