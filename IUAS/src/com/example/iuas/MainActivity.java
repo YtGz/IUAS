@@ -277,7 +277,7 @@ public class MainActivity extends ActionBarActivity {
 			robotSetLeds((byte) 255, (byte) 0);
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedExceptString message = editText.getText().toString();ion e) {
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			robotSetLeds((byte) 0, (byte) 0);
@@ -287,7 +287,6 @@ public class MainActivity extends ActionBarActivity {
 				e.printStackTrace();
 			}
 			break;
-			String message = editText.getText().toString();
 		case 2:
 			robotSetLeds((byte) 0, (byte) 128);
 			try {
@@ -344,7 +343,7 @@ public class MainActivity extends ActionBarActivity {
 			double newX = a * Math.sqrt(2) * Math.cos(t)
 					/ (Math.sin(t) * Math.sin(t) + 1);
 			double newY = a * Math.sqrt(2) * Math.cos(t) * Math.sin(t)
-					/ (Math.sin(t) * MString message = editText.getText().toString();ath.sin(t) + 1);
+					/ (Math.sin(t) * Math.sin(t) + 1);
 
 			/*
 			 * converting to polar coordinates relative to current robot
@@ -354,14 +353,14 @@ public class MainActivity extends ActionBarActivity {
 					+ (newY - oldY) * (newY - oldY));
 			byte phi = (byte) Math.ceil(Math
 					.atan2((newY - oldY), (newX - oldX)));
-			newX = r * Math.cos(phi) +String message = editText.getText().toString(); oldX;
+			newX = r * Math.cos(phi) + oldX;
 			newY = r * Math.sin(phi) + oldY;
 			textLog.setText(String.valueOf("forward movement: " + r
 					+ "cm   turn angle: " + phi + "°"));
 			robotTurn(phi, L_DETAIL);
 			robotDrive(r);
 			oldX = newX;
-			oldY = newY;String message = editText.getText().toString();
+			oldY = newY;
 		}
 	}
 
