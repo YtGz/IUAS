@@ -16,15 +16,6 @@
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:id="@+id/connect"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:layout_alignLeft="@+id/run"
-        android:layout_alignParentTop="true"
-        android:onClick="connectOnClick"
-        android:text="Connect" />
-
-    <Button
         android:id="@+id/switchActivity"
         android:layout_width="200dp"
         android:layout_height="60dp"
@@ -87,5 +78,14 @@
         android:onClick="runOnClick"
         android:text="run" />
             <!-- android:layout_below="@+id/programId" -->
+
+    <Button
+        android:id="@+id/connect"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="connectOnClick"
+        android:text="Connect" />
 
 </RelativeLayout>

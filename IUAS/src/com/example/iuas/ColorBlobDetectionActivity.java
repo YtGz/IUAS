@@ -203,7 +203,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     	  LinkedList<Point> PointList = new LinkedList<Point>();
     	 
     	  // Define real-world coordinates for given chessboard pattern:
-    	  for (int i = 0; i < mPatternSize.height; i++) {
+    	  for (int i = 0; i < mPatternSize.height; i++) {		//swap the loops when switching between landscape and portrait mode
     	    y = 309.0f;
     	    for (int j = 0; j < mPatternSize.width; j++) {
     	      PointList.addLast(new Point(x,y));
