@@ -242,7 +242,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         } while(homography == null);
         
         //test
-        System.out.println(homography);
+        System.out.println(homography.rows() > 0 && homography.cols() > 0);
         /*Mat src =  new Mat(1, 1, CvType.CV_32FC2);
         Mat dest = new Mat(1, 1, CvType.CV_32FC2);
         src.put(0, 0, new double[] { 50.0, 30.0 }); // ps is a point in image coordinates
