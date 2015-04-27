@@ -1674,16 +1674,17 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f0b0031;
         public static final int action_mode_bar_stub=0x7f0b0030;
         public static final int action_mode_close_button=0x7f0b0023;
-        public static final int action_settings=0x7f0b004b;
+        public static final int action_settings=0x7f0b004c;
         public static final int activity_chooser_view_content=0x7f0b0024;
         public static final int always=0x7f0b0017;
         public static final int any=0x7f0b0009;
         public static final int back=0x7f0b000a;
         public static final int back_button=0x7f0b004a;
+        public static final int ball_catching_activity_view=0x7f0b0049;
         public static final int beginning=0x7f0b001e;
         public static final int checkbox=0x7f0b002c;
         public static final int collapseActionView=0x7f0b0018;
-        public static final int color_blob_detection_activity_surface_view=0x7f0b0049;
+        public static final int color_blob_detection_activity_surface_view=0x7f0b004b;
         public static final int connect=0x7f0b0043;
         public static final int decor_content_parent=0x7f0b0032;
         public static final int default_activity_button=0x7f0b0027;
@@ -1788,9 +1789,10 @@ containing a value of this type.
         public static final int abc_search_view=0x7f030015;
         public static final int abc_simple_dropdown_hint=0x7f030016;
         public static final int activity_main=0x7f030017;
-        public static final int color_blob_detection_surface_view=0x7f030018;
-        public static final int main=0x7f030019;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001a;
+        public static final int ball_catching_view=0x7f030018;
+        public static final int color_blob_detection_surface_view=0x7f030019;
+        public static final int main=0x7f03001a;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001b;
     }
     public static final class menu {
         public static final int main=0x7f0d0000;
@@ -1854,6 +1856,7 @@ containing a value of this type.
         public static final int abc_toolbar_collapse_description=0x7f060006;
         public static final int action_settings=0x7f060014;
         public static final int app_name=0x7f060001;
+        public static final int catching_ball=0x7f060015;
         public static final int color_blob_detection=0x7f060012;
         public static final int hello=0x7f060000;
         public static final int hello_world=0x7f060013;

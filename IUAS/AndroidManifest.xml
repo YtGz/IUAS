@@ -48,6 +48,12 @@
                   android:screenOrientation="landscape"
                   android:configChanges="keyboardHidden|orientation">
         </activity>
+        <activity android:name="CatchingBallActivity"
+                  android:label="@string/catching_ball"
+                  android:parentActivityName="com.example.iuas.MainActivity"
+                  android:screenOrientation="landscape"
+                  android:configChanges="keyboardHidden|orientation">
+        </activity>
     </application>
 
 </manifest>
