@@ -1,15 +1,19 @@
 package com.example.iuas;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -38,6 +42,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     private Mat                  mSpectrum;
     private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
+    private Mat					 homography;
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
@@ -75,6 +80,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.color_blob_detection_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
+        
     }
 
     @Override
@@ -189,10 +195,50 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         return new Scalar(pointMatRgba.get(0, 0));
     }
     
+    public Mat getHomographyMatrix(Mat mRgba) {
+    	  final Size mPatternSize = new Size(6, 9); // number of inner corners in the used chessboard pattern 
+    	  float x = -48.0f; // coordinates of first detected inner corner on chessboard
+    	  float y = 309.0f;
+    	  float delta = 12.0f; // size of a single square edge in chessboard
+    	  LinkedList<Point> PointList = new LinkedList<Point>();
+    	 
+    	  // Define real-world coordinates for given chessboard pattern:
+    	  for (int i = 0; i < mPatternSize.height; i++) {
+    	    y = 309.0f;
+    	    for (int j = 0; j < mPatternSize.width; j++) {
+    	      PointList.addLast(new Point(x,y));
+    	      y += delta;
+    	    }
+    	    x += delta;
+    	  }
+    	  MatOfPoint2f RealWorldC = new MatOfPoint2f();
+    	  RealWorldC.fromList(PointList);
+    	 
+    	  // Detect inner corners of chessboard pattern from image:
+    	  Mat gray = new Mat();
+    	  Imgproc.cvtColor(mRgba, gray, Imgproc.COLOR_RGBA2GRAY); // convert image to grayscale
+    	  MatOfPoint2f mCorners = new MatOfPoint2f();
+    	  boolean mPatternWasFound = Calib3d.findChessboardCorners(gray, mPatternSize, mCorners);
+    	 
+    	  // Calculate homography:
+    	  if (mPatternWasFound) {
+    	    Calib3d.drawChessboardCorners(mRgba, mPatternSize, mCorners, mPatternWasFound); //for visualization
+    	    return Calib3d.findHomography(mCorners, RealWorldC);
+    	  }
+    	  else
+    	    return new Mat();
+    }
+    
     public void backButtonOnClick(View view) {
     	Intent intent = new Intent();
         intent.putExtra("color", mBlobColorRgba.val);
         setResult(RESULT_OK, intent);
         finish();
+    }
+    
+    public void homographyButtonOnClick(View view) {
+        do {
+        	homography = getHomographyMatrix(mRgba);
+        } while(homography == null);
     }
 }

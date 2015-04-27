@@ -1674,7 +1674,7 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f0b0031;
         public static final int action_mode_bar_stub=0x7f0b0030;
         public static final int action_mode_close_button=0x7f0b0023;
-        public static final int action_settings=0x7f0b004c;
+        public static final int action_settings=0x7f0b004d;
         public static final int activity_chooser_view_content=0x7f0b0024;
         public static final int always=0x7f0b0017;
         public static final int any=0x7f0b0009;
@@ -1698,6 +1698,7 @@ containing a value of this type.
         public static final int front=0x7f0b000b;
         public static final int home=0x7f0b0000;
         public static final int homeAsUp=0x7f0b0011;
+        public static final int homographyButton=0x7f0b004c;
         public static final int icon=0x7f0b0029;
         public static final int ifRoom=0x7f0b0019;
         public static final int image=0x7f0b0026;
