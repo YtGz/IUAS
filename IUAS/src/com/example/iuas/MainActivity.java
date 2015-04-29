@@ -4,7 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 
@@ -27,9 +30,9 @@ public class MainActivity extends ActionBarActivity {
 	private EditText xIn;
 	private EditText yIn;
 	private EditText phiIn;
-	private final double K = 1.358; // offset correction for forward movement
+	private final double K = 1.4; // offset correction for forward movement
 	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
-	private final double L = 1.14; // offset correction for turning angle
+	private final double L = 1.01; // offset correction for turning angle
 	private final double L_DETAIL = 1.05; // offset correction for turning angle
 											// of 15�
 	private final double L_DETAIL_SENSOR = 1.467; // offset correction for
@@ -218,7 +221,8 @@ public class MainActivity extends ActionBarActivity {
 			if (degree == 10) {
 				degree = 11;
 			}
-			comWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
+			if(degree > 0)
+				comWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
 			try {
 				Thread.sleep((long) Math.ceil(degree * 1000 / calib / R_SPEED));
 			} catch (InterruptedException e) {
@@ -487,6 +491,7 @@ public class MainActivity extends ActionBarActivity {
 	public void navigateIgnoringObstacles(int x, int y, int theta) {
 		int r = (int) Math.sqrt(x * x + y * y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
+		System.out.println(phi);
 		phi *= -1;
 		robotTurn(phi);
 		robotDrive(r);
@@ -652,8 +657,7 @@ public class MainActivity extends ActionBarActivity {
 		double c = 1 + calib / 100.0;
 		for (int i = 1; i <= 360; i += DELTA_R) {
 			robotTurn(DELTA_R, c);
-			detectObstacle(new boolean[] { true, true, false }, new int[] {
-					100, 255 });
+			//detectObstacle(new boolean[] { true, true, false }, new int[] { 100, 255 });
 		}
 	}
 	
@@ -661,8 +665,7 @@ public class MainActivity extends ActionBarActivity {
 		double c = 1 + calib /100.0;
 		for(int i =1 ; i <= 60; i += DELTA_M){
 			robotDrive(DELTA_M, c);
-			detectObstacle(new boolean[] { true, true, false }, new int[] {
-					100, 255 });
+			//detectObstacle(new boolean[] { true, true, false }, new int[] { 100, 255 });
 			
 		}
 	}
@@ -683,38 +686,43 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	public void runOnClick(View view) {
-		/*switch (Integer.parseInt(programId.getText().toString())) {
-		case 0:
+		//switch (Integer.parseInt(xIn.getText().toString())) {
+		//case 0:
 			//calibrateLDetail(100);
-			navigate(0, 120, 0);
+			//navigate(0, 120, 0);
 			// rotTest(60);
-			break;
-		case 1:
-			textLog.setText(retrieveSensorData());
+			//break;
+		//case 1:
+			//textLog.setText(retrieveSensorData());
 			// viewSensorOutput(); //To (1) calibrate the sensors and (2) see if
 			// data is byte array or String and if it is in cm or V
-			break;
-		case 2:
-			lemniscateTestVer2(50);
-			break;
-		case 3:
-			robotFlashLed(0);
-			navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
-			break;
-		case 4:
+			//break;
+		//case 2:
+			//lemniscateTestVer2(50);
+			//break;
+		//case 3:
+			//robotFlashLed(0);
+			//navigateIgnoringObstacles((byte) 4 , (byte) 5, (byte) 0);
+			//break;
+		//case 4:
 			// navigate((byte) 4 , (byte) 5, (byte) 0);
-			break;
-		default:
+			//break;
+		//default:
 			// robotDrive(Integer.parseInt(programId.getText().toString()));
 			// //To calibrate the forward movement (calculate k)
 			// robotTurn(Integer.parseInt(programId.getText().toString())); //To
 			// calibrate the turning angle
 			// stopAndGo(Integer.parseInt(programId.getText().toString()));
-			//calibrateLDetail(Integer.parseInt(programId.getText().toString()));
-			//calibrateDistance(Integer.parseInt(programId.getText().toString()));
+			//calibrateLDetail(Integer.parseInt(xIn.getText().toString()));
+			//calibrateDistance(Integer.parseInt(xIn.getText().toString()));
 			//rotTest(Integer.parseInt(programId.getText().toString()));
-		}
-		*/
-		navigate(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
+		//}
+		//navigateIgnoringObstacles(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
+		Mat src =  new Mat(1, 1, CvType.CV_32FC2);
+        Mat dest = new Mat(1, 1, CvType.CV_32FC2);
+        src.put(0, 0, new double[] { 0.0, 100.0 }); // ps is a point in image coordinates
+        Core.perspectiveTransform(src, dest, ColorBlobDetectionActivity.homography); //homography is your homography matrix
+        Point dest_point = new Point(dest.get(0, 0)[0], dest.get(0, 0)[1]);
+		navigateIgnoringObstacles((int)dest_point.x, (int)dest_point.y, 0);
 	}
 }

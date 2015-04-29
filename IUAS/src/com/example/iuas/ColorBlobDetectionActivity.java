@@ -42,7 +42,8 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     private Mat                  mSpectrum;
     private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
-    private Mat					 homography;
+    public  static Mat			 homography;
+    private boolean				 lockMrgba = false;
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
@@ -169,21 +170,22 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-        mRgba = inputFrame.rgba();
-
-        if (mIsColorSelected) {
-            mDetector.process(mRgba);
-            List<MatOfPoint> contours = mDetector.getContours();
-            Log.e(TAG, "Contours count: " + contours.size());
-            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-
-            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
-            colorLabel.setTo(mBlobColorRgba);
-
-            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
-            mSpectrum.copyTo(spectrumLabel);
-        }
-
+    	if(!lockMrgba){
+	        mRgba = inputFrame.rgba();
+	
+	        if (mIsColorSelected) {
+	            mDetector.process(mRgba);
+	            List<MatOfPoint> contours = mDetector.getContours();
+	            Log.e(TAG, "Contours count: " + contours.size());
+	            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+	
+	            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
+	            colorLabel.setTo(mBlobColorRgba);
+	
+	            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
+	            mSpectrum.copyTo(spectrumLabel);
+	        }
+    	}
         return mRgba;
     }
 
@@ -222,6 +224,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     	 
     	  // Calculate homography:
     	  if (mPatternWasFound) {
+    		lockMrgba = true;
     	    Calib3d.drawChessboardCorners(mRgba, mPatternSize, mCorners, mPatternWasFound); //for visualization
     	    return Calib3d.findHomography(mCorners, RealWorldC);
     	  }
