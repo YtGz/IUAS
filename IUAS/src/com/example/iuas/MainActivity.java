@@ -72,21 +72,7 @@ public class MainActivity extends ActionBarActivity {
 		connect();
 	}
 	
-	public void switchActivity(View view) {
-		Intent intent = new Intent(this, ColorBlobDetectionActivity.class);
-		final int result=1;
-		startActivityForResult(intent, result);
-	}
-	
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		double[] color = data.getDoubleArrayExtra("color");
-		for (double c : color) {
-			System.out.println(c);
-		}
-		mBlobColorRgba = new Scalar(color);
-	}
+
 
 	/**************************************************************************************************************************************
 	 * Basic robot commands. *
@@ -675,8 +661,23 @@ public class MainActivity extends ActionBarActivity {
 	 * UI methods *
 	 ***************************************************************************************************************************************************/
 
-	public void connectOnClick(View view) {
-		//connect();
+	public void switchActivity(View view) {
+		Intent intent = new Intent(this, ColorBlobDetectionActivity.class);
+		final int result=1;
+		startActivityForResult(intent, result);
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		double[] color = data.getDoubleArrayExtra("color");
+		for (double c : color) {
+			System.out.println(c);
+		}
+		mBlobColorRgba = new Scalar(color);
+	}
+	
+	public void ballCatchingOnClick(View view) {
 		Intent intent = new Intent(this, BallCatchingActivity.class);
 		intent.putExtra("mBlobColorRgba", mBlobColorRgba.val);
 		startActivity(intent);

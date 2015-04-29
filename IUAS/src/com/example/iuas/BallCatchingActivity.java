@@ -1,15 +1,20 @@
 package com.example.iuas;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -27,7 +32,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 
-public class BallCatchingActivity extends Activity implements OnTouchListener, CvCameraViewListener2 {
+public class BallCatchingActivity extends MainActivity implements CvCameraViewListener2 {
     private static final String  TAG              = "OCVSample::Activity";
 
     private boolean              mIsColorSelected = false;
@@ -38,6 +43,9 @@ public class BallCatchingActivity extends Activity implements OnTouchListener, C
     private Mat                  mSpectrum;
     private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
+    private Scalar				 POINT_COLOR;
+    private Mat				 	 homography;
+    private Point				 lowestTargetPoint;
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
@@ -49,7 +57,6 @@ public class BallCatchingActivity extends Activity implements OnTouchListener, C
                 {
                     Log.i(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
-                    mOpenCvCameraView.setOnTouchListener(BallCatchingActivity.this);
                 } break;
                 default:
                 {
@@ -66,18 +73,21 @@ public class BallCatchingActivity extends Activity implements OnTouchListener, C
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	homography = ColorBlobDetectionActivity.homography;
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-      
+
+        setContentView(R.layout.ball_catching_view);
+        
         Intent intent = getIntent();
         double[] c = intent.getDoubleArrayExtra("mBlobColorRgba");
         mBlobColorRgba = new Scalar(c);
-        setContentView(R.layout.ball_catching_view);
+
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.ball_catching_activity_view);
-        mOpenCvCameraView.setCvCameraViewListener(this);
+        
     }
 
     @Override
@@ -105,82 +115,41 @@ public class BallCatchingActivity extends Activity implements OnTouchListener, C
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mSpectrum = new Mat();
-        //mBlobColorRgba = new Scalar(255);
-        mBlobColorHsv = new Scalar(255);
         SPECTRUM_SIZE = new Size(200, 64);
-        CONTOUR_COLOR = new Scalar(255,0,0,255);
+        CONTOUR_COLOR = new Scalar(0,0,255,255);
+        POINT_COLOR = new Scalar(255,0,0,255);
     }
 
     public void onCameraViewStopped() {
         mRgba.release();
     }
 
-    public boolean onTouch(View v, MotionEvent event) {  	
-        int cols = mRgba.cols();
-        int rows = mRgba.rows();
-
-        int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
-        int yOffset = (mOpenCvCameraView.getHeight() - rows) / 2;
-
-        int x = (int)event.getX() - xOffset;
-        int y = (int)event.getY() - yOffset;
-
-        Log.i(TAG, "Touch image coordinates: (" + x + ", " + y + ")");
-
-        if ((x < 0) || (y < 0) || (x > cols) || (y > rows)) return false;
-
-        Rect touchedRect = new Rect();
-
-        touchedRect.x = (x>4) ? x-4 : 0;
-        touchedRect.y = (y>4) ? y-4 : 0;
-
-        touchedRect.width = (x+4 < cols) ? x + 4 - touchedRect.x : cols - touchedRect.x;
-        touchedRect.height = (y+4 < rows) ? y + 4 - touchedRect.y : rows - touchedRect.y;
-
-        Mat touchedRegionRgba = mRgba.submat(touchedRect);
-
-        Mat touchedRegionHsv = new Mat();
-        Imgproc.cvtColor(touchedRegionRgba, touchedRegionHsv, Imgproc.COLOR_RGB2HSV_FULL);
-
-        // Calculate average color of touched region
-        mBlobColorHsv = Core.sumElems(touchedRegionHsv);
-        int pointCount = touchedRect.width*touchedRect.height;
-        for (int i = 0; i < mBlobColorHsv.val.length; i++)
-            mBlobColorHsv.val[i] /= pointCount;
-
-        mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
-
-        Log.i(TAG, "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " + mBlobColorRgba.val[1] +
-                ", " + mBlobColorRgba.val[2] + ", " + mBlobColorRgba.val[3] + ")");
-
-        mDetector.setHsvColor(mBlobColorHsv);
-
-        Imgproc.resize(mDetector.getSpectrum(), mSpectrum, SPECTRUM_SIZE);
-
-        mIsColorSelected = true;
-
-        touchedRegionRgba.release();
-        touchedRegionHsv.release();
-
-        return false; // don't need subsequent touch events
-    }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-        mRgba = inputFrame.rgba();
-
-        if (mIsColorSelected) {
+	        mRgba = inputFrame.rgba();
             mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
             Log.e(TAG, "Contours count: " + contours.size());
+            for (MatOfPoint mp : contours) {
+            	double min = Double.MAX_VALUE;
+            	for (Point p : mp.toArray()) {
+            		if(p.y < min){
+            			min = p.y;
+            			lowestTargetPoint = p;
+            		}      		
+            	}
+            	break;
+            	
+            }
+            ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
+            l.add(new MatOfPoint(lowestTargetPoint));
             Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-
+            Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
             Mat colorLabel = mRgba.submat(4, 68, 4, 68);
             colorLabel.setTo(mBlobColorRgba);
-
+            
             Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
             mSpectrum.copyTo(spectrumLabel);
-        }
-
         return mRgba;
     }
 
@@ -192,10 +161,26 @@ public class BallCatchingActivity extends Activity implements OnTouchListener, C
         return new Scalar(pointMatRgba.get(0, 0));
     }
     
+    
     public void backButtonOnClick(View view) {
     	Intent intent = new Intent();
         intent.putExtra("color", mBlobColorRgba.val);
         setResult(RESULT_OK, intent);
         finish();
+    }
+    
+    public void catchBallOnClick(View view){
+    	Point p = convertImageToGround(lowestTargetPoint);
+    	navigateIgnoringObstacles((int)p.x, (int)p.y, 0);
+    }
+    
+    public Point convertImageToGround(Point p){
+    	Mat src =  new Mat(1, 1, CvType.CV_32FC2);
+        Mat dest = new Mat(1, 1, CvType.CV_32FC2);
+        src.put(0, 0, new double[] { p.x, p.y }); // p is a point in image coordinates
+        Core.perspectiveTransform(src, dest, homography); //homography is your homography matrix
+        Point dest_point = new Point(dest.get(0, 0)[0], dest.get(0, 0)[1]);
+       // System.out.println(dest_point);
+        return dest_point;
     }
 }

@@ -242,6 +242,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     	 
     	  // Calculate homography:
     	  if (mPatternWasFound) {
+    		System.out.println("Homography is ready!");
     		lockMrgba = true;
     	    Calib3d.drawChessboardCorners(mRgba, mPatternSize, mCorners, mPatternWasFound); //for visualization
     	    return Calib3d.findHomography(mCorners, RealWorldC);
@@ -261,14 +262,5 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         do {
         	homography = getHomographyMatrix(mRgba);
         } while(homography == null);
-        
-        //test
-        System.out.println(homography.rows() > 0 && homography.cols() > 0);
-        /*Mat src =  new Mat(1, 1, CvType.CV_32FC2);
-        Mat dest = new Mat(1, 1, CvType.CV_32FC2);
-        src.put(0, 0, new double[] { 50.0, 30.0 }); // ps is a point in image coordinates
-        Core.perspectiveTransform(src, dest, homography); //homography is your homography matrix
-        Point dest_point = new Point(dest.get(0, 0)[0], dest.get(0, 0)[1]);
-        System.out.println(dest_point);*/
     }
 }
