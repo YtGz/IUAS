@@ -1,5 +1,6 @@
 package com.example.iuas;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     private Mat                  mSpectrum;
     private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
+    private Scalar				 POINT_COLOR;
     public  static Mat			 homography;
     private boolean				 lockMrgba = false;
 
@@ -112,7 +114,8 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         mBlobColorRgba = new Scalar(255);
         mBlobColorHsv = new Scalar(255);
         SPECTRUM_SIZE = new Size(200, 64);
-        CONTOUR_COLOR = new Scalar(255,0,0,255);
+        CONTOUR_COLOR = new Scalar(0,0,255,255);
+        POINT_COLOR = new Scalar(255,0,0,255);
     }
 
     public void onCameraViewStopped() {
@@ -172,16 +175,31 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
     	if(!lockMrgba){
 	        mRgba = inputFrame.rgba();
-	
+	        
 	        if (mIsColorSelected) {
+	        	Point a = new Point();
 	            mDetector.process(mRgba);
 	            List<MatOfPoint> contours = mDetector.getContours();
 	            Log.e(TAG, "Contours count: " + contours.size());
+	            //System.out.println("Contours count: " + contours.size());
+	            for (MatOfPoint mp : contours) {
+	            	double min = Double.MAX_VALUE;
+	            	for (Point p : mp.toArray()) {
+	            		if(p.y < min){
+	            			min = p.y;
+	            			a = p;
+	            		}      		
+	            	}
+	            	break;
+	            	
+	            }
+	            ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
+	            l.add(new MatOfPoint(a));
 	            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-	
+	            Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
 	            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
 	            colorLabel.setTo(mBlobColorRgba);
-	
+	            
 	            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
 	            mSpectrum.copyTo(spectrumLabel);
 	        }

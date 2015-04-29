@@ -55,6 +55,7 @@ public class MainActivity extends ActionBarActivity {
 								// anymore
 
 	private Scalar mBlobColorRgba;
+	private static Point targetLowestPoint;
 	
 	
 	
