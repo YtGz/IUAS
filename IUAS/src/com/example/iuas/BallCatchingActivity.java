@@ -35,10 +35,8 @@ import android.view.View.OnTouchListener;
 public class BallCatchingActivity extends MainActivity implements CvCameraViewListener2 {
     private static final String  TAG              = "OCVSample::Activity";
 
-    private boolean              mIsColorSelected = false;
     private Mat                  mRgba;
     private Scalar               mBlobColorRgba;
-    private Scalar               mBlobColorHsv;
     private ColorBlobDetector    mDetector;
     private Mat                  mSpectrum;
     private Size                 SPECTRUM_SIZE;
