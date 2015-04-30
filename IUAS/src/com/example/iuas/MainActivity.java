@@ -54,7 +54,7 @@ public class MainActivity extends ActionBarActivity {
 								// sensor doesn't see the obstacle's edge
 								// anymore
 
-	private Scalar mBlobColorRgba;
+	private Scalar mBlobColorHsv;
 	private static Point targetLowestPoint;
 	
 	
@@ -674,12 +674,12 @@ public class MainActivity extends ActionBarActivity {
 		for (double c : color) {
 			System.out.println(c);
 		}
-		mBlobColorRgba = new Scalar(color);
+		mBlobColorHsv = new Scalar(color);
 	}
 	
 	public void ballCatchingOnClick(View view) {
 		Intent intent = new Intent(this, BallCatchingActivity.class);
-		intent.putExtra("mBlobColorRgba", mBlobColorRgba.val);
+		intent.putExtra("mBlobColorHsv", mBlobColorHsv.val);
 		startActivity(intent);
 	}
 

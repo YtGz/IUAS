@@ -253,7 +253,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     
     public void backButtonOnClick(View view) {
     	Intent intent = new Intent();
-        intent.putExtra("color", mBlobColorRgba.val);
+        intent.putExtra("color", mBlobColorHsv.val);
         setResult(RESULT_OK, intent);
         finish();
     }
