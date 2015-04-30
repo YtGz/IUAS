@@ -156,8 +156,9 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     	if (lowestTargetPoint != null) {
 	    	Point p = convertImageToGround(lowestTargetPoint);
 	    	System.out.println(p);
-	    	navigateIgnoringObstacles((int)p.x/10, (int)p.y/10-5, 0);
-	    	robotDrive(-2);
+	    	navigateIgnoringObstacles((int)p.x/10, (int)p.y/10-10, 0);
+	    	robotDrive(-5);
+	    	robotFlashLed(0);
     	}
     }
     
