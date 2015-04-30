@@ -3,6 +3,8 @@ package com.example.iuas;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.ksksue.driver.serial.FTDriver;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
@@ -18,11 +20,12 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import android.content.Intent;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 public class BallCatchingActivity extends MainActivity implements CvCameraViewListener2 {
     private Mat                  mRgba;
@@ -41,6 +44,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                 {
+                	System.out.println("OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
                 } break;
                 default:
@@ -58,22 +62,25 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	homography = ColorBlobDetectionActivity.homography;
         System.out.println("called onCreate");
-        super.onCreate(savedInstanceState);
+        super.onBallCatchingActivityCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.ball_catching_view);
         
+        textLog = (TextView) findViewById(R.id.textLog);
+        com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
+		connect();
+        
         Intent intent = getIntent();
         double[] c = intent.getDoubleArrayExtra("mBlobColorHsv");
         mBlobColorHsv = new Scalar(c);
-        mDetector.setHsvColor(mBlobColorHsv);
-
+        System.out.println("mBlobColorHsv: " + mBlobColorHsv);
+        homography = ColorBlobDetectionActivity.homography;
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.ball_catching_activity_view);
-        
+        mOpenCvCameraView.setCvCameraViewListener(this);
     }
 
     @Override
@@ -98,8 +105,10 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     }
 
     public void onCameraViewStarted(int width, int height) {
+    	System.out.println("Cam View: " + mOpenCvCameraView);
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
+        mDetector.setHsvColor(mBlobColorHsv);
         CONTOUR_COLOR = new Scalar(0,0,255,255);
         POINT_COLOR = new Scalar(255,0,0,255);
     }
@@ -113,22 +122,24 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	        mRgba = inputFrame.rgba();
             mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
-           System.out.println("Contours count: " + contours.size());
-            for (MatOfPoint mp : contours) {
-            	double min = Double.MAX_VALUE;
-            	for (Point p : mp.toArray()) {
-            		if(p.y < min){
-            			min = p.y;
-            			lowestTargetPoint = p;
-            		}      		
-            	}
-            	break;
-            	
+            //System.out.println("Contours count: " + contours.size());
+            if(contours.size() > 0) {
+	            for (MatOfPoint mp : contours) {
+	            	double min = Double.MAX_VALUE;
+	            	for (Point p : mp.toArray()) {
+	            		if(p.y < min){
+	            			min = p.y;
+	            			lowestTargetPoint = p;
+	            		}      		
+	            	}
+	            	break;
+	            	
+	            }
+	            ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
+	            l.add(new MatOfPoint(lowestTargetPoint));
+	            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+	            Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
             }
-            ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
-            l.add(new MatOfPoint(lowestTargetPoint));
-            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-            Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
             
         return mRgba;
     }
@@ -142,8 +153,12 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     }
     
     public void catchBallOnClick(View view){
-    	Point p = convertImageToGround(lowestTargetPoint);
-    	navigateIgnoringObstacles((int)p.x, (int)p.y, 0);
+    	if (lowestTargetPoint != null) {
+	    	Point p = convertImageToGround(lowestTargetPoint);
+	    	System.out.println(p);
+	    	navigateIgnoringObstacles((int)p.x/10, (int)p.y/10-5, 0);
+	    	robotDrive(-2);
+    	}
     }
     
     public Point convertImageToGround(Point p){

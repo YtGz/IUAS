@@ -8,6 +8,13 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/ball_catching_activity_view" />
+    
+      <TextView
+        android:id="@+id/textLog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/back_button"

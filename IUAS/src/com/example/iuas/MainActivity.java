@@ -1,38 +1,32 @@
 package com.example.iuas;
 
-import java.io.File;
-import java.util.ArrayList;
+import jp.ksksue.driver.serial.FTDriver;
 
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.highgui.Highgui;
 
-import jp.ksksue.driver.serial.FTDriver;
+import android.app.Activity;
 import android.content.Intent;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
-	private FTDriver com;
-	private TextView textLog;
+	protected FTDriver com;
+	protected TextView textLog;
 	//private EditText programId; 
 	private EditText xIn;
 	private EditText yIn;
 	private EditText phiIn;
-	private final double K = 1.4; // offset correction for forward movement
+	protected final double K = 1.4; // offset correction for forward movement
 	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
-	private final double L = 1.01; // offset correction for turning angle
+	protected final double L = 1.01; // offset correction for turning angle
 	private final double L_DETAIL = 1.05; // offset correction for turning angle
 											// of 15�
 	private final double L_DETAIL_SENSOR = 1.467; // offset correction for
@@ -41,9 +35,9 @@ public class MainActivity extends ActionBarActivity {
 													// obstacles
 	private final byte[] SENSOR_OFFSETS = { 1, 1, 1 }; // offsets of the
 														// individual sensors
-	private final double R_SPEED = 72; // The default turning speed of the robot
+	protected final double R_SPEED = 72; // The default turning speed of the robot
 										// in �/s
-	private final double M_SPEED = 14.2; // The default velocity of the robot in
+	protected final double M_SPEED = 14.2; // The default velocity of the robot in
 											// cm/s
 	private final int WHEEL_SPACING = 19;
 	private final int DELTA_M = 10; // The distance to travel until robot
@@ -55,7 +49,6 @@ public class MainActivity extends ActionBarActivity {
 								// anymore
 
 	private Scalar mBlobColorHsv;
-	private static Point targetLowestPoint;
 	
 	
 	
@@ -70,6 +63,11 @@ public class MainActivity extends ActionBarActivity {
 		phiIn = (EditText) findViewById(R.id.phi);
 		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 		connect();
+	}
+	
+
+	public void onBallCatchingActivityCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 	}
 	
 
