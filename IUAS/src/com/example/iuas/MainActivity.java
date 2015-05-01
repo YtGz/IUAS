@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
 	private final int WHEEL_SPACING = 19;
 	private final int DELTA_M = 10; // The distance to travel until robot
 									// measures for obstacle
-	private final int DELTA_R = 15; // The degrees to rotate until robot
+	protected final int DELTA_R = 15; // The degrees to rotate until robot
 									// measures for obstacle
 	private final int O = 10; // How far the robot should drive after the right
 								// sensor doesn't see the obstacle's edge

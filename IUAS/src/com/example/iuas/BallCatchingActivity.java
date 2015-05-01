@@ -1,6 +1,8 @@
 package com.example.iuas;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import jp.ksksue.driver.serial.FTDriver;
@@ -27,7 +29,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-public class BallCatchingActivity extends MainActivity implements CvCameraViewListener2 {
+public class BallCatchingActivity extends MainActivity implements CvCameraViewListener2, Runnable {
     private Mat                  mRgba;
     private Scalar               mBlobColorHsv;
     private ColorBlobDetector    mDetector;
@@ -122,7 +124,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	        mRgba = inputFrame.rgba();
             mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
-            //System.out.println("Contours count: " + contours.size());
+            System.out.println("Contours count: " + contours.size());
             if(contours.size() > 0) {
 	            for (MatOfPoint mp : contours) {
 	            	double min = Double.MAX_VALUE;
@@ -139,8 +141,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	            l.add(new MatOfPoint(lowestTargetPoint));
 	            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
 	            Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
-            }
-            
+            }    
         return mRgba;
     }
     
@@ -153,13 +154,8 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     }
     
     public void catchBallOnClick(View view){
-    	if (lowestTargetPoint != null) {
-	    	Point p = convertImageToGround(lowestTargetPoint);
-	    	System.out.println(p);
-	    	navigateIgnoringObstacles((int)p.x/10, (int)p.y/10-10, 0);
-	    	robotDrive(-5);
-	    	robotFlashLed(0);
-    	}
+    	Thread t = new Thread(this);
+    	t.start();
     }
     
     public Point convertImageToGround(Point p){
@@ -171,4 +167,57 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
        // System.out.println(dest_point);
         return dest_point;
     }
+    
+    public void work() {
+    	ArrayList<Double> l = new ArrayList<Double>();
+    	for(int i = 0; i < 50000; i++) {
+    		l.add(Math.random());
+    	}
+    	Collections.sort(l);
+    	System.out.println("Finished wait");
+    }
+
+	@Override
+	public void run() {
+	/*	for (int i = 1; i <= 360; i += DELTA_R) {
+    		//work();
+	    	if (lowestTargetPoint != null) {
+	    		//robotTurn(-DELTA_R);
+	    		work();
+		    	Point p = convertImageToGround(lowestTargetPoint);
+		    	System.out.println(p);
+		    	navigateIgnoringObstacles((int)p.x/10, (int)p.y/10-20, 0);
+		    	robotDrive(-5);
+		    	robotFlashLed(0);
+		    	return;
+	    	}
+    	robotTurn(DELTA_R);
+    	}*/
+		exploreWorkspace();
+	}
+	
+	
+	/**
+	 * Explores workspace ala "Zick-Zack".
+	 */
+	public void exploreWorkspace() {
+		final int workspaceFactor = 2;
+		robotTurn(-45);
+		robotDrive((int)Math.sqrt(450)/workspaceFactor);
+		robotTurn(135);
+		robotDrive(300/workspaceFactor);
+		robotTurn((int)Math.ceil(168.75));
+		robotDrive((int)Math.sqrt(956.25)/workspaceFactor);
+		robotTurn((int)Math.ceil(-157.5));
+		robotDrive((int)Math.sqrt(956.25)/workspaceFactor);
+		robotTurn((int)Math.ceil(157.5));
+		robotDrive((int)Math.sqrt(956.25)/workspaceFactor);
+		robotTurn((int)Math.ceil(-157.5));
+		robotDrive((int)Math.sqrt(956.25)/workspaceFactor);
+		robotTurn((int)Math.ceil(-168.75));
+		robotDrive(300/workspaceFactor);
+		robotTurn(135);
+		robotDrive((int)Math.sqrt(450)/workspaceFactor);
+		
+	}
 }
