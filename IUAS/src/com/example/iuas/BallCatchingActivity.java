@@ -22,6 +22,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import android.content.Intent;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.View;
@@ -37,6 +38,8 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     private Scalar				 POINT_COLOR;
     private Mat				 	 homography;
     private Point				 lowestTargetPoint;
+    private Point				 robotPosition;
+    private double				 robotRotation;
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
@@ -80,6 +83,8 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
         mBlobColorHsv = new Scalar(c);
         System.out.println("mBlobColorHsv: " + mBlobColorHsv);
         homography = ColorBlobDetectionActivity.homography;
+        robotPosition = new Point(0, 0);
+        robotRotation = 0;
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.ball_catching_activity_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
@@ -124,7 +129,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	        mRgba = inputFrame.rgba();
             mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
-            System.out.println("Contours count: " + contours.size());
+           // System.out.println("Contours count: " + contours.size());
             if(contours.size() > 0) {
 	            for (MatOfPoint mp : contours) {
 	            	double min = Double.MAX_VALUE;
@@ -179,45 +184,91 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 
 	@Override
 	public void run() {
-	/*	for (int i = 1; i <= 360; i += DELTA_R) {
+	
+		exploreWorkspace();
+	}
+	
+	public void catchBall(double x, double y){
+		if(!turnToDetectObstacle()) {
+			exploreWorkspace();
+		}
+		//deliver ball to target position
+		//return to origin
+	}
+	
+	public boolean turnToDetectObstacle(){
+		for (int i = 1; i <= 360; i += DELTA_R) {
     		//work();
 	    	if (lowestTargetPoint != null) {
 	    		//robotTurn(-DELTA_R);
 	    		work();
 		    	Point p = convertImageToGround(lowestTargetPoint);
 		    	System.out.println(p);
-		    	navigateIgnoringObstacles((int)p.x/10, (int)p.y/10-20, 0);
-		    	robotDrive(-5);
+		    	p.x /= 10;
+		    	p.y = p.y/10-20;
+		    	double[] d = cartesianToPolar(p);
+		    	robotMove(d[1], d[0]);
+		    	robotMove(0, -5);
 		    	robotFlashLed(0);
-		    	return;
+		    	return true;
 	    	}
-    	robotTurn(DELTA_R);
-    	}*/
-		exploreWorkspace();
+    	robotMove(DELTA_R, 0);
+    	}
+		return false;
 	}
 	
+	/**
+	 * Converts coordinates from polar to cartesian.
+	 */
+	public Point polarToCartesian(double phi, double r) {
+		double xf = Math.cos(phi * 2 * Math.PI / 360) * r;
+		double yf = Math.sin(phi * 2 * Math.PI / 360) * r;
+		
+		return new Point(xf, yf);
+	}
+	
+	public double[] cartesianToPolar(Point p){
+		double r =  Math.sqrt(p.x*p.x + p.y * p.y);
+    	double phi =  Math.atan2(p.y, p.x);
+    	return new double[]{r, phi};
+	}
+	
+	/**
+	 * Lets the robot turn and move with the given parameters.
+	 * Also returns a log of the robot's current position.
+	 * 
+	 * @param phi
+	 * @param r
+	 */
+	public void robotMove(double phi, double r) {
+		int phiC = (int) Math.round(phi);
+		int rC = (int) Math.round(r);
+		robotTurn(phiC);
+		robotDrive(rC);
+		
+		robotRotation = phiC - robotRotation;
+		Point p = polarToCartesian(robotRotation, rC);
+		robotPosition.x += p.x;
+		robotPosition.y += p.y;
+		
+		System.out.println("Updated robot position: "+robotPosition);
+		System.out.println("Updated rotation rel. to start: "+robotRotation);
+	}
 	
 	/**
 	 * Explores workspace ala "Zick-Zack".
+	 * Makes one turn and one driving distance per method call.
 	 */
 	public void exploreWorkspace() {
 		final int workspaceFactor = 2;
-		robotTurn(-45);
-		robotDrive((int)Math.sqrt(450)/workspaceFactor);
-		robotTurn(135);
-		robotDrive(300/workspaceFactor);
-		robotTurn((int)Math.ceil(168.75));
-		robotDrive((int)Math.sqrt(956.25)/workspaceFactor);
-		robotTurn((int)Math.ceil(-157.5));
-		robotDrive((int)Math.sqrt(956.25)/workspaceFactor);
-		robotTurn((int)Math.ceil(157.5));
-		robotDrive((int)Math.sqrt(956.25)/workspaceFactor);
-		robotTurn((int)Math.ceil(-157.5));
-		robotDrive((int)Math.sqrt(956.25)/workspaceFactor);
-		robotTurn((int)Math.ceil(-168.75));
-		robotDrive(300/workspaceFactor);
-		robotTurn(135);
-		robotDrive((int)Math.sqrt(450)/workspaceFactor);
-		
+		final double density = Math.sqrt(17);  	//Math.sqrt(5); for 2 crossings / Math.sqrt(17); for 4 crossings / Math.sqrt(65); for 8 crossings
+		robotMove(-45, Math.sqrt(45000)/workspaceFactor);
+		robotMove(135, 300/workspaceFactor);
+		robotMove(Math.ceil((180 - (Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor);
+		robotMove(-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density)))))), Math.sqrt(95625)/workspaceFactor);
+		robotMove(Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor);
+		robotMove(-Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor);
+		robotMove(Math.ceil(180 - (Math.asin(Math.toRadians(75/density)))), 300/workspaceFactor);
+		robotMove(135, Math.sqrt(45000)/workspaceFactor);	
 	}
 }
