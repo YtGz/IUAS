@@ -181,7 +181,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 
 	@Override
 	public void run() {
-		catchBall(150, 150);
+		catchBall(30, 30);
 	}
 	
 	public void catchBall(double x, double y){
@@ -190,30 +190,31 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		}
 		//deliver ball to target position
 		moveFromPointToPoint(robotPosition, new Point(x, y));
+		robotSetBar((byte) 255);
 		//return to origin
 		moveFromPointToPoint(robotPosition, new Point(0, 0));
 	}
 	
 	public boolean turnToDetectObstacle(){
 		for (int i = 1; i <= 360; i += DELTA_R) {
-    		//work();
-	    	if (lowestTargetPoint != null) {
-	    		//robotTurn(-DELTA_R);
-	    		work();
-		    	Point p = convertImageToGround(lowestTargetPoint);
-		    	System.out.println("lowest target point: "+p);
-		    	p.x /= 10;
-		    	p.y = p.y/10-20;
-		    	double[] d = cartesianToPolar(p);
-		    	robotMove(d[1], d[0]);
-		    	robotMove(0, -5);
-		    	robotFlashLed(0);
-		    	return true;
-	    	}
-    	//robotMove(DELTA_R, 0);
-	    	robotTurn(DELTA_R);
+			if(robotMove(DELTA_R, 0, true)) {
+				return true;
+			}
     	}
 		return false;
+	}
+
+	private void detectedBall() {
+		work();
+		Point p = convertImageToGround(lowestTargetPoint);
+		System.out.println("lowest target point: "+p);
+		p.x /= 10;
+		p.y = p.y/10-20;
+		double[] d = cartesianToPolar(p);
+		robotMove(d[1], d[0], false);
+		robotMove(0, -5, false);
+		robotSetBar((byte) 0);
+		robotFlashLed(0);
 	}
 	
 	/**
@@ -228,7 +229,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	
 	public double[] cartesianToPolar(Point p){
 		double r =  Math.sqrt(p.x*p.x + p.y * p.y);
-    	double phi =  Math.atan2(p.y, p.x);
+    	double phi =  Math.toDegrees(Math.atan2(p.y, p.x));
     	return new double[]{r, phi};
 	}
 	
@@ -239,16 +240,10 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	 * @param phi
 	 * @param r
 	 */
-	public void robotMove(double phi, double r) {
+	public boolean robotMove(double phi, double r, boolean searchForBall) {
 		int phiC = (int) Math.round(phi);
 		int rC = (int) Math.round(r);
 		robotTurn(phiC);
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		if(rC != 0) {
 			robotDrive(rC);
 		}
@@ -260,6 +255,12 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		
 		System.out.println("Updated robot position: "+robotPosition);
 		System.out.println("Updated rotation rel. to start: "+robotRotation);
+		
+		if (lowestTargetPoint != null && searchForBall) {
+			detectedBall();
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -269,23 +270,24 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	public void exploreWorkspace() {
 		final int workspaceFactor = 2;
 		final double density = Math.sqrt(17);  	//Math.sqrt(5); for 2 crossings / Math.sqrt(17); for 4 crossings / Math.sqrt(65); for 8 crossings
-		robotMove(-45, Math.sqrt(45000)/workspaceFactor);
-		robotMove(135, 300/workspaceFactor);
-		robotMove(Math.ceil((180 - (Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor);
-		robotMove(-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density)))))), Math.sqrt(95625)/workspaceFactor);
-		robotMove(Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor);
-		robotMove(-Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor);
-		robotMove(Math.ceil(180 - (Math.asin(Math.toRadians(75/density)))), 300/workspaceFactor);
-		robotMove(135, Math.sqrt(45000)/workspaceFactor);	
+		if(robotMove(-45, Math.sqrt(45000)/workspaceFactor, true)) return;
+		if(robotMove(135, 300/workspaceFactor, true)) return;
+		if(robotMove(Math.ceil((180 - (Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor, true)) return;
+		if(robotMove(-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density)))))), Math.sqrt(95625)/workspaceFactor, true)) return;
+		if(robotMove(Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor, true)) return;
+		if(robotMove(-Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor, true)) return;
+		if(robotMove(Math.ceil(180 - (Math.asin(Math.toRadians(75/density)))), 300/workspaceFactor, true)) return;
+		robotMove(135, Math.sqrt(45000)/workspaceFactor, true);	
 	}
 	
 	public void moveFromPointToPoint(Point origin, Point target) {
 		double x = target.x - origin.x;
 		double y = target.y - origin.y;
 		double[] d = cartesianToPolar(new Point(x, y));
+		System.out.println(d[0] + d[1]);
 		double r = d[0];
 		double phi = d[1] - robotRotation;
 		robotRotation = d[1];
-		robotMove(phi, r);
+		robotMove(phi, r, false);
 	}
 }
