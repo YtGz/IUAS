@@ -126,28 +126,28 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-	        mRgba = inputFrame.rgba();
-            mDetector.process(mRgba);
-            List<MatOfPoint> contours = mDetector.getContours();
-           // System.out.println("Contours count: " + contours.size());
-            if(contours.size() > 0) {
-	            for (MatOfPoint mp : contours) {
-	            	double min = Double.MAX_VALUE;
-	            	for (Point p : mp.toArray()) {
-	            		if(p.y < min){
-	            			min = p.y;
-	            			lowestTargetPoint = p;
-	            		}      		
-	            	}
-	            	break;
-	            	
-	            }
-	            ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
-	            l.add(new MatOfPoint(lowestTargetPoint));
-	            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-	            Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
-            }    
-        return mRgba;
+	    mRgba = inputFrame.rgba();
+	    mDetector.process(mRgba);
+	    List<MatOfPoint> contours = mDetector.getContours();
+	    System.out.println("Contours count: " + contours.size());
+	    if(contours.size() > 0) {
+	        for (MatOfPoint mp : contours) {
+	        	double min = Double.MAX_VALUE;
+	        	for (Point p : mp.toArray()) {
+	        		if(p.y < min){
+	        			min = p.y;
+	        			lowestTargetPoint = p;
+	        		}      		
+	        	}
+	        	break;
+	        	
+	        }
+	        ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
+	        l.add(new MatOfPoint(lowestTargetPoint));
+	        Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+	        Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
+	    }    
+	return mRgba;
     }
     
     
@@ -181,7 +181,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 
 	@Override
 	public void run() {
-		catchBall(30, 30);
+		catchBall(75, 75);
 	}
 	
 	public void catchBall(double x, double y){
@@ -193,9 +193,13 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		robotSetBar((byte) 255);
 		//return to origin
 		moveFromPointToPoint(robotPosition, new Point(0, 0));
+		robotMove(-robotRotation, 0, false);
 	}
 	
 	public boolean turnToDetectObstacle(){
+		if(robotMove(0, 0, true)) {
+			return true;
+		}
 		for (int i = 1; i <= 360; i += DELTA_R) {
 			if(robotMove(DELTA_R, 0, true)) {
 				return true;
@@ -205,12 +209,13 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	}
 
 	private void detectedBall() {
-		work();
+		//work();
 		Point p = convertImageToGround(lowestTargetPoint);
 		System.out.println("lowest target point: "+p);
 		p.x /= 10;
 		p.y = p.y/10-20;
 		double[] d = cartesianToPolar(p);
+		System.out.println("polar to target point: " + d[1] + " " + d[0]);
 		robotMove(d[1], d[0], false);
 		robotMove(0, -5, false);
 		robotSetBar((byte) 0);
@@ -221,8 +226,8 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	 * Converts coordinates from polar to cartesian.
 	 */
 	public Point polarToCartesian(double phi, double r) {
-		double xf = Math.cos(phi * 2 * Math.PI / 360) * r;
-		double yf = Math.sin(phi * 2 * Math.PI / 360) * r;
+		double xf = Math.cos(Math.toRadians(phi)) * r;
+		double yf = Math.sin(Math.toRadians(phi)) * r;
 		
 		return new Point(xf, yf);
 	}
@@ -243,12 +248,16 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	public boolean robotMove(double phi, double r, boolean searchForBall) {
 		int phiC = (int) Math.round(phi);
 		int rC = (int) Math.round(r);
-		robotTurn(phiC);
+		if(phiC != 0) {
+			robotTurn(phiC);
+		}
 		if(rC != 0) {
 			robotDrive(rC);
 		}
-		
+		System.out.println("robotRot:" + robotRotation);
 		robotRotation = phiC + robotRotation;
+		System.out.println("phiC: " + phiC);
+		System.out.println("robotRotstion: " + robotRotation);
 		Point p = polarToCartesian(robotRotation, rC);
 		robotPosition.x += p.x;
 		robotPosition.y += p.y;
@@ -284,10 +293,9 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		double x = target.x - origin.x;
 		double y = target.y - origin.y;
 		double[] d = cartesianToPolar(new Point(x, y));
-		System.out.println(d[0] + d[1]);
+		System.out.println(d[0] + " " + d[1]);
 		double r = d[0];
 		double phi = d[1] - robotRotation;
-		robotRotation = d[1];
 		robotMove(phi, r, false);
 	}
 }

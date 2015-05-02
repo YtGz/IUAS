@@ -168,7 +168,18 @@ public class MainActivity extends Activity {
 	}
 
 	public void robotTurn(int degree) {
-		robotTurn(degree, L);
+		for (int i = Math.abs(degree); i >= DELTA_R;) {
+			i -= DELTA_R;
+			if(degree < 0){
+			degree = -i; 
+			robotTurn(-DELTA_R, L_DETAIL_SENSOR);
+			}
+			else {
+				degree = i;
+				robotTurn(DELTA_R, L_DETAIL_SENSOR);
+			}
+		}
+		robotTurn(degree, L_DETAIL_SENSOR);
 	}
 
 	public void robotTurn(int degree, double calib) {
@@ -718,11 +729,7 @@ public class MainActivity extends Activity {
 			//rotTest(Integer.parseInt(programId.getText().toString()));
 		//}
 		//navigateIgnoringObstacles(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
-		Mat src =  new Mat(1, 1, CvType.CV_32FC2);
-        Mat dest = new Mat(1, 1, CvType.CV_32FC2);
-        src.put(0, 0, new double[] { 0.0, 100.0 }); // ps is a point in image coordinates
-        Core.perspectiveTransform(src, dest, ColorBlobDetectionActivity.homography); //homography is your homography matrix
-        Point dest_point = new Point(dest.get(0, 0)[0], dest.get(0, 0)[1]);
-		navigateIgnoringObstacles((int)dest_point.x, (int)dest_point.y, 0);
+		robotTurn(-180);
+		robotDrive(106);
 	}
 }
