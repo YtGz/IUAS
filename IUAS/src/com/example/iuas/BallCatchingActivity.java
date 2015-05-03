@@ -129,8 +129,8 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	    mRgba = inputFrame.rgba();
 	    mDetector.process(mRgba);
 	    List<MatOfPoint> contours = mDetector.getContours();
-	    System.out.println("Contours count: " + contours.size());
-	    if(contours.size() > 0) {
+	   // System.out.println("Contours count: " + contours.size());
+	    if(contours.size() == 1) {
 	        for (MatOfPoint mp : contours) {
 	        	double min = Double.MAX_VALUE;
 	        	for (Point p : mp.toArray()) {
@@ -254,7 +254,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		if(rC != 0) {
 			robotDrive(rC);
 		}
-		System.out.println("robotRot:" + robotRotation);
+		//System.out.println("robotRot:" + robotRotation);
 		robotRotation = phiC + robotRotation;
 		System.out.println("phiC: " + phiC);
 		System.out.println("robotRotstion: " + robotRotation);

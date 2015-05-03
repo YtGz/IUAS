@@ -487,7 +487,7 @@ public class MainActivity extends Activity {
 	public void navigateIgnoringObstacles(int x, int y, int theta) {
 		int r = (int) Math.sqrt(x * x + y * y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
-		System.out.println(phi);
+		//System.out.println(phi);
 		phi *= -1;
 		robotTurn(phi);
 		robotDrive(r);
