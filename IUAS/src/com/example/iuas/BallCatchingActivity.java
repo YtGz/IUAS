@@ -112,7 +112,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     }
 
     public void onCameraViewStarted(int width, int height) {
-    	System.out.println("Cam View: " + mOpenCvCameraView);
+    	//System.out.println("Cam View: " + mOpenCvCameraView);
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mDetector.setHsvColor(mBlobColorHsv);
@@ -130,7 +130,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	    mDetector.process(mRgba);
 	    List<MatOfPoint> contours = mDetector.getContours();
 	   // System.out.println("Contours count: " + contours.size());
-	    if(contours.size() == 1) {
+	    if(contours.size() > 0) {
 	        for (MatOfPoint mp : contours) {
 	        	double min = Double.MAX_VALUE;
 	        	for (Point p : mp.toArray()) {
@@ -176,7 +176,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     		l.add(Math.random());
     	}
     	Collections.sort(l);
-    	System.out.println("Finished wait");
+    	//System.out.println("Finished wait");
     }
 
 	@Override
@@ -185,9 +185,9 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	}
 	
 	public void catchBall(double x, double y){
-		if(!turnToDetectObstacle()) {
+		//if(!turnToDetectObstacle()) {
 			exploreWorkspace();
-		}
+		//}
 		//deliver ball to target position
 		moveFromPointToPoint(robotPosition, new Point(x, y));
 		robotSetBar((byte) 255);
@@ -213,7 +213,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		Point p = convertImageToGround(lowestTargetPoint);
 		System.out.println("lowest target point: "+p);
 		p.x /= 10;
-		p.y = p.y/10-20;
+		p.y = p.y/10-15;
 		double[] d = cartesianToPolar(p);
 		System.out.println("polar to target point: " + d[1] + " " + d[0]);
 		robotMove(d[1], d[0], false);
@@ -248,27 +248,52 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	public boolean robotMove(double phi, double r, boolean searchForBall) {
 		int phiC = (int) Math.round(phi);
 		int rC = (int) Math.round(r);
+
+		//System.out.println("robotRot:" + robotRotation);
+//				System.out.println("phiC: " + phiC);
+//				System.out.println("robotRotation: " + robotRotation);
+				
 		if(phiC != 0) {
 			robotTurn(phiC);
 		}
-		if(rC != 0) {
-			robotDrive(rC);
-		}
-		//System.out.println("robotRot:" + robotRotation);
 		robotRotation = phiC + robotRotation;
-		System.out.println("phiC: " + phiC);
-		System.out.println("robotRotstion: " + robotRotation);
-		Point p = polarToCartesian(robotRotation, rC);
-		robotPosition.x += p.x;
-		robotPosition.y += p.y;
 		
-		System.out.println("Updated robot position: "+robotPosition);
-		System.out.println("Updated rotation rel. to start: "+robotRotation);
-		
-		if (lowestTargetPoint != null && searchForBall) {
-			detectedBall();
-			return true;
+		if(rC != 0) {
+			int d_r = rC;
+			for(int i = 1; i <= rC; i += DELTA_R, d_r -= DELTA_R) {
+				if (lowestTargetPoint != null && searchForBall) {
+					Point p = polarToCartesian(robotRotation, i);
+					robotPosition.x += p.x;
+					robotPosition.y += p.y;
+					System.out.println("Updated robot position: "+robotPosition);
+					System.out.println("Updated rotation rel. to start: "+robotRotation);
+					detectedBall();
+					return true;
+				}
+				robotDrive(DELTA_R);
+			}
+			if (lowestTargetPoint != null && searchForBall) {
+				Point p = polarToCartesian(robotRotation, rC-d_r);
+				robotPosition.x += p.x;
+				robotPosition.y += p.y;
+				System.out.println("Updated robot position: "+robotPosition);
+				System.out.println("Updated rotation rel. to start: "+robotRotation);
+				detectedBall();
+				return true;
+			}
+			robotDrive(d_r);
+			Point p = polarToCartesian(robotRotation, rC);
+			robotPosition.x += p.x;
+			robotPosition.y += p.y;
+			System.out.println("Updated robot position: "+robotPosition);
+			System.out.println("Updated rotation rel. to start: "+robotRotation);
 		}
+		
+		
+//		if (lowestTargetPoint != null && searchForBall) {
+//			detectedBall();
+//			return true;
+//		}
 		return false;
 	}
 	
@@ -277,7 +302,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	 * Makes one turn and one driving distance per method call.
 	 */
 	public void exploreWorkspace() {
-		final int workspaceFactor = 2;
+		final int workspaceFactor = 1;
 		final double density = Math.sqrt(17);  	//Math.sqrt(5); for 2 crossings / Math.sqrt(17); for 4 crossings / Math.sqrt(65); for 8 crossings
 		if(robotMove(-45, Math.sqrt(45000)/workspaceFactor, true)) return;
 		if(robotMove(135, 300/workspaceFactor, true)) return;

@@ -78,16 +78,16 @@ public class MainActivity extends Activity {
 
 	public void connect() {
 		if (com.begin(FTDriver.BAUD9600)) {
-			textLog.append("Connected\nWillkommen in der Unterwelt!\n");
+			//textLog.append("Connected\nWillkommen in der Unterwelt!\n");
 		} else {
-			textLog.append("Not connected\n");
+			//textLog.append("Not connected\n");
 		}
 	}
 
 	public void disconnect() {
 		com.end();
 		if (!com.isConnected()) {
-			textLog.append("Disconnected\n");
+			//textLog.append("Disconnected\n");
 		}
 	}
 
@@ -95,7 +95,8 @@ public class MainActivity extends Activity {
 		if (com.isConnected()) {
 			com.write(data);
 		} else {
-			textLog.append("Not connected\n");
+			//textLog.append("Not connected\n");
+			System.out.println("Not connected!");
 		}
 	}
 
@@ -172,14 +173,14 @@ public class MainActivity extends Activity {
 			i -= DELTA_R;
 			if(degree < 0){
 			degree = -i; 
-			robotTurn(-DELTA_R, L_DETAIL_SENSOR);
+			robotTurn(-DELTA_R, L);
 			}
 			else {
 				degree = i;
-				robotTurn(DELTA_R, L_DETAIL_SENSOR);
+				robotTurn(DELTA_R, L);
 			}
 		}
-		robotTurn(degree, L_DETAIL_SENSOR);
+		robotTurn(degree, L);
 	}
 
 	public void robotTurn(int degree, double calib) {
@@ -355,8 +356,8 @@ public class MainActivity extends Activity {
 					.atan2((newY - oldY), (newX - oldX)));
 			newX = r * Math.cos(phi) + oldX;
 			newY = r * Math.sin(phi) + oldY;
-			textLog.setText(String.valueOf("forward movement: " + r
-					+ "cm   turn angle: " + phi + "°"));
+			/*textLog.setText(String.valueOf("forward movement: " + r
+					+ "cm   turn angle: " + phi + "°"));*/
 			robotTurn(phi, L_DETAIL);
 			robotDrive(r);
 			oldX = newX;
@@ -432,8 +433,8 @@ public class MainActivity extends Activity {
 
 	public void viewSensorOutput() {
 		int[] temp = parseDataString(retrieveSensorData());
-		textLog.setText(String.valueOf(temp[0]) + " " + String.valueOf(temp[1])
-				+ " " + String.valueOf(temp[2]));
+		/*textLog.setText(String.valueOf(temp[0]) + " " + String.valueOf(temp[1])
+				+ " " + String.valueOf(temp[2]));*/
 	}
 
 	/**
