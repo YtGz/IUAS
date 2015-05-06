@@ -261,7 +261,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		if(rC != 0) {
 			int d_r = rC;
 			for(int i = 1; i <= rC; i += DELTA_R, d_r -= DELTA_R) {
-				if (lowestTargetPoint != null && searchForBall) {
+				/*if (lowestTargetPoint != null && searchForBall) {
 					Point p = polarToCartesian(robotRotation, i);
 					robotPosition.x += p.x;
 					robotPosition.y += p.y;
@@ -269,10 +269,10 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 					System.out.println("Updated rotation rel. to start: "+robotRotation);
 					detectedBall();
 					return true;
-				}
+				}*/
 				robotDrive(DELTA_R);
 			}
-			if (lowestTargetPoint != null && searchForBall) {
+			/*if (lowestTargetPoint != null && searchForBall) {
 				Point p = polarToCartesian(robotRotation, rC-d_r);
 				robotPosition.x += p.x;
 				robotPosition.y += p.y;
@@ -280,7 +280,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 				System.out.println("Updated rotation rel. to start: "+robotRotation);
 				detectedBall();
 				return true;
-			}
+			}*/
 			robotDrive(d_r);
 			Point p = polarToCartesian(robotRotation, rC);
 			robotPosition.x += p.x;
