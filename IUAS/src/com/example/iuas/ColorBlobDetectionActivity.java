@@ -1,3 +1,10 @@
+/**
+ * This class allows the app detect colors by using OpenCV.
+ * 
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
 package com.example.iuas;
 
 import java.util.ArrayList;
@@ -33,6 +40,10 @@ import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 
 public class ColorBlobDetectionActivity extends Activity implements OnTouchListener, CvCameraViewListener2 {
+	protected final boolean DEBUG = true; // enables debug messages
+	protected final int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append --> atm no textLog defined here, so only sysout available
+	protected final int USE_DEVICE = 1; // 1: USB, 2: Bluetooth
+	
     private static final String  TAG              = "OCVSample::Activity";
 
     private boolean              mIsColorSelected = false;
@@ -49,6 +60,9 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
+    /**
+     * Internal private class for starting OpenCV.
+     */
     private BaseLoaderCallback  mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -66,12 +80,17 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
             }
         }
     };
-
+    
+    /**
+     * Constructor.
+     */
     public ColorBlobDetectionActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
 
-    /** Called when the activity is first created. */
+    /** 
+     * Called when the activity is first created. 
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "called onCreate");
@@ -85,43 +104,75 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         mOpenCvCameraView.setCvCameraViewListener(this);
         
     }
+    
+	/**
+	 * Write debug log on console or mobile phone.
+	 */
+	public void showLog(Object text) {
+		if (DEBUG) {
+			if (DEBUG_DEVICE == 1) {
+				System.out.println(text);
+			}
+			/*else if (DEBUG_DEVICE == 2) {
+				textLog.append(text + "\n");
+			}*/
+		}
+	}
 
+    /**
+     * On pause camera is disabled.
+     */
     @Override
-    public void onPause()
-    {   
+    public void onPause() {   
         super.onPause();
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
     }
-
+    
+    /**
+     * Resume.
+     */
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
     }
-
+    
+    /**
+     * Destroy and disable camera view.
+     */
     public void onDestroy() {
         super.onDestroy();
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
     }
-
+    
+    /**
+     * Set camera view components on start.
+     */
     public void onCameraViewStarted(int width, int height) {
+    	showLog("Cam View: " + mOpenCvCameraView);
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
-        mSpectrum = new Mat();
-        mBlobColorRgba = new Scalar(255);
-        mBlobColorHsv = new Scalar(255);
-        SPECTRUM_SIZE = new Size(200, 64);
+        mDetector.setHsvColor(mBlobColorHsv);
         CONTOUR_COLOR = new Scalar(0,0,255,255);
         POINT_COLOR = new Scalar(255,0,0,255);
     }
-
+    
+    /**
+     * "Release" mRgba variable when camera view stops.
+     */
     public void onCameraViewStopped() {
         mRgba.release();
     }
-
+    
+    /**
+     * On touch try to detect color of object touched and store it in matrix.
+     * 
+     * @param v
+     * @param event
+     * @return 
+     */
     public boolean onTouch(View v, MotionEvent event) {  	
         int cols = mRgba.cols();
         int rows = mRgba.rows();
@@ -171,7 +222,10 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
 
         return false; // don't need subsequent touch events
     }
-
+    
+    /**
+     * Determines what happens on getting a camera frame.
+     */
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
     	if(!lockMrgba){
 	        mRgba = inputFrame.rgba();
@@ -181,7 +235,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
 	            mDetector.process(mRgba);
 	            List<MatOfPoint> contours = mDetector.getContours();
 	            Log.e(TAG, "Contours count: " + contours.size());
-	            //System.out.println("Contours count: " + contours.size());
+	            //showLog("Contours count: " + contours.size());
 	            for (MatOfPoint mp : contours) {
 	            	double min = Double.MAX_VALUE;
 	            	for (Point p : mp.toArray()) {
@@ -206,7 +260,13 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     	}
         return mRgba;
     }
-
+    
+    /**
+     * Converts scalar HSV values to RGB values.
+     * 
+     * @param hsvColor
+     * @return
+     */
     private Scalar converScalarHsv2Rgba(Scalar hsvColor) {
         Mat pointMatRgba = new Mat();
         Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
@@ -215,6 +275,12 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         return new Scalar(pointMatRgba.get(0, 0));
     }
     
+    /**
+     * Creates the homography matrix.
+     * 
+     * @param mRgba
+     * @return
+     */
     public Mat getHomographyMatrix(Mat mRgba) {
     	  final Size mPatternSize = new Size(6, 9); // number of inner corners in the used chessboard pattern 
     	  float x = -48.0f; // coordinates of first detected inner corner on chessboard
@@ -251,6 +317,11 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     	    return new Mat();
     }
     
+    /**
+     * Finish on clicking the Back-Button.
+     * 
+     * @param view
+     */
     public void backButtonOnClick(View view) {
     	Intent intent = new Intent();
         intent.putExtra("color", mBlobColorHsv.val);
@@ -258,6 +329,11 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         finish();
     }
     
+    /**
+     * Try to detect & set homography matrix when "calibrate-h" button is pressed.
+     * 
+     * @param view
+     */
     public void homographyButtonOnClick(View view) {
         do {
         	homography = getHomographyMatrix(mRgba);

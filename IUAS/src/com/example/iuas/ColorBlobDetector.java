@@ -1,3 +1,11 @@
+/**
+ * This class helps detecting colors.
+ * It is used by the ColorBlobDetection Activity.
+ * 
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
 package com.example.iuas;
 
 import java.util.ArrayList;
@@ -15,8 +23,10 @@ public class ColorBlobDetector {
     // Lower and Upper bounds for range checking in HSV color space
     private Scalar mLowerBound = new Scalar(0);
     private Scalar mUpperBound = new Scalar(0);
+    
     // Minimum contour area in percent for contours filtering
     private static double mMinContourArea = 0.1;
+    
     // Color radius for range checking in HSV color space
     private Scalar mColorRadius = new Scalar(25,50,50,0);
     private Mat mSpectrum = new Mat();
@@ -28,11 +38,21 @@ public class ColorBlobDetector {
     Mat mMask = new Mat();
     Mat mDilatedMask = new Mat();
     Mat mHierarchy = new Mat();
-
+    
+    /**
+     * Sets the color radius.
+     * 
+     * @param radius
+     */
     public void setColorRadius(Scalar radius) {
         mColorRadius = radius;
     }
-
+    
+    /**
+     * Sets the HSV color.
+     * 
+     * @param hsvColor
+     */
     public void setHsvColor(Scalar hsvColor) {
         double minH = (hsvColor.val[0] >= mColorRadius.val[0]) ? hsvColor.val[0]-mColorRadius.val[0] : 0;
         double maxH = (hsvColor.val[0]+mColorRadius.val[0] <= 255) ? hsvColor.val[0]+mColorRadius.val[0] : 255;
@@ -58,15 +78,30 @@ public class ColorBlobDetector {
 
         Imgproc.cvtColor(spectrumHsv, mSpectrum, Imgproc.COLOR_HSV2RGB_FULL, 4);
     }
-
+    
+    /**
+     * Gets the spectrum.
+     * 
+     * @return
+     */
     public Mat getSpectrum() {
         return mSpectrum;
     }
-
+    
+    /**
+     * Sets the min. contour area.
+     * 
+     * @param area
+     */
     public void setMinContourArea(double area) {
         mMinContourArea = area;
     }
-
+    
+    /**
+     * Process to find contours of objects.
+     * 
+     * @param rgbaImage
+     */
     public void process(Mat rgbaImage) {
         Imgproc.pyrDown(rgbaImage, mPyrDownMat);
         Imgproc.pyrDown(mPyrDownMat, mPyrDownMat);
@@ -101,7 +136,12 @@ public class ColorBlobDetector {
             }
         }
     }
-
+    
+    /**
+     * Gets the contours.
+     * 
+     * @return
+     */
     public List<MatOfPoint> getContours() {
         return mContours;
     }
