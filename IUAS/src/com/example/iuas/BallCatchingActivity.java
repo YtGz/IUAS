@@ -92,7 +92,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
         
         textLog = (TextView) findViewById(R.id.textLog);
         com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
-		connect();
+		connectUSB();
         
         Intent intent = getIntent();
         double[] c = intent.getDoubleArrayExtra("mBlobColorHsv");

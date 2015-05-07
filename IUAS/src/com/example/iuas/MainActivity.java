@@ -87,8 +87,15 @@ public class MainActivity extends Activity {
 		xIn = (EditText) findViewById(R.id.x);
 		yIn = (EditText) findViewById(R.id.y);
 		phiIn = (EditText) findViewById(R.id.phi);
-		com = new FTDriver((UsbManager) getSystemService(USB_SERVICE)); // use USE_DEVICE in if-else block
-		connect(); //  and change connect to connectUSB() and connectBT() (or connect("USB") bzw connect("BT") instead) -- !! ALSO in BallCatchingActivity & ColorBlobDetection !!
+		
+		if (USE_DEVICE == 1) {
+			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE)); // use USE_DEVICE in if-else block
+			connectUSB(); //  and change connect to connectUSB() and connectBT() (or connect("USB") bzw connect("BT") instead) -- !! ALSO in BallCatchingActivity & ColorBlobDetection !!
+		}
+		/*else if (USE_DEVICE == 2) {
+			com = new BluetoothAdapter(); // Code hierzu muss erst noch nachgeschaut/erarbeitet werden ...
+			connectBT();
+		}*/
 	}
 	
 	/**
@@ -119,20 +126,33 @@ public class MainActivity extends Activity {
 	/**************************************************************************************************************************************
 	 * Basic robot commands. *
 	 **************************************************************************************************************************************/
-
-	public void connect() {
+	
+	/**
+	 * Connects USB device.
+	 */
+	public void connectUSB() {
 		if (com.begin(FTDriver.BAUD9600)) {
 			showLog("Connected\nWillkommen in der Unterwelt!");
 		} else {
 			showLog("Not connected");
 		}
 	}
-
+	
+	/**
+	 * Disconnects USB device.
+	 */
 	public void disconnect() {
 		com.end();
 		if (!com.isConnected()) {
 			showLog("Disconnected");
 		}
+	}
+	
+	/**
+	 * Connects Bluetooth device.
+	 */
+	public void connectBT() {
+		// nothing yet
 	}
 	
 	/**
@@ -422,6 +442,20 @@ public class MainActivity extends Activity {
 			break;
 		}
 	}
+	
+	
+	/***************************************************************************************************************************************************
+	 * Bluetooth connection
+	 ***************************************************************************************************************************************************/
+	
+	/* Will be implemented soon if it is not too complicated.
+	 * 
+	 * see SampleGatt Classes in package and also
+	 * http://developer.android.com/samples/BluetoothLeGatt/src/com.example.android.bluetoothlegatt/DeviceControlActivity.html#l305
+	 * http://developer.android.com/guide/topics/connectivity/bluetooth-le.html
+	 */
+	
+	
 
 	/*************************************************************************************************************************************************
 	 * Exercise 2 *
@@ -791,19 +825,6 @@ public class MainActivity extends Activity {
 			//detectObstacle(new boolean[] { true, true, false }, new int[] { 100, 255 });
 		}
 	}
-	
-	
-	
-	/***************************************************************************************************************************************************
-	 * Bluetooth connection
-	 ***************************************************************************************************************************************************/
-	
-	/* Will be implemented soon if it is not too complicated.
-	 * 
-	 * see SampleGatt Classes in package and also
-	 * http://developer.android.com/samples/BluetoothLeGatt/src/com.example.android.bluetoothlegatt/DeviceControlActivity.html#l305
-	 * http://developer.android.com/guide/topics/connectivity/bluetooth-le.html
-	 */
 	
 	
 
