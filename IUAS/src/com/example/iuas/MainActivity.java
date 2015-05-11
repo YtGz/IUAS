@@ -9,33 +9,18 @@
 
 package com.example.iuas;
 
-import java.util.UUID;
-
 import jp.ksksue.driver.serial.FTDriver;
 
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothAdapter.LeScanCallback;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import at.uibk.informatik.androbot.contracts.IConnection;
 
 public class MainActivity extends Activity {
 	
@@ -68,6 +53,8 @@ public class MainActivity extends Activity {
 	private final int O = 10; // How far the robot should drive after the right sensor doesn't see the obstacle's edge anymore
 	
 	private Scalar mBlobColorHsv; // Needed for ColorBlobDetection
+	private Context context;
+	private BluetoothConnection conn;
 	
 	
 	
@@ -88,15 +75,22 @@ public class MainActivity extends Activity {
 		yIn = (EditText) findViewById(R.id.y);
 		phiIn = (EditText) findViewById(R.id.phi);
 		
-		if (USE_DEVICE == 1) {
-			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE)); // use USE_DEVICE in if-else block
-			connectUSB(); //  and change connect to connectUSB() and connectBT() (or connect("USB") bzw connect("BT") instead) -- !! ALSO in BallCatchingActivity & ColorBlobDetection !!
+//		if (USE_DEVICE == 1) {
+//			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE)); // use USE_DEVICE in if-else block
+//			connectUSB(); //  and change connect to connectUSB() and connectBT() (or connect("USB") bzw connect("BT") instead) -- !! ALSO in BallCatchingActivity & ColorBlobDetection !!
+		BluetoothConnection btc = new BluetoothConnection(context);
+		btc.setDeviceAddress("94:ce:2c:b7:01:a4");
+		conn = btc;
+		conn.connect();
 		}
+		
 		/*else if (USE_DEVICE == 2) {
 			com = new BluetoothAdapter(); // Code hierzu muss erst noch nachgeschaut/erarbeitet werden ...
 			connectBT();
 		}*/
-	}
+//	}
+	
+	
 	
 	/**
 	 * Starts BallCatching activity.
@@ -161,11 +155,12 @@ public class MainActivity extends Activity {
 	 * @param data
 	 */
 	public void comWrite(byte[] data) {
-		if (com.isConnected()) {
+	/*	if (com.isConnected()) {
 			com.write(data);
 		} else {
 			showLog("Not connected!");
-		}
+		}*/
+		conn.write(data);
 	}
 	
 	/**
@@ -194,13 +189,15 @@ public class MainActivity extends Activity {
 	 * @return
 	 */
 	public String comReadWrite(byte[] data) {
-		com.write(data);
+		/*com.write(data);
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// ignore
 		}
-		return comRead();
+		return comRead();*/
+		conn.write(data);
+		return "";
 	}
 	
 	/**
