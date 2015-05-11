@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
 //			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE)); // use USE_DEVICE in if-else block
 //			connectUSB(); //  and change connect to connectUSB() and connectBT() (or connect("USB") bzw connect("BT") instead) -- !! ALSO in BallCatchingActivity & ColorBlobDetection !!
 		BluetoothConnection btc = new BluetoothConnection(context);
-		btc.setDeviceAddress("94:ce:2c:b7:01:a4");
+		btc.setDeviceAddress("94:CE:2C:A2:E8:9E");
 		conn = btc;
 		conn.connect();
 		}

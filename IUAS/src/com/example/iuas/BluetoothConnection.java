@@ -71,7 +71,7 @@ public class BluetoothConnection implements IConnection {
 	 */
 	private synchronized void setState(int state) {
 		this.state = state;
-		handler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+		//handler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
 	}
 
 	/*
@@ -152,12 +152,12 @@ public class BluetoothConnection implements IConnection {
 		connectedThread.start();
 
 		// Send the name of the connected device back to the caller
-		Message msg = handler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
-		Bundle bundle = new Bundle();
-		bundle.putString(Constants.DEVICE_NAME, device.getName());
-		msg.setData(bundle);
-		handler.sendMessage(msg);
-
+//		Message msg = handler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
+//		Bundle bundle = new Bundle();
+//		bundle.putString(Constants.DEVICE_NAME, device.getName());
+//		msg.setData(bundle);
+//		handler.sendMessage(msg);
+//
 		setState(STATE_CONNECTED);
 	}
 
@@ -211,11 +211,11 @@ public class BluetoothConnection implements IConnection {
 	private void connectionFailed() {
 
 		// Send a failure message back to the Activity
-		Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
-		Bundle bundle = new Bundle();
-		bundle.putString(Constants.TOAST, "Unable to connect device");
-		msg.setData(bundle);
-		handler.sendMessage(msg);
+		//Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
+		//Bundle bundle = new Bundle();
+//		bundle.putString(Constants.TOAST, "Unable to connect device");
+//		msg.setData(bundle);
+//		handler.sendMessage(msg);
 	}
 
 	/**
@@ -224,11 +224,11 @@ public class BluetoothConnection implements IConnection {
 	private void connectionLost() {
 
 		// Send a failure message back to the Activity
-		Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
-		Bundle bundle = new Bundle();
-		bundle.putString(Constants.TOAST, "Device connection was lost");
-		msg.setData(bundle);
-		handler.sendMessage(msg);
+//		Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
+//		Bundle bundle = new Bundle();
+//		bundle.putString(Constants.TOAST, "Device connection was lost");
+//		msg.setData(bundle);
+//		handler.sendMessage(msg);
 	}
 
 	/**
@@ -237,11 +237,11 @@ public class BluetoothConnection implements IConnection {
 	private void connectionClosed() {
 
 		// Send a failure message back to the Activity
-		Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
-		Bundle bundle = new Bundle();
-		bundle.putString(Constants.TOAST, "Device connection closed");
-		msg.setData(bundle);
-		handler.sendMessage(msg);
+//		Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
+//		Bundle bundle = new Bundle();
+//		bundle.putString(Constants.TOAST, "Device connection closed");
+//		msg.setData(bundle);
+//		handler.sendMessage(msg);
 	}
 
 	private class ConnectThread extends Thread {
@@ -273,7 +273,9 @@ public class BluetoothConnection implements IConnection {
 
 			// Always cancel discovery because it will slow down a connection
 			btAdapter.cancelDiscovery();
-
+			
+			System.out.println(btAdapter);
+			System.out.println(btSocket);
 			// Make a connection to the BluetoothSocket
 			try {
 				// This is a blocking call and will only return on a
@@ -375,7 +377,7 @@ public class BluetoothConnection implements IConnection {
 					if (lineComplete) {
 						// Send the obtained bytes to the caller
 						Log.d(LOG_TAG, "Message received: " + new String(buffer, 0, pos));
-						handler.obtainMessage(Constants.MESSAGE_READ, pos, -1, buffer).sendToTarget();
+//						handler.obtainMessage(Constants.MESSAGE_READ, pos, -1, buffer).sendToTarget();
 
 						pos = 0;
 						lineComplete = false;
