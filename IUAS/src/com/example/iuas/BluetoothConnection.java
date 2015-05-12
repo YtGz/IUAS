@@ -9,20 +9,12 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
-import at.uibk.informatik.androbot.contracts.Constants;
-import at.uibk.informatik.androbot.contracts.IConnection;
 
 public class BluetoothConnection implements IConnection {
 
-	private static final String LOG_TAG = "BluetoothConnection";
 	private static final UUID SERVICE_ID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
 	private final BluetoothAdapter btAdapter;
-	private Handler handler;
 	private int state;
 
 	private ConnectThread connectThread;
@@ -38,19 +30,7 @@ public class BluetoothConnection implements IConnection {
 	public BluetoothConnection(Context context) {
 
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
-
-		// TODO: Activate Bluetooth
-
 		this.state = STATE_NONE;
-	}
-
-	/**
-	 * Returns the mac address from the remote device of the connection.
-	 * 
-	 * @return the remote device
-	 */
-	public String getDeviceAddress() {
-		return deviceAddress;
 	}
 
 	/**
@@ -71,37 +51,17 @@ public class BluetoothConnection implements IConnection {
 	 */
 	private synchronized void setState(int state) {
 		this.state = state;
-		//handler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see Sprint.IConnecition#getState()
-	 */
 	@Override
 	public synchronized int getState() {
 		return this.state;
 	}
-
-	@Override
-	public synchronized void setReadHandler(Handler readHandler) {
-
-		if (this.state != STATE_NONE)
-			return;
-
-		this.handler = readHandler;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see Sprint.IConnecition#connect(android.bluetooth.BluetoothDevice, boolean)
-	 */
+	
 	@Override
 	public synchronized void connect() {
 
-		Log.d(LOG_TAG, "connect to: " + getDeviceAddress());
+		System.out.println("Trying to connect to: " + deviceAddress);
 
 		// Cancel any thread attempting to make a connection
 		if (state == STATE_CONNECTING) {
@@ -118,7 +78,7 @@ public class BluetoothConnection implements IConnection {
 		}
 
 		// Start the thread to connect with the given device
-		connectThread = new ConnectThread(this.getDeviceAddress());
+		connectThread = new ConnectThread(deviceAddress);
 		connectThread.start();
 		setState(STATE_CONNECTING);
 	}
@@ -133,7 +93,7 @@ public class BluetoothConnection implements IConnection {
 	 */
 	public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
 
-		Log.d(LOG_TAG, "connected to " + device.getName());
+		System.out.println("connected to " + device.getName());
 
 		// Cancel the thread that completed the connection
 		if (connectThread != null) {
@@ -151,24 +111,12 @@ public class BluetoothConnection implements IConnection {
 		connectedThread = new ConnectedThread(socket);
 		connectedThread.start();
 
-		// Send the name of the connected device back to the caller
-//		Message msg = handler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
-//		Bundle bundle = new Bundle();
-//		bundle.putString(Constants.DEVICE_NAME, device.getName());
-//		msg.setData(bundle);
-//		handler.sendMessage(msg);
-//
 		setState(STATE_CONNECTED);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see Sprint.IConnecition#stop()
-	 */
 	@Override
 	public synchronized void stop() {
-		Log.d(LOG_TAG, "stop");
+		System.out.println("Buetooth connection stopped.");
 
 		if (connectThread != null) {
 			connectThread.cancel();
@@ -183,11 +131,6 @@ public class BluetoothConnection implements IConnection {
 		setState(STATE_NONE);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see Sprint.IConnecition#write(byte[])
-	 */
 	@Override
 	public void write(byte[] out) {
 
@@ -203,45 +146,6 @@ public class BluetoothConnection implements IConnection {
 
 		// Perform the write unsynchronized
 		r.write(out);
-	}
-
-	/**
-	 * Indicate that the connection attempt failed and notify the UI Activity.
-	 */
-	private void connectionFailed() {
-
-		// Send a failure message back to the Activity
-		//Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
-		//Bundle bundle = new Bundle();
-//		bundle.putString(Constants.TOAST, "Unable to connect device");
-//		msg.setData(bundle);
-//		handler.sendMessage(msg);
-	}
-
-	/**
-	 * Indicate that the connection was lost and notify the UI Activity.
-	 */
-	private void connectionLost() {
-
-		// Send a failure message back to the Activity
-//		Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
-//		Bundle bundle = new Bundle();
-//		bundle.putString(Constants.TOAST, "Device connection was lost");
-//		msg.setData(bundle);
-//		handler.sendMessage(msg);
-	}
-
-	/**
-	 * Indicate that the connection was closed and notify the UI Activity.
-	 */
-	private void connectionClosed() {
-
-		// Send a failure message back to the Activity
-//		Message msg = handler.obtainMessage(Constants.MESSAGE_TOAST);
-//		Bundle bundle = new Bundle();
-//		bundle.putString(Constants.TOAST, "Device connection closed");
-//		msg.setData(bundle);
-//		handler.sendMessage(msg);
 	}
 
 	private class ConnectThread extends Thread {
@@ -260,7 +164,8 @@ public class BluetoothConnection implements IConnection {
 				tmp = btDevice.createRfcommSocketToServiceRecord(SERVICE_ID);
 
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "Socket create() failed", e);
+				System.out.println("Socket create() failed");
+				e.printStackTrace();
 			}
 
 			btSocket = tmp;
@@ -268,7 +173,7 @@ public class BluetoothConnection implements IConnection {
 
 		public void run() {
 
-			Log.i(LOG_TAG, "BEGIN ConnectThread");
+			System.out.println("ConnectThread has begun.");
 			setName("ConnectThread");
 
 			// Always cancel discovery because it will slow down a connection
@@ -282,15 +187,16 @@ public class BluetoothConnection implements IConnection {
 				// successful connection or an exception
 				btSocket.connect();
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "Connection failed", e);
+				System.out.println("Connection failed");
+				e.printStackTrace();
 
 				// Close the socket
 				try {
 					btSocket.close();
 				} catch (IOException e2) {
-					Log.e(LOG_TAG, "unable to close() socket during connection failure", e2);
+					System.out.println("unable to close() socket during connection failure");
+					e2.printStackTrace();
 				}
-				connectionFailed();
 				setState(STATE_NONE);
 				return;
 			}
@@ -302,15 +208,15 @@ public class BluetoothConnection implements IConnection {
 
 			// Start the connected thread
 			connected(btSocket, btDevice);
-
-			Log.i(LOG_TAG, "END ConnectThread");
+			System.out.println("ConnectThread finished.");
 		}
 
 		public void cancel() {
 			try {
 				btSocket.close();
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "close() of connect socket failed", e);
+				System.out.println("close() of connect socket failed");
+				e.printStackTrace();
 			}
 		}
 	}
@@ -320,21 +226,20 @@ public class BluetoothConnection implements IConnection {
 		private final BluetoothSocket btSocket;
 		private final InputStream btInStream;
 		private final OutputStream btOutStream;
-		private boolean canceled;
 
 		public ConnectedThread(BluetoothSocket socket) {
-			Log.d(LOG_TAG, "create ConnectedThread");
+			System.out.println("create ConnectedThread");
 			btSocket = socket;
 			InputStream tmpIn = null;
 			OutputStream tmpOut = null;
-			canceled = false;
 
 			// Get the BluetoothSocket input and output streams
 			try {
 				tmpIn = socket.getInputStream();
 				tmpOut = socket.getOutputStream();
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "temp sockets not created", e);
+				System.out.println("temp sockets not created");
+				e.printStackTrace();
 			}
 
 			btInStream = tmpIn;
@@ -343,9 +248,8 @@ public class BluetoothConnection implements IConnection {
 
 		public void run() {
 
-			Log.i(LOG_TAG, "BEGIN ConnectedThread");
+			System.out.println("ConnectedThread has begun.");
 			byte[] buffer = new byte[1024];
-			int bytes;
 			int pos = 0;
 
 			boolean lineComplete = false;
@@ -353,12 +257,9 @@ public class BluetoothConnection implements IConnection {
 			// Keep listening to the InputStream while connected
 			while (true) {
 				try {
-					// Read from the InputStream
-					// bytes = btInStream.read(buffer);
 
 					while (true) {
 						int r = btInStream.read();
-						// Log.d(LOG_TAG, String.format("%d", r));
 
 						if (r == -1) {
 							break;
@@ -375,29 +276,20 @@ public class BluetoothConnection implements IConnection {
 					}
 
 					if (lineComplete) {
-						// Send the obtained bytes to the caller
-						Log.d(LOG_TAG, "Message received: " + new String(buffer, 0, pos));
-//						handler.obtainMessage(Constants.MESSAGE_READ, pos, -1, buffer).sendToTarget();
-
+						System.out.println("Message received: " + new String(buffer, 0, pos));
 						pos = 0;
 						lineComplete = false;
 					}
 
 				} catch (IOException e) {
-					Log.i(LOG_TAG, "disconnected");
-
-					if (canceled) {
-						connectionClosed();
-					} else {
-						Log.e(LOG_TAG, "Exception: ", e);
-						connectionLost();
-					}
-
+					System.out.println("disconnected");
+					e.printStackTrace();
+					cancel();
 					break;
 				} 
 			}
 
-			Log.i(LOG_TAG, "END ConnectedThread");
+			System.out.println("ConnectedThread finished.");
 		}
 
 		/**
@@ -410,20 +302,18 @@ public class BluetoothConnection implements IConnection {
 			try {
 				btOutStream.write(buffer);
 
-				// Share the sent message back to the caller
-				// handler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
-
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "Exception during write", e);
+				System.out.println("Exception during write");
+				e.printStackTrace();
 			}
 		}
 
 		public synchronized void cancel() {
 			try {
-				this.canceled = true;
 				btSocket.close();
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "close() of connect socket failed", e);
+				System.out.println("close() of connect socket failed");
+				e.printStackTrace();
 			}
 		}
 	}

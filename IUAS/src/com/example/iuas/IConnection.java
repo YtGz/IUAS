@@ -1,4 +1,4 @@
-package at.uibk.informatik.androbot.contracts;
+package com.example.iuas;
 
 import android.os.Handler;
 
@@ -38,13 +38,5 @@ public interface IConnection {
 	 * @see ConnectedThread#write(byte[])
 	 */
 	public abstract void write(byte[] out);
-	
-	/**
-	 * Sets the Handler which handles the ReadEvents for the Connection 
-	 * The handler can only be set in state STATE_NONE
-	 * 
-	 * @param readHandler The handler which should receive the ReadEvents
-	 */
-	public abstract void setReadHandler(Handler readHandler);
 
 }

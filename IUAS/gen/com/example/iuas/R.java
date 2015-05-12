@@ -1680,7 +1680,7 @@ containing a value of this type.
         public static final int any=0x7f0b0009;
         public static final int back=0x7f0b000a;
         public static final int back_button=0x7f0b004a;
-        public static final int ballCatching=0x7f0b0044;
+        public static final int ballCatching=0x7f0b0047;
         public static final int ball_catching_activity_view=0x7f0b0049;
         public static final int beginning=0x7f0b001e;
         public static final int catchBall=0x7f0b004b;
@@ -1709,11 +1709,11 @@ containing a value of this type.
         public static final int never=0x7f0b001a;
         public static final int none=0x7f0b0012;
         public static final int normal=0x7f0b000e;
-        public static final int phi=0x7f0b0047;
+        public static final int phi=0x7f0b0045;
         public static final int progress_circular=0x7f0b0007;
         public static final int progress_horizontal=0x7f0b0008;
         public static final int radio=0x7f0b002e;
-        public static final int run=0x7f0b0048;
+        public static final int run=0x7f0b0046;
         public static final int search_badge=0x7f0b0038;
         public static final int search_bar=0x7f0b0037;
         public static final int search_button=0x7f0b0039;
@@ -1730,7 +1730,7 @@ containing a value of this type.
         public static final int showTitle=0x7f0b0015;
         public static final int split_action_bar=0x7f0b0004;
         public static final int submit_area=0x7f0b003f;
-        public static final int switchActivity=0x7f0b0043;
+        public static final int switchActivity=0x7f0b0048;
         public static final int tabMode=0x7f0b000f;
         public static final int textLog=0x7f0b0042;
         public static final int title=0x7f0b002a;
@@ -1738,8 +1738,8 @@ containing a value of this type.
         public static final int useLogo=0x7f0b0016;
         public static final int withText=0x7f0b001b;
         public static final int wrap_content=0x7f0b000c;
-        public static final int x=0x7f0b0045;
-        public static final int y=0x7f0b0046;
+        public static final int x=0x7f0b0043;
+        public static final int y=0x7f0b0044;
     }
     public static final class integer {
         /**  The maximum number of action buttons that should be permitted within
@@ -1793,8 +1793,9 @@ containing a value of this type.
         public static final int activity_main=0x7f030017;
         public static final int ball_catching_view=0x7f030018;
         public static final int color_blob_detection_surface_view=0x7f030019;
-        public static final int main=0x7f03001a;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001b;
+        public static final int color_radius_surface_view=0x7f03001a;
+        public static final int main=0x7f03001b;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001c;
     }
     public static final class menu {
         public static final int main=0x7f0d0000;

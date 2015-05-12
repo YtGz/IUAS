@@ -16,11 +16,11 @@ import org.opencv.core.Scalar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import at.uibk.informatik.androbot.contracts.IConnection;
 
 public class MainActivity extends Activity {
 	
@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 
 	protected final boolean DEBUG = true; // enables debug messages
 	protected final int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append
-	protected final int USE_DEVICE = 1; // 1: USB, 2: Bluetooth
+	protected final int USE_DEVICE = 2; // 1: USB, 2: Bluetooth
 	
 	protected FTDriver com;
 	protected TextView textLog;
@@ -54,7 +54,7 @@ public class MainActivity extends Activity {
 	
 	private Scalar mBlobColorHsv; // Needed for ColorBlobDetection
 	private Context context;
-	private BluetoothConnection conn;
+	private BluetoothConnection btc;
 	
 	
 	
@@ -75,20 +75,15 @@ public class MainActivity extends Activity {
 		yIn = (EditText) findViewById(R.id.y);
 		phiIn = (EditText) findViewById(R.id.phi);
 		
-//		if (USE_DEVICE == 1) {
-//			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE)); // use USE_DEVICE in if-else block
-//			connectUSB(); //  and change connect to connectUSB() and connectBT() (or connect("USB") bzw connect("BT") instead) -- !! ALSO in BallCatchingActivity & ColorBlobDetection !!
-		BluetoothConnection btc = new BluetoothConnection(context);
-		btc.setDeviceAddress("94:CE:2C:A2:E8:9E");
-		conn = btc;
-		conn.connect();
+		if (USE_DEVICE == 1) {
+			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
+			connectUSB(); //!! ALSO in BallCatchingActivity & ColorBlobDetection !!
 		}
 		
-		/*else if (USE_DEVICE == 2) {
-			com = new BluetoothAdapter(); // Code hierzu muss erst noch nachgeschaut/erarbeitet werden ...
+		else if (USE_DEVICE == 2) {
 			connectBT();
-		}*/
-//	}
+		}
+	}
 	
 	
 	
@@ -146,7 +141,9 @@ public class MainActivity extends Activity {
 	 * Connects Bluetooth device.
 	 */
 	public void connectBT() {
-		// nothing yet
+		btc = new BluetoothConnection(context);
+		btc.setDeviceAddress("94:CE:2C:A2:E8:9E");
+		btc.connect();
 	}
 	
 	/**
@@ -160,7 +157,7 @@ public class MainActivity extends Activity {
 		} else {
 			showLog("Not connected!");
 		}*/
-		conn.write(data);
+		btc.write(data);
 	}
 	
 	/**
@@ -196,7 +193,7 @@ public class MainActivity extends Activity {
 			// ignore
 		}
 		return comRead();*/
-		conn.write(data);
+		btc.write(data);
 		return "";
 	}
 	
