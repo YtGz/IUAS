@@ -875,7 +875,8 @@ public class MainActivity extends Activity {
 	 * @param view
 	 */
 	public void runOnClick(View view) {
-		showLog("Nothing defined for Run-Button yet");
+		//showLog("Nothing defined for Run-Button yet");
+		squareTest(30);
 		/*switch (Integer.parseInt(xIn.getText().toString())) {
 		case 0:
 			calibrateLDetail(100);
@@ -897,7 +898,7 @@ public class MainActivity extends Activity {
 		case 4:
 			 navigate((byte) 4 , (byte) 5, (byte) 0);
 			 break;
-		defult:
+		default:
 			 robotDrive(Integer.parseInt(programId.getText().toString()));
 			 //To calibrate the forward movement (calculate k)
 			 robotTurn(Integer.parseInt(programId.getText().toString())); //To
