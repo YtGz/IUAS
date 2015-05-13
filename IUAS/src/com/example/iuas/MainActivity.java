@@ -142,7 +142,7 @@ public class MainActivity extends Activity {
 	 */
 	public void connectBT() {
 		btc = new BluetoothConnection(context);
-		btc.setDeviceAddress("94:CE:2C:A2:E8:9E");
+		btc.setDeviceAddress("20:13:08:16:16:29");
 		btc.connect();
 	}
 	
