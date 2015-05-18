@@ -10,6 +10,7 @@ package com.example.iuas;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
@@ -57,6 +58,8 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     private Scalar				 POINT_COLOR;
     public  static Mat			 homography;
     private boolean				 lockMrgba = false;
+    private int					 contoursCountThreshold = 20;
+
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
@@ -155,6 +158,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mDetector.setHsvColor(mBlobColorHsv);
+        SPECTRUM_SIZE = new Size(200, 64);
         CONTOUR_COLOR = new Scalar(0,0,255,255);
         POINT_COLOR = new Scalar(255,0,0,255);
     }
@@ -234,28 +238,35 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
 	        	Point a = new Point();
 	            mDetector.process(mRgba);
 	            List<MatOfPoint> contours = mDetector.getContours();
-	            Log.e(TAG, "Contours count: " + contours.size());
-	            //showLog("Contours count: " + contours.size());
-	            for (MatOfPoint mp : contours) {
-	            	double min = Double.MAX_VALUE;
-	            	for (Point p : mp.toArray()) {
-	            		if(p.y < min){
-	            			min = p.y;
-	            			a = p;
-	            		}      		
-	            	}
-	            	break;
-	            	
-	            }
-	            ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
-	            l.add(new MatOfPoint(a));
-	            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-	            Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
-	            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
-	            colorLabel.setTo(mBlobColorRgba);
-	            
-	            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
-	            mSpectrum.copyTo(spectrumLabel);
+	            System.out.println("Contours count: " + contours.size());
+	            // Count the amount of detected Pixels
+	        	int nPixel = 0;
+	        	ListIterator<MatOfPoint> it = mDetector.getContours().listIterator();
+	        	while(it.hasNext()) {
+	        		nPixel += it.next().toArray().length;
+	        	}
+	        	if(nPixel >= contoursCountThreshold) {
+		            for (MatOfPoint mp : contours) {
+		            	double min = Double.MAX_VALUE;
+		            	for (Point p : mp.toArray()) {
+		            		if(p.y < min){
+		            			min = p.y;
+		            			a = p;
+		            		}      		
+		            	}
+		            	break;
+		            	
+		            }
+		            ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
+		            l.add(new MatOfPoint(a));
+		            Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+		            Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
+		            Mat colorLabel = mRgba.submat(4, 68, 4, 68);
+		            colorLabel.setTo(mBlobColorRgba);
+		            
+		            Mat spectrumLabel = mRgba.submat(4, 4 + mSpectrum.rows(), 70, 70 + mSpectrum.cols());
+		            mSpectrum.copyTo(spectrumLabel);
+	        	}
 	        }
     	}
         return mRgba;
