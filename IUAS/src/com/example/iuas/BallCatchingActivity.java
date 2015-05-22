@@ -91,8 +91,6 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
         setContentView(R.layout.ball_catching_view);
         
         textLog = (TextView) findViewById(R.id.textLog);
-        com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
-		connectUSB();
         
         Intent intent = getIntent();
         double[] c = intent.getDoubleArrayExtra("mBlobColorHsv");
@@ -196,8 +194,9 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
      * @param view
      */
     public void catchBallOnClick(View view){
-    	Thread t = new Thread(this);
-    	t.start();
+    	robotDrive(200);
+    	/*Thread t = new Thread(this);
+    	t.start();*/
     }
     
     /**
@@ -243,9 +242,9 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	 * @param y
 	 */
 	public void catchBall(double x, double y){
-		//if(!turnToDetectObstacle()) { // if no ball is detected in the area around, explore the whole workspace until the ball is found
+		if(!turnToDetectObstacle()) { // if no ball is detected in the area around, explore the whole workspace until the ball is found
 			exploreWorkspace();
-		//}
+		}
 		//deliver ball to target position
 		moveFromPointToPoint(robotPosition, new Point(x, y));
 		robotSetBar((byte) 255);
@@ -337,7 +336,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		if(rC != 0) {
 			int d_r = rC;
 			for(int i = 1; i <= rC; i += DELTA_R, d_r -= DELTA_R) { // auskommentierter Abschnitt hat nicht funktioniert!! Muss nochmals ueberprueft werden !!
-				/*if (lowestTargetPoint != null && searchForBall) {
+				if (lowestTargetPoint != null && searchForBall) {
 					Point p = polarToCartesian(robotRotation, i);
 					robotPosition.x += p.x;
 					robotPosition.y += p.y;
@@ -345,10 +344,10 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 					System.out.println("Updated rotation rel. to start: "+robotRotation);
 					detectedBall();
 					return true;
-				}*/
+				}
 				robotDrive(DELTA_R);
 			}
-			/*if (lowestTargetPoint != null && searchForBall) {
+			if (lowestTargetPoint != null && searchForBall) {
 				Point p = polarToCartesian(robotRotation, rC-d_r);
 				robotPosition.x += p.x;
 				robotPosition.y += p.y;
@@ -356,7 +355,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 				System.out.println("Updated rotation rel. to start: "+robotRotation);
 				detectedBall();
 				return true;
-			}*/
+			}
 			robotDrive(d_r);
 			Point p = polarToCartesian(robotRotation, rC);
 			robotPosition.x += p.x;
@@ -366,10 +365,10 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		}
 		
 		
-//		if (lowestTargetPoint != null && searchForBall) {
-//			detectedBall();
-//			return true;
-//		}
+		if (lowestTargetPoint != null && searchForBall) {
+			detectedBall();
+			return true;
+		}
 		return false;
 	}
 	

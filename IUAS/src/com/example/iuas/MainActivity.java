@@ -53,8 +53,8 @@ public class MainActivity extends Activity {
 	private final int O = 10; // How far the robot should drive after the right sensor doesn't see the obstacle's edge anymore
 	
 	private Scalar mBlobColorHsv; // Needed for ColorBlobDetection
-	private Context context;
-	private BluetoothConnection btc;
+	public static Context context;
+	public static BluetoothConnection btc;
 	
 	
 	
@@ -81,7 +81,8 @@ public class MainActivity extends Activity {
 		}
 		
 		else if (USE_DEVICE == 2) {
-			connectBT();
+			if(btc == null)
+				connectBT();
 		}
 	}
 	
