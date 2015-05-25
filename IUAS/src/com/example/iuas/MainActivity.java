@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
 		
 		if (USE_DEVICE == 1) {
 			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
-			connectUSB(); //!! ALSO in BallCatchingActivity & ColorBlobDetection !!
+			connectUSB();
 		}
 		
 		else if (USE_DEVICE == 2) {
@@ -437,102 +437,7 @@ public class MainActivity extends Activity {
 			break;
 		}
 	}
-	
-	
-	/***************************************************************************************************************************************************
-	 * Bluetooth connection
-	 ***************************************************************************************************************************************************/
-	
-	/* Will be implemented soon if it is not too complicated.
-	 * 
-	 * see SampleGatt Classes in package and also
-	 * http://developer.android.com/samples/BluetoothLeGatt/src/com.example.android.bluetoothlegatt/DeviceControlActivity.html#l305
-	 * http://developer.android.com/guide/topics/connectivity/bluetooth-le.html
-	 */
-	
-	
 
-	/*************************************************************************************************************************************************
-	 * Exercise 2 *
-	 *************************************************************************************************************************************************/
-
-	/**
-	 * The square test is used to determine accuracy of odometry.
-	 * 
-	 * @param size the side length of the square in cm
-	 */
-	public void squareTest(int size) {
-		for (int i = 0; i < 4; i++) {
-			robotDrive(size);
-			robotTurn(90);
-		}
-	}
-
-	/**
-	 * If this is not working then have a closer look to:
-	 * http://www.iasj.net/iasj?func=fulltext&aId=94193, page 48
-	 * 
-	 * @param a The length of an arch of the lemniscate.
-	 */
-	public void lemniscateTest(int a) {
-		/*
-		 * The smaller this value the more frequently the robot repeats it's
-		 * move & turn cycles along the path. A small value leads to more
-		 * accuracy but the robot will get slower. Number of move & turn cycles:
-		 * 2*pi/resolution.
-		 */
-		double resolution = .1;
-
-		double oldX = 0;
-		double oldY = 0;
-		for (double t = 0; t < 2 * Math.PI; t += resolution) {
-			double newX = a * Math.sqrt(2) * Math.cos(t) / (Math.sin(t) * Math.sin(t) + 1);
-			double newY = a * Math.sqrt(2) * Math.cos(t) * Math.sin(t) / (Math.sin(t) * Math.sin(t) + 1);
-
-			/*
-			 * converting to polar coordinates relative to current robot
-			 * position
-			 */
-			byte r = (byte) Math.sqrt((newX - oldX) * (newX - oldX) + (newY - oldY) * (newY - oldY));
-			byte phi = (byte) Math.ceil(Math.atan2((newY - oldY), (newX - oldX)));
-			newX = r * Math.cos(phi) + oldX;
-			newY = r * Math.sin(phi) + oldY;
-			//showLog(String.valueOf("forward movement: " + r + "cm   turn angle: " + phi + "degree"));
-			robotTurn(phi, L_DETAIL);
-			robotDrive(r);
-			oldX = newX;
-			oldY = newY;
-		}
-	}
-
-	/**
-	 * Not very accurate, but works. Robot drives two circles, not a real lemniscate.
-	 * 
-	 * @param a The length of an arch of the lemniscate.
-	 */
-	public void lemniscateTestVer2(int a) {
-		double r = (WHEEL_SPACING + a) / 2; // the radius of the circle of the outer wheel
-		double s = 2 * Math.PI * (r - WHEEL_SPACING / 2);
-		double s1 = 2 * Math.PI * (r - WHEEL_SPACING);
-		double s2 = 2 * Math.PI * r;
-		int v = 14; // how fast the robot should drive
-		double t = s / v;
-		byte v1 = (byte) Math.round(s1 / t);
-		byte v2 = (byte) Math.round(s2 / t);
-		robotSetVelocity(v1, v2);
-		try {
-			Thread.sleep((long) t * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		robotSetVelocity(v2, v1);
-		try {
-			Thread.sleep((long) t * 1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		robotSetVelocity((byte) 0, (byte) 0);
-	}
 
 	/********************************************************************************************************************************************************
 	 * Exercise 3 *
@@ -877,7 +782,7 @@ public class MainActivity extends Activity {
 	 */
 	public void runOnClick(View view) {
 		//showLog("Nothing defined for Run-Button yet");
-		squareTest(30);
+		//squareTest(30);
 		/*switch (Integer.parseInt(xIn.getText().toString())) {
 		case 0:
 			calibrateLDetail(100);
