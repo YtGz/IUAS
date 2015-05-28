@@ -82,6 +82,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     private int					 beaconCount = 0;
     private int					 contoursCount = 0;
     private HashSet<BEACON>	 	 currentBeacons = new HashSet<BEACON>();
+    
 
 
     private CameraBridgeViewBase mOpenCvCameraView;

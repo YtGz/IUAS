@@ -37,20 +37,26 @@ public class MainActivity extends Activity {
 	private EditText xIn; // x value input
 	private EditText yIn; // y value input
 	private EditText phiIn; // phi value input
+	public final double velocityDriveCalibration = 53.8; // calibration factor for drive
+	public final double velocityTurnCalibration = 9.51; // calibration factor for turn
+	public static double x = 0; // x pos. of robot
+	public static double y = 0; // y pos. of robot
+	public static double theta = 0; // theta of robot
+	public final byte speed = 30; // speed of robot's wheels
 	
-	protected final double K = 1.4; // offset correction for forward movement
-	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
-	protected final double L = 1.01; // offset correction for turning angle
-	private final double L_DETAIL = 1.05; // offset correction for turning angle of 15 degrees
-	private final double L_DETAIL_SENSOR = 1.467; // offset correction for turning angle of 15 degree while measuring for obstacles
+//	protected final double K = 1.4; // offset correction for forward movement
+//	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
+//	protected final double L = 1.01; // offset correction for turning angle
+//	private final double L_DETAIL = 1.05; // offset correction for turning angle of 15 degrees
+//	private final double L_DETAIL_SENSOR = 1.467; // offset correction for turning angle of 15 degree while measuring for obstacles
 	
 	private final byte[] SENSOR_OFFSETS = { 1, 1, 1 }; // offsets of the individual sensors
-	protected final double R_SPEED = 72; // The default turning speed of the robot in cm/s
-	protected final double M_SPEED = 14.2; // The default velocity of the robot in cm/s
-	private final int WHEEL_SPACING = 19; // space between the 2 wheels
-	private final int DELTA_M = 10; // The distance to travel until robot measures for obstacle
-	protected final int DELTA_R = 15; // The degrees to rotate until robot measures for obstacle
-	private final int O = 10; // How far the robot should drive after the right sensor doesn't see the obstacle's edge anymore
+//	protected final double R_SPEED = 72; // The default turning speed of the robot in cm/s
+//	protected final double M_SPEED = 14.2; // The default velocity of the robot in cm/s
+//	private final int WHEEL_SPACING = 19; // space between the 2 wheels
+//	private final int DELTA_M = 10; // The distance to travel until robot measures for obstacle
+//	protected final int DELTA_R = 15; // The degrees to rotate until robot measures for obstacle
+//	private final int O = 10; // How far the robot should drive after the right sensor doesn't see the obstacle's edge anymore
 	
 	private Scalar mBlobColorHsv; // Needed for ColorBlobDetection
 	public static Context context;
@@ -85,8 +91,6 @@ public class MainActivity extends Activity {
 				connectBT();
 		}
 	}
-	
-	
 	
 	/**
 	 * Starts BallCatching activity.
@@ -204,16 +208,50 @@ public class MainActivity extends Activity {
 	 * @param distance_cm
 	 */
 	public void robotDrive(int distance_cm){
-		robotDrive(distance_cm, K);
+		//robotDrive(distance_cm, K);
+		robotDrive(distance_cm, velocityDriveCalibration);
 	}
 	
 	/**
-	 * Lets robotz drive a given distance in cm.
+	 * Lets robot drive a given distance in cm.
 	 * Also accepts a calibration factor to get the input distance in real world drive.
 	 * 
 	 * @param distance_cm
 	 * @param calib
 	 */
+	public void robotDrive(double distance, double calib) {
+		boolean interruption = false;
+		robotSetVelocity(speed, speed);
+		double startTime = System.currentTimeMillis();
+
+		try {
+			Thread.sleep((long) (Math.abs(distance) * calib * (20/Math.abs(speed))));
+		}
+		catch (InterruptedException e) {
+			showLog("Robot Drive Interruption!");
+			interruption = true;
+		}
+		finally {
+			if (interruption) {
+				x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1/calib) * (speed/20);
+				y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1/calib) * (speed/20);
+			}
+			else {
+				x += Math.cos(Math.toRadians(theta)) * distance;
+				y += Math.sin(Math.toRadians(theta)) * distance;
+			}
+		}
+		
+		robotSetVelocity((byte) 0, (byte) 0);
+		startTime = 0;
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
+	}
+	/* Old method without set velocity
 	public void robotDrive(int distance_cm, double calib) {
 		distance_cm = ((int) Math.ceil(distance_cm * calib)); // calculate distance with calibration factor
 		
@@ -258,13 +296,17 @@ public class MainActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 	
 	/**
 	 * Lets robot turn a given amount of degrees.
 	 * 
 	 * @param degree
 	 */
+	public void robotTurn(int degree) {
+		robotTurn(degree, velocityTurnCalibration);
+	}
+	/* Old method without set velocity
 	public void robotTurn(int degree) {
 		for (int i = Math.abs(degree); i >= DELTA_R;) {
 			i -= DELTA_R;
@@ -278,7 +320,7 @@ public class MainActivity extends Activity {
 			}
 		}
 		robotTurn(degree, L);
-	}
+	}*/
 	
 	/**
 	 * Lets robot turn a given amount of degrees.
@@ -287,6 +329,42 @@ public class MainActivity extends Activity {
 	 * @param degree
 	 * @param calib
 	 */
+	public void robotTurn(int degree, double calib) {
+		boolean interruption = false;
+		
+		if (degree >= 0) robotSetVelocity((byte) (-1 * speed), (byte) speed);
+		else if (degree < 0) robotSetVelocity((byte) speed, (byte) (-1 *speed));
+		
+		double startTime = System.currentTimeMillis();
+		
+		try {
+			Thread.sleep((long) (3.14159 * velocityTurnCalibration * (Math.abs(degree)/180) * velocityDriveCalibration * (20/Math.abs(speed))));
+		}
+		catch (InterruptedException e) {
+			showLog("Robot Turn Interruption!");
+			interruption = true;
+		}
+		finally {
+			if (interruption) {
+				double temp = (System.currentTimeMillis() - startTime) * (1/velocityDriveCalibration) * (180/(3.14159 * velocityTurnCalibration)) * (speed/20);
+				theta += temp;
+				System.out.println("Could only turn " + temp + "degrees");
+			}
+			else {
+				theta += degree;
+			}
+		}
+		theta = theta % 360;
+
+		robotSetVelocity((byte) 0, (byte) 0);
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
+	}
+	/* Old method without set velocity
 	public void robotTurn(int degree, double calib) {
 		degree = (int) Math.ceil(degree * calib); // calculate degrees with calibration factor
 		
@@ -333,7 +411,7 @@ public class MainActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 	
 	/**
 	 * Method to set velocity.
@@ -531,6 +609,7 @@ public class MainActivity extends Activity {
 	 * Test method for detecting obstacles.
 	 * @param distance
 	 */
+	/*
 	public void stopAndGo(int distance) {
 		while (distance > DELTA_M) {
 			robotDrive(DELTA_M);
@@ -541,7 +620,7 @@ public class MainActivity extends Activity {
 			}
 		}
 		robotDrive(distance);
-	}
+	}*/
 
 	/** 
 	 * Robot heads straight for the goal, ignoring obstacles, and in the end rotates according to theta.
@@ -567,11 +646,13 @@ public class MainActivity extends Activity {
 	 * @param y
 	 * @param theta
 	 */
+	/*
 	public void navigate(int x, int y, int theta) {
 		int r = (int) Math.sqrt(x * x + y * y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
 		phi *= -1;
-		robotTurn(phi, L_DETAIL_SENSOR);
+		//robotTurn(phi, L_DETAIL_SENSOR);
+		robotTurn(phi);
 		
 		detectObstacle(new boolean[] { false, false, true }); //temporary
 		while (r > 0) {
@@ -584,7 +665,7 @@ public class MainActivity extends Activity {
 			}
 		}
 		robotTurn(theta - phi);
-	}
+	}*/
 
 	
 	
@@ -616,6 +697,7 @@ public class MainActivity extends Activity {
 	 * @param phi
 	 * @return the new angle & distance to the obstacle
 	 */
+	/*
 	public int[] bugZero(int r, int phi) {
 		int r2 = 0;
 		int phi2 = 0;
@@ -655,7 +737,7 @@ public class MainActivity extends Activity {
 		}
 		int[] returnVal = { r, phi };
 		return returnVal;
-	}
+	}*/
 	
 	/**
 	 * A test method to test rotation and caluclation if obstacle was detected and robot has to re-calculate his way to the goal.
@@ -663,6 +745,7 @@ public class MainActivity extends Activity {
 	 * @param r
 	 * @return
 	 */
+	/*
 	public int rotTest(int r) {
 		int r2 = 0;
 		int phi = 0;
@@ -692,7 +775,7 @@ public class MainActivity extends Activity {
 		robotTurn(phi); // let robot face the goal again
 		int returnVal = r;
 		return returnVal;
-	}
+	}*/
 	
 	
 
@@ -705,26 +788,28 @@ public class MainActivity extends Activity {
 	 * 
 	 * @param calib
 	 */
+	/*
 	public void calibrateLDetail(int calib) {
 		double c = 1 + calib / 100.0;
 		for (int i = 1; i <= 360; i += DELTA_R) {
 			robotTurn(DELTA_R, c);
 			//detectObstacle(new boolean[] { true, true, false }, new int[] { 100, 255 });
 		}
-	}
+	}*/
 	
 	/**
 	 * A method to find out the right calibration value for moving forward a given distance.
 	 * 
 	 * @param calib
 	 */
+	/*
 	public void calibrateDistance(int calib){
 		double c = 1 + calib /100.0;
 		for(int i =1 ; i <= 60; i += DELTA_M){
 			robotDrive(DELTA_M, c);
 			//detectObstacle(new boolean[] { true, true, false }, new int[] { 100, 255 });
 		}
-	}
+	}*/
 	
 	
 
@@ -817,5 +902,6 @@ public class MainActivity extends Activity {
 		navigateIgnoringObstacles(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
 		robotTurn(-180);
 		robotDrive(106);*/
+		robotDrive(100);
 	}
 }

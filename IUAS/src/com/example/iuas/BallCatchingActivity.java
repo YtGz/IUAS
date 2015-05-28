@@ -242,16 +242,16 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	 * @param y
 	 */
 	public void catchBall(double x, double y){
-		if(!turnToDetectObstacle()) { // if no ball is detected in the area around, explore the whole workspace until the ball is found
+		/*if(!turnToDetectObstacle()) { // if no ball is detected in the area around, explore the whole workspace until the ball is found
 			exploreWorkspace();
-		}
+		}*/
 		//deliver ball to target position
 		moveFromPointToPoint(robotPosition, new Point(x, y));
 		robotSetBar((byte) 255);
 		
 		//return to origin
 		moveFromPointToPoint(robotPosition, new Point(0, 0));
-		robotMove(-robotRotation, 0, false);
+		//robotMove(-robotRotation, 0, false);
 	}
 	
 	/**
@@ -259,6 +259,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	 * 
 	 * @return true if ball was found, false else.
 	 */
+	/*
 	public boolean turnToDetectObstacle(){
 		if(robotMove(0, 0, true)) {
 			return true;
@@ -269,7 +270,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 			}
     	}
 		return false;
-	}
+	}*/
 	
 	/**
 	 * This method checks if the ball was found by using the caluclated lowest target point.
@@ -282,8 +283,8 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		p.y = p.y/10-15;
 		double[] d = cartesianToPolar(p);
 		System.out.println("polar to target point: " + d[1] + " " + d[0]);
-		robotMove(d[1], d[0], false);
-		robotMove(0, -5, false);
+		/*robotMove(d[1], d[0], false);
+		robotMove(0, -5, false);*/
 		robotSetBar((byte) 0);
 		robotFlashLed(0);
 	}
@@ -320,6 +321,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	 * @param phi
 	 * @param r
 	 */
+	/*
 	public boolean robotMove(double phi, double r, boolean searchForBall) {
 		int phiC = (int) Math.round(phi); // C stands for "corrected"
 		int rC = (int) Math.round(r);
@@ -370,7 +372,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 			return true;
 		}
 		return false;
-	}
+	}*/
 	
 	/**
 	 * Explores workspace ala "Zick-Zack".
@@ -378,6 +380,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	 * 
 	 * @see local sheets where this path was drawn & calculated
 	 */
+	/*
 	public void exploreWorkspace() {
 		final int workspaceFactor = 1;
 		final double density = Math.sqrt(17);  	//Math.sqrt(5); for 2 crossings / Math.sqrt(17); for 4 crossings / Math.sqrt(65); for 8 crossings
@@ -389,7 +392,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		if(robotMove(-Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor, true)) return;
 		if(robotMove(Math.ceil(180 - (Math.asin(Math.toRadians(75/density)))), 300/workspaceFactor, true)) return;
 		robotMove(135, Math.sqrt(45000)/workspaceFactor, true);	
-	}
+	}*/
 	
 	/**
 	 * Moves the robot from Point A to Point B.
@@ -404,6 +407,6 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 		System.out.println("moveFromPointToPoint: New poloar coordinates: " + d[0] + " " + d[1]);
 		double r = d[0];
 		double phi = d[1] - robotRotation;
-		robotMove(phi, r, false);
+		//robotMove(phi, r, false);
 	}
 }
