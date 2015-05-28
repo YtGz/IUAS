@@ -162,7 +162,12 @@ public class MainActivity extends Activity {
 		} else {
 			showLog("Not connected!");
 		}*/
-		btc.write(data);
+		if (btc == null) {
+			showLog("BT Connection failed!");
+		}
+		else {
+			btc.write(data);
+		}
 	}
 	
 	/**
@@ -221,7 +226,7 @@ public class MainActivity extends Activity {
 	 */
 	public void robotDrive(double distance, double calib) {
 		boolean interruption = false;
-		robotSetVelocity(speed, speed);
+		robotSetVelocity((byte) speed, (byte) speed);
 		double startTime = System.currentTimeMillis();
 
 		try {
@@ -902,6 +907,9 @@ public class MainActivity extends Activity {
 		navigateIgnoringObstacles(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
 		robotTurn(-180);
 		robotDrive(106);*/
-		robotDrive(100);
+		//robotFlashLed(0);
+		//robotDrive(30);
+		//robotFlashLed(0);
+		comWrite(new byte[] { 'i', (byte) 20, (byte) -20, '\r', '\n' });
 	}
 }

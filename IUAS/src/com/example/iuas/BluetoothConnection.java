@@ -46,7 +46,7 @@ public class BluetoothConnection {
 			// This is a blocking call and will only return on a successful connection or an exception
 			btSocket.connect();
 		} catch (IOException e) {
-			System.out.println("Connection failed");
+			System.out.println("BT Connection failed");
 			e.printStackTrace();
 
 			// Close the socket
@@ -61,7 +61,6 @@ public class BluetoothConnection {
 	}
 
 	public void write(byte[] out) {
-
 		try {
 			btSocket.getOutputStream().write(out);
 		} catch (IOException e) {
