@@ -157,16 +157,20 @@ public class MainActivity extends Activity {
 	 * @param data
 	 */
 	public void comWrite(byte[] data) {
-	/*	if (com.isConnected()) {
-			com.write(data);
-		} else {
-			showLog("Not connected!");
-		}*/
-		if (btc == null) {
-			showLog("BT Connection failed!");
+		if (USE_DEVICE == 1) {
+			if (com.isConnected()) {
+				com.write(data);
+			} else {
+				showLog("Not connected!");
+			}
 		}
-		else {
-			btc.write(data);
+		else if (USE_DEVICE == 2) {
+			if (btc == null) {
+				showLog("BT Connection failed!");
+			}
+			else {
+				btc.write(data);
+			}
 		}
 	}
 	
@@ -196,15 +200,19 @@ public class MainActivity extends Activity {
 	 * @return
 	 */
 	public String comReadWrite(byte[] data) {
-		/*com.write(data);
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// ignore
+		if (USE_DEVICE == 1) {
+			com.write(data);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+			return comRead();
 		}
-		return comRead();*/
-		btc.write(data);
-		return "";
+		else if (USE_DEVICE == 2) {
+			btc.write(data);
+			return "";
+		}
 	}
 	
 	/**
