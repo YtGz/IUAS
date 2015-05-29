@@ -13,12 +13,15 @@ import jp.ksksue.driver.serial.FTDriver;
 
 import org.opencv.core.Scalar;
 
+import com.example.iuas.ColorBlobDetectionActivity.COLOR;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -39,6 +42,7 @@ public class MainActivity extends Activity {
 	private EditText xIn; // x value input
 	private EditText yIn; // y value input
 	private EditText phiIn; // phi value input
+	private Spinner mySpinner;
 	public final double velocityDriveCalibration = 53.8; // calibration factor for drive
 	public final double velocityTurnCalibration = 10; // calibration factor for turn
 	public static double x = 0; // x pos. of robot
@@ -63,7 +67,7 @@ public class MainActivity extends Activity {
 	private Scalar mBlobColorHsv; // Needed for ColorBlobDetection
 	public static Context context;
 	public static BluetoothConnection btc;
-	public static ColorBlobDetectionActivity.COLOR BALL_COLOR;
+	public static COLOR BALL_COLOR;
 	
 	
 	
@@ -83,8 +87,17 @@ public class MainActivity extends Activity {
 		xIn = (EditText) findViewById(R.id.x);
 		yIn = (EditText) findViewById(R.id.y);
 		phiIn = (EditText) findViewById(R.id.phi);
-		Spinner mySpinner = (Spinner) findViewById(R.id.chooseColor);
+		mySpinner = (Spinner) findViewById(R.id.chooseColor);
 		mySpinner.setAdapter(new ArrayAdapter<COLOR>(this, android.R.layout.simple_spinner_item, COLOR.values()));
+		mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+		    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) { 
+		    	BALL_COLOR = (COLOR) mySpinner.getItemAtPosition(i);
+		    } 
+
+		    public void onNothingSelected(AdapterView<?> adapterView) {
+		        return;
+		    } 
+		}); 
 		
 		if (USE_DEVICE == 1) {
 			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
