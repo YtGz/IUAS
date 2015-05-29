@@ -38,11 +38,11 @@ public class MainActivity extends Activity {
 	private EditText yIn; // y value input
 	private EditText phiIn; // phi value input
 	public final double velocityDriveCalibration = 53.8; // calibration factor for drive
-	public final double velocityTurnCalibration = 9.51; // calibration factor for turn
+	public final double velocityTurnCalibration = 10; // calibration factor for turn
 	public static double x = 0; // x pos. of robot
 	public static double y = 0; // y pos. of robot
 	public static double theta = 0; // theta of robot
-	public final byte speed = 30; // speed of robot's wheels
+	public final byte speed = 20; // speed of robot's wheels
 	
 //	protected final double K = 1.4; // offset correction for forward movement
 //	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
 	 */
 	public void connectBT() {
 		btc = new BluetoothConnection(context);
-		btc.setDeviceAddress("20:13:08:16:16:29");
+		btc.setDeviceAddress("20:13:08:16:08:95");
 		btc.connect();
 	}
 	
@@ -213,6 +213,7 @@ public class MainActivity extends Activity {
 			btc.write(data);
 			return "";
 		}
+		return "";
 	}
 	
 	/**
@@ -255,7 +256,9 @@ public class MainActivity extends Activity {
 			}
 		}
 		
-		robotSetVelocity((byte) 0, (byte) 0);
+		//robotSetVelocity((byte) 0, (byte) 0);
+		robotStop();
+		showLog("Robot stopped");
 		startTime = 0;
 		try {
 			Thread.sleep(50);
@@ -369,7 +372,9 @@ public class MainActivity extends Activity {
 		}
 		theta = theta % 360;
 
-		robotSetVelocity((byte) 0, (byte) 0);
+		//robotSetVelocity((byte) 0, (byte) 0);
+		robotStop();
+		showLog("Robot stopped");
 		try {
 			Thread.sleep(50);
 		} catch (InterruptedException e) {
@@ -916,8 +921,11 @@ public class MainActivity extends Activity {
 		robotTurn(-180);
 		robotDrive(106);*/
 		//robotFlashLed(0);
-		//robotDrive(30);
+		//robotDrive(Integer.parseInt(xIn.getText().toString()));
 		//robotFlashLed(0);
-		comWrite(new byte[] { 'i', (byte) 20, (byte) -20, '\r', '\n' });
+		robotDrive(30);
+		robotTurn(180);
+		robotFlashLed(0);
+		System.out.println("Im the Hero! !!!");
 	}
 }
