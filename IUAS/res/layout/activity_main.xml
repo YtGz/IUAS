@@ -90,4 +90,11 @@
         android:onClick="switchActivity"
         android:text="Choose Color" />
 
+    <Spinner
+        android:id="@+id/chooseColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/switchActivity"
+        android:layout_below="@+id/switchActivity" />
+
 </RelativeLayout>

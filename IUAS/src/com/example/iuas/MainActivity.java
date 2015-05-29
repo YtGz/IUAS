@@ -19,7 +19,9 @@ import android.content.Intent;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -61,6 +63,7 @@ public class MainActivity extends Activity {
 	private Scalar mBlobColorHsv; // Needed for ColorBlobDetection
 	public static Context context;
 	public static BluetoothConnection btc;
+	private enum  COLOR {YELLOW, RED, GREEN, BLUE};
 	
 	
 	
@@ -80,6 +83,8 @@ public class MainActivity extends Activity {
 		xIn = (EditText) findViewById(R.id.x);
 		yIn = (EditText) findViewById(R.id.y);
 		phiIn = (EditText) findViewById(R.id.phi);
+		Spinner mySpinner = (Spinner) findViewById(R.id.chooseColor);
+		mySpinner.setAdapter(new ArrayAdapter<COLOR>(this, android.R.layout.simple_spinner_item, COLOR.values()));
 		
 		if (USE_DEVICE == 1) {
 			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
