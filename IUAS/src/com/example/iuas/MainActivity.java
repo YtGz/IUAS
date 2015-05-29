@@ -63,7 +63,7 @@ public class MainActivity extends Activity {
 	private Scalar mBlobColorHsv; // Needed for ColorBlobDetection
 	public static Context context;
 	public static BluetoothConnection btc;
-	private enum  COLOR {YELLOW, RED, GREEN, BLUE};
+	public static ColorBlobDetectionActivity.COLOR BALL_COLOR;
 	
 	
 	

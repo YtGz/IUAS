@@ -63,7 +63,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     private boolean				 lockMrgba = false;
     private int					 contoursCountThreshold = 0;//25;
     private enum 			 	 OBJECT_TYPE {BALL, BEACON};
-    private enum				 COLOR {YELLOW, RED, GREEN, BLUE}
+    public  static enum			 COLOR {YELLOW, RED, GREEN, BLUE}
     private final HashMap<COLOR, Scalar> COLOR_VALUE = new HashMap<COLOR, Scalar>(){{put(COLOR.YELLOW, new Scalar(144, 155, 48)); put(COLOR.RED, new Scalar (155, 44, 50));
     							 put(COLOR.GREEN, new Scalar (33, 153, 109)); put(COLOR.BLUE, new Scalar(0, 182, 255));}}; 
     private enum				 BEACON {YELLOW_RED, RED_YELLOW, BLUE_GREEN, RED_BLUE, BLUE_RED, BLUE_YELLOW, YELLOW_BLUE, RED_GREEN};
@@ -473,11 +473,13 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     		}
     	}
     	
-    	for(boolean beacon : isBeacon){
-    		if(!beacon){
-    			ballCount++;
-    			//choose active ball
-    			//save ball coordinates
+    	for(int i = 0; i < isBeacon.length; i++){
+    		if(!isBeacon[i]){
+    			if(it.get(i).second == MainActivity.BALL_COLOR) {
+    				ballCount++;
+        			//choose active ball
+        			//save ball coordinates
+    			}
     		}
     	}
     	
