@@ -45,6 +45,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     private Scalar               CONTOUR_COLOR;
     private Scalar				 POINT_COLOR;
     private Mat				 	 homography;
+    private boolean				 lockMrgba = false;
     private Point				 lowestTargetPoint;
     private Point				 robotPosition;
     private double				 robotRotation;
@@ -155,28 +156,16 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
      * Determines what happens on getting a camera frame.
      */
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
-	    mRgba = inputFrame.rgba();
-	    mDetector.process(mRgba);
-	    List<MatOfPoint> contours = mDetector.getContours();
-	   // System.out.println("Contours count: " + contours.size());
-	    if(contours.size() > 0) {
-	        for (MatOfPoint mp : contours) {
-	        	double min = Double.MAX_VALUE;
-	        	for (Point p : mp.toArray()) {
-	        		if(p.y < min){
-	        			min = p.y;
-	        			lowestTargetPoint = p;
-	        		}      		
-	        	}
-	        	break;
-	        	
-	        }
-	        ArrayList<MatOfPoint> l = new ArrayList<MatOfPoint>();
-	        l.add(new MatOfPoint(lowestTargetPoint));
-	        Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-	        Imgproc.drawContours(mRgba, l, -1, POINT_COLOR);
-	    }    
-	    return mRgba;
+    	if(!lockMrgba){
+    		mRgba = inputFrame.rgba();
+
+    		ArrayList<ArrayList<MatOfPoint>> l = BallAndBeaconDetection.detect(mRgba, mDetector);
+    		ArrayList<MatOfPoint> contours = l.get(0);
+    		ArrayList<MatOfPoint> lowestTargetPoint = l.get(1);
+			Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+			Imgproc.drawContours(mRgba, lowestTargetPoint, -1, POINT_COLOR);
+    	}
+        return mRgba;
     }
     
     /**
@@ -230,6 +219,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
 	public void catchBall(double x, double y){
 		// DOES NOTHING YET
 	}
+	
 	
 	/**
 	 * Converts coordinates from polar to cartesian.
