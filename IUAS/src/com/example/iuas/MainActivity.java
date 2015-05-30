@@ -284,52 +284,6 @@ public class MainActivity extends Activity {
 		}
 		System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
 	}
-	/* Old method without set velocity
-	public void robotDrive(int distance_cm, double calib) {
-		distance_cm = ((int) Math.ceil(distance_cm * calib)); // calculate distance with calibration factor
-		
-		// if distance < 0 use absolute value of distance and turn 129 byte as long as distance value is > 127cm and at the end 256 - distance_cm byte
-		if (distance_cm < 0) {
-			distance_cm = Math.abs(distance_cm);
-			while (distance_cm > 127) {
-				comWrite(new byte[] { 'k', (byte) (129), '\r', '\n' });
-				distance_cm -= 127;
-				try {
-					Thread.sleep((long) Math.ceil(127 * 1000 / calib / M_SPEED));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			comWrite(new byte[] { 'k', (byte) (256 - distance_cm), '\r', '\n' });
-			try {
-				Thread.sleep((long) Math.ceil(distance_cm * 1000 / calib / M_SPEED));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		// if distance > 0 turn 127 byte as long as distance value > 127cm and at the end the given distance_cm byte
-		else {
-			while (distance_cm > 127) {
-				comWrite(new byte[] { 'k', (byte) (127), '\r', '\n' });
-				distance_cm -= 127;
-				try {
-					Thread.sleep((long) Math.ceil(127 * 1000 / calib / M_SPEED));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			if (distance_cm == 10) { // 10 does nothing, therefore set it to 11 if given
-				distance_cm = 11;
-			}
-			comWrite(new byte[] { 'k', (byte) (distance_cm), '\r', '\n' });
-			try {
-				Thread.sleep((long) Math.ceil(distance_cm * 1000 / calib / M_SPEED));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}*/
 	
 	/**
 	 * Lets robot turn a given amount of degrees.
@@ -339,21 +293,7 @@ public class MainActivity extends Activity {
 	public void robotTurn(int degree) {
 		robotTurn(degree, velocityTurnCalibration);
 	}
-	/* Old method without set velocity
-	public void robotTurn(int degree) {
-		for (int i = Math.abs(degree); i >= DELTA_R;) {
-			i -= DELTA_R;
-			if(degree < 0){
-			degree = -i; 
-			robotTurn(-DELTA_R, L);
-			}
-			else {
-				degree = i;
-				robotTurn(DELTA_R, L);
-			}
-		}
-		robotTurn(degree, L);
-	}*/
+
 	
 	/**
 	 * Lets robot turn a given amount of degrees.
@@ -399,54 +339,7 @@ public class MainActivity extends Activity {
 		}
 		System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
 	}
-	/* Old method without set velocity
-	public void robotTurn(int degree, double calib) {
-		degree = (int) Math.ceil(degree * calib); // calculate degrees with calibration factor
-		
-		// if degree < 0 use absolute value of degree and turn 129 byte as long as degree value is > 127 and at the end 256 - degree byte
-		if (degree < 0) {
-			degree = Math.abs(degree);
-			while (degree > 127) {
-				comWrite(new byte[] { 'l', (byte) (129), '\r', '\n' });
-				degree -= 127;
-				try {
-					Thread.sleep((long) Math.ceil(127 * 1000 / calib / R_SPEED));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			comWrite(new byte[] { 'l', (byte) (256 - degree), '\r', '\n' });
-			try {
-				Thread.sleep((long) Math.ceil(degree * 1000 / calib / R_SPEED));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		// if degree > 0 turn 127 byte as long as degree > 127
-		else {
-			while (degree > 127) {
-				comWrite(new byte[] { 'l', (byte) (127), '\r', '\n' });
-				degree -= 127;
-				try {
-					Thread.sleep((long) Math.ceil(127 * 1000 / calib / R_SPEED));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			if (degree == 10) { // 10 does nothing, therefore set it to 11 if given
-				degree = 11;
-			}
-			if(degree > 0) { // if left amount of degrees is > 0 turn robot the outstanding degree value
-				comWrite(new byte[] { 'l', (byte) (degree), '\r', '\n' });
-			}
-			try {
-				Thread.sleep((long) Math.ceil(degree * 1000 / calib / R_SPEED));
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}*/
+	
 	
 	/**
 	 * Method to set velocity.
