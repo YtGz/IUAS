@@ -53,8 +53,23 @@ public class Odometry {
 				p = intersectionPoints[0];
 			}
 			else {
-				//TODO: Determine which intersection point
-				p = null; //delete this line
+				//Determine which intersection point to use
+				int near;
+				int far;
+				if(intersectionPoints[0].mod() < intersectionPoints[1].mod()) {
+					near = 0;
+					far = 1;
+				}
+				else {
+					near = 1;
+					far = 0;
+				}
+				if(beaconCoordinatesEgocentric[0].x > beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
+					p = intersectionPoints[far];
+				}
+				else {
+					p = intersectionPoints[near];
+				}
 			}
 			//calculate angle
 			Vector2 robotToLeftBeacon = beaconCoordinatesWorld[0].sub(p);
