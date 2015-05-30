@@ -159,7 +159,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     	if(!lockMrgba){
     		mRgba = inputFrame.rgba();
 
-    		ArrayList<ArrayList<MatOfPoint>> l = BallAndBeaconDetection.detect(mRgba, mDetector);
+    		ArrayList<ArrayList<MatOfPoint>> l = BallAndBeaconDetection.detect(mRgba, mDetector); // run as thread & add selfLocalization
     		ArrayList<MatOfPoint> contours = l.get(0);
     		ArrayList<MatOfPoint> lowestTargetPoint = l.get(1);
 			Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
@@ -183,7 +183,9 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
      * @param view
      */
     public void catchBallOnClick(View view){
-    	// DOES NOTHING YET
+    	Odometry.selfLocalize(BallAndBeaconDetection.currentBeacons, BallAndBeaconDetection.beaconImgCoords);
+    	System.out.println("ROBOT position: " + Odometry.position);
+    	System.out.println("ROBOT rotation: " + Odometry.rotation);
     }
     
     /**

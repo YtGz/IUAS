@@ -31,9 +31,20 @@ import android.view.View.OnTouchListener;
 public class BallAndBeaconDetection {
 
     public static enum		 	 	OBJECT_TYPE {BALL, BEACON};
-    public static enum			 	COLOR {YELLOW, RED, GREEN, BLUE}
-    public static final HashMap<COLOR, Scalar> COLOR_VALUE = new HashMap<COLOR, Scalar>(){{put(COLOR.YELLOW, new Scalar(144, 155, 48)); put(COLOR.RED, new Scalar (155, 44, 50));
-    							 	put(COLOR.GREEN, new Scalar (33, 153, 109)); put(COLOR.BLUE, new Scalar(0, 182, 255));}}; 
+    public static enum			 	COLOR {YELLOW, RED, GREEN, BLUE};
+    
+    
+    /*
+     * lighter colors
+     */
+//    public static final HashMap<COLOR, Scalar> COLOR_VALUE = new HashMap<COLOR, Scalar>(){{put(COLOR.YELLOW, new Scalar(144, 155, 48)); put(COLOR.RED, new Scalar (155, 44, 50));
+//    put(COLOR.GREEN, new Scalar (33, 153, 109)); put(COLOR.BLUE, new Scalar(0, 182, 255));}}; 
+    
+    /*
+     * darker colors
+     */
+    public static final HashMap<COLOR, Scalar> COLOR_VALUE = new HashMap<COLOR, Scalar>(){{put(COLOR.YELLOW, new Scalar(110, 86, 0)); put(COLOR.RED, new Scalar (89, 6, 0));
+     							 	put(COLOR.GREEN, new Scalar (77, 127, 33)); put(COLOR.BLUE, new Scalar(1, 69, 84));}}; 
     public static enum			 	BEACON {YELLOW_RED, RED_YELLOW, BLUE_GREEN, RED_BLUE, BLUE_RED, BLUE_YELLOW, YELLOW_BLUE, RED_GREEN};
     public static final HashMap<BEACON, Pair<COLOR, COLOR>> BEACON_COLORS = new HashMap<BEACON, Pair<COLOR, COLOR>>() {{put(BEACON.YELLOW_RED, new Pair(COLOR.YELLOW, COLOR.RED));
     							 	put(BEACON.RED_YELLOW, new Pair(COLOR.RED, COLOR.YELLOW)); put(BEACON.BLUE_RED, new Pair(COLOR.BLUE, COLOR.RED));
@@ -123,7 +134,6 @@ public class BallAndBeaconDetection {
     }
     
     public static Point calculateEps (double xMin1, double xMax1, double xMin2, double xMax2, double yMin1, double yMax1, double yMin2, double yMax2){
-    	System.out.println("yMin: " + yMin1 + "yMax: " + yMax1);
     	return new Point((((xMax1 - xMin1) + (xMax2 - xMin2))/2)*2, (((yMax1 - yMin1)+ (yMax2 - yMin2))/2)*.5);
     }
     
