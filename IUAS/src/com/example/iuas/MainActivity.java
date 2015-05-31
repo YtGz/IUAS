@@ -33,22 +33,22 @@ public class MainActivity extends Activity {
 	 * Define constants *
 	 **************************************************************************************************************************************/	
 
-	protected final boolean DEBUG = true; // enables debug messages
-	protected final int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append
-	protected final int USE_DEVICE = 2; // 1: USB, 2: Bluetooth
+	protected final static boolean DEBUG = true; // enables debug messages
+	protected final static int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append
+	protected final static int USE_DEVICE = 2; // 1: USB, 2: Bluetooth
 	
-	protected FTDriver com;
-	protected TextView textLog;
+	protected static FTDriver com;
+	protected static TextView textLog;
 	private EditText xIn; // x value input
 	private EditText yIn; // y value input
 	private EditText phiIn; // phi value input
 	private Spinner mySpinner;
-	public final double velocityDriveCalibration = 53.8; // calibration factor for drive
-	public final double velocityTurnCalibration = 10; // calibration factor for turn
+	public final static double velocityDriveCalibration = 53.8; // calibration factor for drive
+	public final static double velocityTurnCalibration = 10; // calibration factor for turn
 	public static double x = 0; // x pos. of robot
 	public static double y = 0; // y pos. of robot
 	public static double theta = 0; // theta of robot
-	public final byte speed = 20; // speed of robot's wheels
+	public final static byte speed = 20; // speed of robot's wheels
 	
 //	protected final double K = 1.4; // offset correction for forward movement
 //	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
 	/**
 	 * Write debug log on console or mobile phone.
 	 */
-	public void showLog(Object text) {
+	public static void showLog(Object text) {
 		if (DEBUG) {
 			if (DEBUG_DEVICE == 1) {
 				System.out.println(text);
@@ -173,7 +173,7 @@ public class MainActivity extends Activity {
 	 * 
 	 * @param data
 	 */
-	public void comWrite(byte[] data) {
+	public static void comWrite(byte[] data) {
 		if (USE_DEVICE == 1) {
 			if (com.isConnected()) {
 				com.write(data);
@@ -238,7 +238,7 @@ public class MainActivity extends Activity {
 	 * 
 	 * @param distance_cm
 	 */
-	public void robotDrive(int distance_cm){
+	public static void robotDrive(int distance_cm){
 		//robotDrive(distance_cm, K);
 		robotDrive(distance_cm, velocityDriveCalibration);
 	}
@@ -250,7 +250,7 @@ public class MainActivity extends Activity {
 	 * @param distance_cm
 	 * @param calib
 	 */
-	public void robotDrive(double distance, double calib) {
+	public static void robotDrive(double distance, double calib) {
 		boolean interruption = false;
 		robotSetVelocity((byte) speed, (byte) speed);
 		double startTime = System.currentTimeMillis();
@@ -290,7 +290,7 @@ public class MainActivity extends Activity {
 	 * 
 	 * @param degree
 	 */
-	public void robotTurn(int degree) {
+	public static void robotTurn(int degree) {
 		robotTurn(degree, velocityTurnCalibration);
 	}
 
@@ -302,7 +302,7 @@ public class MainActivity extends Activity {
 	 * @param degree
 	 * @param calib
 	 */
-	public void robotTurn(int degree, double calib) {
+	public static void robotTurn(int degree, double calib) {
 		boolean interruption = false;
 		
 		if (degree >= 0) robotSetVelocity((byte) (-1 * speed), (byte) speed);
@@ -346,7 +346,7 @@ public class MainActivity extends Activity {
 	 * @param left
 	 * @param right
 	 */
-	public void robotSetVelocity(byte left, byte right) {
+	public static void robotSetVelocity(byte left, byte right) {
 		comWrite(new byte[] { 'i', left, right, '\r', '\n' });
 	}
 	
@@ -354,12 +354,11 @@ public class MainActivity extends Activity {
 	 * Method to control the Bar.
 	 * @param value
 	 */
-	public void robotSetBar(byte value) {
+	public static void robotSetBar(byte value) {
 		comWrite(new byte[] { 'o', value, '\r', '\n' });
 	}
 	
 	/**
-	 * Method to let robot move forward.
 	 */
 	public void robotMoveForward() {
 		comWrite(new byte[] { 'w', '\r', '\n' });
@@ -368,7 +367,7 @@ public class MainActivity extends Activity {
 	/**
 	 * Method to stop robot's movement.
 	 */
-	public void robotStop() {
+	public static void robotStop() {
 		comWrite(new byte[] { 's', '\r', '\n' });
 	}
 	

@@ -47,7 +47,7 @@ public class CopyOfBallCatchingActivity extends MainActivity implements CvCamera
     private Mat				 	 homography;
     private Point				 lowestTargetPoint;
     private Point				 robotPosition;
-    private double				 robotRotation;
+    private static double		 robotRotation;
 
     private CameraBridgeViewBase mOpenCvCameraView;
     
@@ -188,16 +188,7 @@ public class CopyOfBallCatchingActivity extends MainActivity implements CvCamera
         finish();
     }
     
-    /**
-     * Start new thread for catching the ball.
-     * 
-     * @param view
-     */
-    public void catchBallOnClick(View view){
-    	robotDrive(200);
-    	/*Thread t = new Thread(this);
-    	t.start();*/
-    }
+  
     
     /**
      * Converts image to ground (calculates lowest target point) and returns a destination point.
@@ -215,62 +206,12 @@ public class CopyOfBallCatchingActivity extends MainActivity implements CvCamera
         return dest_point;
     }
     
-    /**
-     * Give the program some work to slow it down.
-     */
-    public void work() {
-    	ArrayList<Double> l = new ArrayList<Double>();
-    	for(int i = 0; i < 50000; i++) {
-    		l.add(Math.random());
-    	}
-    	Collections.sort(l);
-    	//showLog("Finished wait after work()");
-    }
+    
     
     /**
      * Run method of new thread which is called on thread start of ball catching.
      */
-	@Override
-	public void run() {
-		catchBall(75, 75);
-	}
-	
-	/**
-	 * This is the main method for catching the wanted ball and for bringing it to the goal corner.
-	 * 
-	 * @param x
-	 * @param y
-	 */
-	public void catchBall(double x, double y){
-		/*if(!turnToDetectObstacle()) { // if no ball is detected in the area around, explore the whole workspace until the ball is found
-			exploreWorkspace();
-		}*/
-		//deliver ball to target position
-		moveFromPointToPoint(robotPosition, new Point(x, y));
-		robotSetBar((byte) 255);
-		
-		//return to origin
-		moveFromPointToPoint(robotPosition, new Point(0, 0));
-		//robotMove(-robotRotation, 0, false);
-	}
-	
-	/**
-	 * Make a 360 turn at start to look if the ball is reachable right now.
-	 * 
-	 * @return true if ball was found, false else.
-	 */
-	/*
-	public boolean turnToDetectObstacle(){
-		if(robotMove(0, 0, true)) {
-			return true;
-		}
-		for (int i = 1; i <= 360; i += DELTA_R) {
-			if(robotMove(DELTA_R, 0, true)) {
-				return true;
-			}
-    	}
-		return false;
-	}*/
+
 	
 	/**
 	 * This method checks if the ball was found by using the caluclated lowest target point.
@@ -308,71 +249,13 @@ public class CopyOfBallCatchingActivity extends MainActivity implements CvCamera
 	 * @param p
 	 * @return
 	 */
-	public double[] cartesianToPolar(Point p){
+	public static double[] cartesianToPolar(Point p){
 		double r =  Math.sqrt(p.x*p.x + p.y * p.y);
     	double phi =  Math.toDegrees(Math.atan2(p.y, p.x));
     	return new double[]{r, phi};
 	}
 	
-	/**
-	 * Lets the robot turn and move with the given parameters.
-	 * Also returns a log of the robot's current position.
-	 * 
-	 * @param phi
-	 * @param r
-	 */
-	/*
-	public boolean robotMove(double phi, double r, boolean searchForBall) {
-		int phiC = (int) Math.round(phi); // C stands for "corrected"
-		int rC = (int) Math.round(r);
 
-//		showLog("robotRot:" + robotRotation);
-//		showLog("phiC: " + phiC);
-//		showLog("robotRotation: " + robotRotation);
-				
-		if(phiC != 0) {
-			robotTurn(phiC);
-		}
-		robotRotation = phiC + robotRotation;
-		
-		if(rC != 0) {
-			int d_r = rC;
-			for(int i = 1; i <= rC; i += DELTA_R, d_r -= DELTA_R) { // auskommentierter Abschnitt hat nicht funktioniert!! Muss nochmals ueberprueft werden !!
-				if (lowestTargetPoint != null && searchForBall) {
-					Point p = polarToCartesian(robotRotation, i);
-					robotPosition.x += p.x;
-					robotPosition.y += p.y;
-					System.out.println("Updated robot position: "+robotPosition);
-					System.out.println("Updated rotation rel. to start: "+robotRotation);
-					detectedBall();
-					return true;
-				}
-				robotDrive(DELTA_R);
-			}
-			if (lowestTargetPoint != null && searchForBall) {
-				Point p = polarToCartesian(robotRotation, rC-d_r);
-				robotPosition.x += p.x;
-				robotPosition.y += p.y;
-				System.out.println("Updated robot position: "+robotPosition);
-				System.out.println("Updated rotation rel. to start: "+robotRotation);
-				detectedBall();
-				return true;
-			}
-			robotDrive(d_r);
-			Point p = polarToCartesian(robotRotation, rC);
-			robotPosition.x += p.x;
-			robotPosition.y += p.y;
-			System.out.println("Updated robot position: "+robotPosition);
-			System.out.println("Updated rotation rel. to start: "+robotRotation);
-		}
-		
-		
-		if (lowestTargetPoint != null && searchForBall) {
-			detectedBall();
-			return true;
-		}
-		return false;
-	}*/
 	
 	/**
 	 * Explores workspace ala "Zick-Zack".
@@ -400,7 +283,7 @@ public class CopyOfBallCatchingActivity extends MainActivity implements CvCamera
 	 * @param origin
 	 * @param target
 	 */
-	public void moveFromPointToPoint(Point origin, Point target) {
+	public static void moveFromPointToPoint(Point origin, Point target) { 
 		double x = target.x - origin.x;
 		double y = target.y - origin.y;
 		double[] d = cartesianToPolar(new Point(x, y));
@@ -408,5 +291,6 @@ public class CopyOfBallCatchingActivity extends MainActivity implements CvCamera
 		double r = d[0];
 		double phi = d[1] - robotRotation;
 		//robotMove(phi, r, false);
+		//robotDrive(distance_cm);
 	}
 }
