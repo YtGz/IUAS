@@ -7,12 +7,18 @@
 
 package com.example.iuas;
 
+import jp.ksksue.driver.serial.FTDriver;
+
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+
+import android.content.Context;
+import android.hardware.usb.UsbManager;
+import android.text.GetChars;
 
 import com.example.iuas.circle.Vector2;
 

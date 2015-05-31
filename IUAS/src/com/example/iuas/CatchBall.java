@@ -65,7 +65,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		MainActivity.robotTurn(360);
 		if(ball)
 			return;
-		//exploreWorkspace();
+		exploreWorkspace();
 	}
 
 	@Override
@@ -99,20 +99,50 @@ public class CatchBall implements ThreadListener, Runnable {
 		final int workspaceFactor = 1;
 		final double density = Math.sqrt(17);  	//Math.sqrt(5); for 2 crossings / Math.sqrt(17); for 4 crossings / Math.sqrt(65); for 8 crossings
 		MainActivity.robotTurn(-45);
+		if(ball)
+			return;
 		MainActivity.robotDrive((int) (Math.sqrt(31250)/workspaceFactor));
+		if(ball)
+			return;
 		MainActivity.robotTurn(135);
+		if(ball)
+			return;
 		MainActivity.robotDrive((int) 300/workspaceFactor);
+		if(ball)
+			return;
 		MainActivity.robotTurn((int)(Math.ceil((180 - (Math.toRadians(75/density))))));
+		if(ball)
+			return;
 		MainActivity.robotDrive((int) (Math.sqrt(664062.5)/workspaceFactor));
+		if(ball)
+			return;
 		MainActivity.robotTurn((int) (-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density))))))));
+		if(ball)
+			return;
 		MainActivity.robotDrive((int) (Math.sqrt(664062.5)/workspaceFactor));
+		if(ball)
+			return;
 		MainActivity.robotTurn((int) (Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density)))))));
+		if(ball)
+			return;
 		MainActivity.robotDrive((int)(Math.sqrt(664062.5)/workspaceFactor));
+		if(ball)
+			return;
 		MainActivity.robotTurn((int) (-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density))))))));
+		if(ball)
+			return;
 		MainActivity.robotDrive((int) (Math.sqrt(664062.5)/workspaceFactor));
+		if(ball)
+			return;
 		MainActivity.robotTurn((int)(Math.ceil((180 - (Math.toRadians(75/density))))));
+		if(ball)
+			return;
 		MainActivity.robotDrive((int) (Math.sqrt(664062.5)/workspaceFactor));
+		if(ball)
+			return;
 		MainActivity.robotTurn(135);
+		if(ball)
+			return;
 		MainActivity.robotDrive((int) (Math.sqrt(31250)/workspaceFactor));
 		
 //		if(robotMove(-45, Math.sqrt(45000)/workspaceFactor, true)) return;
@@ -123,6 +153,24 @@ public class CatchBall implements ThreadListener, Runnable {
 //		if(robotMove(-Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor, true)) return;
 //		if(robotMove(Math.ceil(180 - (Math.asin(Math.toRadians(75/density)))), 300/workspaceFactor, true)) return;
 //		robotMove(135, Math.sqrt(45000)/workspaceFactor, true);	
+	}
+	
+	
+	/** 
+	 * Robot heads straight for the goal, ignoring obstacles, and in the end rotates according to theta.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param theta
+	 */
+	public void navigateIgnoringObstacles(int x, int y, int theta) {
+		int r = (int) Math.sqrt(x * x + y * y);
+		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
+		//showLog(phi);
+		phi *= -1;
+		robotTurn(phi);
+		robotDrive(r);
+		robotTurn(theta - phi);
 	}
 	
 
