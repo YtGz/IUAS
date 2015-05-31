@@ -236,4 +236,13 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
         	Utils.homography = getHomographyMatrix(mRgba);
         } while(Utils.homography == null);
     }
+    
+    /**
+     * Finish on clicking the Back-Button.
+     * 
+     * @param view
+     */
+    public void backButtonOnClick(View view) {
+        finish();
+    }
 }
