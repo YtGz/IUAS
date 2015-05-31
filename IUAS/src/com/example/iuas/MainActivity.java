@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
 		mySpinner.setAdapter(new ArrayAdapter<COLOR>(this, android.R.layout.simple_spinner_item, COLOR.values()));
 		mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 		    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) { 
-		    	BallAndBeaconDetection.BALL_COLOR = (COLOR) mySpinner.getItemAtPosition(i);
+		    	BallAndBeaconDetection.setBALL_COLOR((COLOR) mySpinner.getItemAtPosition(i));
 		    } 
 
 		    public void onNothingSelected(AdapterView<?> adapterView) {

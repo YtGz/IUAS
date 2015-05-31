@@ -61,7 +61,6 @@ public class ColorBlobDetectionActivity extends Activity implements CvCameraView
     private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
     private Scalar				 POINT_COLOR;
-    public  static Mat			 homography;
     private boolean				 lockMrgba = false;
     private int					 contoursCountThreshold = 0;//25;
 
@@ -234,25 +233,13 @@ public class ColorBlobDetectionActivity extends Activity implements CvCameraView
     }
     
     /**
-     * Finish on clicking the Back-Button.
-     * 
-     * @param view
-     */
-    public void backButtonOnClick(View view) {
-    	Intent intent = new Intent();
-        intent.putExtra("color", mBlobColorHsv.val);
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-    
-    /**
      * Try to detect & set homography matrix when "calibrate-h" button is pressed.
      * 
      * @param view
      */
     public void homographyButtonOnClick(View view) {
         do {
-        	homography = getHomographyMatrix(mRgba);
-        } while(homography == null);
+        	Utils.homography = getHomographyMatrix(mRgba);
+        } while(Utils.homography == null);
     }
 }

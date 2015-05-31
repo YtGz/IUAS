@@ -9,16 +9,18 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 
+import android.util.Pair;
+
 import com.example.iuas.BallAndBeaconDetection.BEACON;
 import com.example.iuas.circle.Circle;
 import com.example.iuas.circle.CircleCircleIntersection;
 import com.example.iuas.circle.Vector2;
 
-public class Odometry {
-	public static Vector2 position;
-	public static double rotation;
-	
-	public static void selfLocalize(HashSet<BEACON> beaconSet, HashMap<BEACON, Point> beaconImgCoords) {
+public class Odometry implements ThreadListener, Runnable {
+	private Pair<Vector2, Double> odometryData;
+	private Thread t;
+
+	public void selfLocalize(HashSet<BEACON> beaconSet, HashMap<BEACON, Point> beaconImgCoords) {
 		if(beaconSet.size() > 1) {
 			ArrayList<BEACON> beacons = new ArrayList <BEACON>();
 			for(BEACON beacon : beaconSet){
@@ -31,8 +33,8 @@ public class Odometry {
 			double[] beaconDistance = new double[2];
 			for(int i = 0; i < 2; i++) {
 				beaconCoordinatesImage[i] = new Vector2(beaconImgCoords.get(beaconPair[i]).x, beaconImgCoords.get(beaconPair[i]).y);
-				beaconCoordinatesEgocentric[i] = new Vector2(convertImageToGround(beaconCoordinatesImage[i]).x/10, convertImageToGround(beaconCoordinatesImage[i]).y/10);
-				beaconCoordinatesWorld[i] = new Vector2(BallAndBeaconDetection.BEACON_LOC.get(beaconPair[i]).x, BallAndBeaconDetection.BEACON_LOC.get(beaconPair[i]).y);
+				beaconCoordinatesEgocentric[i] = new Vector2(Utils.convertImageToGround(beaconCoordinatesImage[i]).x/10, Utils.convertImageToGround(beaconCoordinatesImage[i]).y/10);
+				beaconCoordinatesWorld[i] = new Vector2(BallCatchingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).x, BallCatchingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).y);
 				beaconDistance[i] = Math.sqrt((Math.pow(beaconCoordinatesEgocentric[i].x, 2) + Math.pow(beaconCoordinatesEgocentric[i].y, 2)));
 			}
 			System.out.println("Debug: beacons: " + beaconPair);
@@ -76,21 +78,32 @@ public class Odometry {
 			Vector2 worldXvector = new Vector2 (1,0);
 			double r = Math.toDegrees(Math.acos(robotToLeftBeacon.dot(worldXvector)/(robotToLeftBeacon.mod()* worldXvector.mod())));
 			double phi =  Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x))-90;
-			rotation = r - phi;
-			position = p;			
+			r = r - phi;
+			setOdometryData(new Pair<Vector2, Double>(p, r));			
 		}
 		else {
 			System.out.println("Only found " + beaconSet.size() + " beacons. No localization possible.");
 		}
 	}
-	
-    public static Point convertImageToGround(Vector2 p){
-    	Mat src =  new Mat(1, 1, CvType.CV_32FC2);
-        Mat dest = new Mat(1, 1, CvType.CV_32FC2);
-        src.put(0, 0, new double[] { p.x, p.y }); // p is a point in image coordinates
-        Core.perspectiveTransform(src, dest, ColorBlobDetectionActivity.homography); //homography is the homography matrix
-        Point dest_point = new Point(dest.get(0, 0)[0], dest.get(0, 0)[1]);
-       // showLog("convertImageToGround: dest_point: " + dest_point);
-        return dest_point;
-    }
+    
+	public synchronized Pair<Vector2, Double> getOdometryData() {
+		return odometryData;
+	}
+
+	public synchronized void setOdometryData(Pair<Vector2, Double> odometryData) {
+		this.odometryData = odometryData;
+	}
+
+	@Override
+	public void onEvent() {
+		if(t == null | !t.isAlive()) {
+			t = new Thread(this);
+			t.start();
+		}
+	}
+
+	@Override
+	public void run() {
+		selfLocalize(BallCatchingActivity.ballDetection.getCurrentBeacons(), BallCatchingActivity.ballDetection.getBeaconImgCoords());	
+	}
 }
