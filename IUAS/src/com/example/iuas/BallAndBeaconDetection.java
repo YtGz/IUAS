@@ -101,7 +101,11 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
         r.add(lowestTargetPoint);
         return r;
     }
-    
+    /**
+     * detect if object is a ball or a beacon and if it a beacon, which beacon
+     * 
+     * @param it
+     */
     public void identifyObjects(ArrayList<Pair<MatOfPoint, COLOR>> it) {
     	double xMin1 = Integer.MAX_VALUE;
     	double xMin2 = Integer.MAX_VALUE;

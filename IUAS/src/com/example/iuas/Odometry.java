@@ -20,6 +20,13 @@ public class Odometry implements ThreadListener, Runnable {
 	private Pair<Vector2, Double> odometryData;
 	private Thread t;
 
+	
+	/**
+	 *calculating the roboter position with beacons 
+	 *
+	 * @param beaconSet
+	 * @param beaconImgCoords
+	 */
 	public void selfLocalize(HashSet<BEACON> beaconSet, HashMap<BEACON, Point> beaconImgCoords) {
 		if(beaconSet.size() > 1) {
 			ArrayList<BEACON> beacons = new ArrayList <BEACON>();

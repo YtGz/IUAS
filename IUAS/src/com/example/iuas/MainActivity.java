@@ -566,33 +566,6 @@ public class MainActivity extends Activity {
 		robotTurn(theta - phi);
 	}
 
-	/**
-	 * Robot heads for the goal, also measuring for obstacles and rotates in the end according to theta.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param theta
-	 */
-	/*
-	public void navigate(int x, int y, int theta) {
-		int r = (int) Math.sqrt(x * x + y * y);
-		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
-		phi *= -1;
-		//robotTurn(phi, L_DETAIL_SENSOR);
-		robotTurn(phi);
-		
-		detectObstacle(new boolean[] { false, false, true }); //temporary
-		while (r > 0) {
-			int[] t = bugZero(r, phi);
-			r = t[0];
-			phi = t[1];
-			if (!detectObstacle(new boolean[] { true, true, true })) {
-				robotDrive(DELTA_M, K_DETAIL_SENSOR);
-				r -= DELTA_M;
-			}
-		}
-		robotTurn(theta - phi);
-	}*/
 
 	
 	
@@ -704,40 +677,7 @@ public class MainActivity extends Activity {
 		return returnVal;
 	}*/
 	
-	
 
-	/***************************************************************************************************************************************************
-	 * Calibration *
-	 ***************************************************************************************************************************************************/
-	
-	/**
-	 * A method to find out the right calibration value for turning angle of the robot.
-	 * 
-	 * @param calib
-	 */
-	/*
-	public void calibrateLDetail(int calib) {
-		double c = 1 + calib / 100.0;
-		for (int i = 1; i <= 360; i += DELTA_R) {
-			robotTurn(DELTA_R, c);
-			//detectObstacle(new boolean[] { true, true, false }, new int[] { 100, 255 });
-		}
-	}*/
-	
-	/**
-	 * A method to find out the right calibration value for moving forward a given distance.
-	 * 
-	 * @param calib
-	 */
-	/*
-	public void calibrateDistance(int calib){
-		double c = 1 + calib /100.0;
-		for(int i =1 ; i <= 60; i += DELTA_M){
-			robotDrive(DELTA_M, c);
-			//detectObstacle(new boolean[] { true, true, false }, new int[] { 100, 255 });
-		}
-	}*/
-	
 	
 
 	/***************************************************************************************************************************************************
