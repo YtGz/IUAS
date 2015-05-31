@@ -5,10 +5,10 @@ import jp.ksksue.driver.serial.FTDriver;
 public class RobotControl implements Runnable {
 	
 	private static String command;
-	private static double[] values;
+	private static int[] values;
 	public static Thread robotControlThread;
 	
-	public static void control(String command, double... values) {
+	public static void control(String command, int... values) {
 		RobotControl.command = command;
 		RobotControl.values = values;
 		robotControlThread = new Thread(new RobotControl());
@@ -22,14 +22,27 @@ public class RobotControl implements Runnable {
 	@Override
 	public void run() {
 		if(command.equalsIgnoreCase("turn")) {
-			
+			robotTurn(values[0]);
 		}
 		else if(command.equalsIgnoreCase("drive")) {
 			robotDrive(values[0]);
 		}
 		else if(command.equalsIgnoreCase("flashLeds")) {
-			
+			robotFlashLed(values[0]);
 		}
+		
+		else if(command.equalsIgnoreCase("setBar")){
+			robotSetBar(values[0]);
+		}
+		
+		else if(command.equalsIgnoreCase("setLed")){
+			robotSetLeds(values[0], values[1]);
+		}
+		
+		else if(command.equalsIgnoreCase("setVelocity")){
+			robotSetVelocity(values[0], values[1]);
+		}
+		
 	}
 	
 	
@@ -52,7 +65,7 @@ public class RobotControl implements Runnable {
 	 * @param distance_cm
 	 * @param calib
 	 */
-	public void robotDrive(double distance) {
+	public void robotDrive(int distance) {
 		boolean interruption = false;
 		robotSetVelocity((byte) speed, (byte) speed);
 		double startTime = System.currentTimeMillis();
@@ -130,16 +143,16 @@ public class RobotControl implements Runnable {
 	 * @param left
 	 * @param right
 	 */
-	public void robotSetVelocity(byte left, byte right) {
-		comWrite(new byte[] { 'i', left, right, '\r', '\n' });
+	public void robotSetVelocity(int left, int right) {
+		comWrite(new byte[] { 'i', (byte) left, (byte) right, '\r', '\n' });
 	}
 	
 	/**
 	 * Method to control the Bar.
 	 * @param value
 	 */
-	public void robotSetBar(byte value) {
-		comWrite(new byte[] { 'o', value, '\r', '\n' });
+	public void robotSetBar(int value) {
+		comWrite(new byte[] { 'o', (byte) value, '\r', '\n' });
 	}
 	
 
@@ -155,8 +168,8 @@ public class RobotControl implements Runnable {
 	 * @param red
 	 * @param blue
 	 */
-	public void robotSetLeds(byte red, byte blue) {
-		comWrite(new byte[] { 'u', red, blue, '\r', '\n' });
+	public void robotSetLeds(int red, int blue) {
+		comWrite(new byte[] { 'u', (byte) red, (byte) blue, '\r', '\n' });
 	}
 
 	/** Let the robot shortly lit the red led, blue led or a mix of both.

@@ -138,7 +138,7 @@ public class MainActivity extends Activity {
 	 * @param view
 	 */
 	public void ballCatchingOnClick(View view) {
-		Intent intent = new Intent(this, BallCatchingActivity.class);
+		Intent intent = new Intent(this, CameraFrameProcessingActivity.class);
 		startActivity(intent);
 	}
 	
