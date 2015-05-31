@@ -70,25 +70,25 @@
             <!-- android:layout_below="@+id/programId" -->
 
     <Button
-        android:id="@+id/ballCatching"
+        android:id="@+id/cameraFrameProcessing"
         android:layout_width="200dp"
         android:layout_height="60dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:onClick="ballCatchingOnClick"
-        android:text="Hol is Balli" />
+        android:onClick="cameraFrameProcessing"
+        android:text="Catch Ball" />
     
     <Button
-        android:id="@+id/switchActivity"
+        android:id="@+id/homography"
         android:layout_width="200dp"
         android:layout_height="60dp"
         android:layout_alignStart="@+id/ballCatching"
         android:layout_alignLeft="@+id/ballCatching"
         android:layout_below="@+id/ballCatching"
         android:layout_marginTop="16dp"
-        android:onClick="switchActivity"
-        android:text="Choose Color" />
+        android:onClick="homography"
+        android:text="Set Homography" />
 
     <Spinner
         android:id="@+id/chooseColor"

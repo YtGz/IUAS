@@ -133,12 +133,20 @@ public class MainActivity extends Activity {
 	 ***************************************************************************************************************************************************/
 	
 	/**
-
 	 * Starts ball catching activity on button click.
 	 * @param view
 	 */
-	public void ballCatchingOnClick(View view) {
+	public void cameraFrameProcessingOnClick(View view) {
 		Intent intent = new Intent(this, CameraFrameProcessingActivity.class);
+		startActivity(intent);
+	}
+	
+	/**
+	 * Starts homography activity on button click.
+	 * @param view
+	 */
+	public void homographyOnClick(View view) {
+		Intent intent = new Intent(this, HomographyActivity.class);
 		startActivity(intent);
 	}
 	
