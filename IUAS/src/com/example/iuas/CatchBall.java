@@ -1,3 +1,11 @@
+/**
+ * This class provides a state machine for managing transitions from exploring the workspace to returning to the workspace after bringing the ball to the goal
+ * It implements a Thread Listener and Runnable.
+ *
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
 package com.example.iuas;
 
 import org.opencv.core.Point;
@@ -9,11 +17,17 @@ public class CatchBall implements ThreadListener, Runnable {
 	private volatile boolean ball;
 	private STATE state;
 	
+	/**
+	 * stars new thread a ball is seen
+	 */
 	public CatchBall() {
 		Thread t = new Thread(this);
 		t.start();
 	}
 	
+	/**
+	 * moving to the balls location and caging it with the bar
+	 */
 	public void catchBall(){
 		//moveToPoint(currentBallPos);
 		MainActivity.robotSetBar((byte) 255);
@@ -21,6 +35,10 @@ public class CatchBall implements ThreadListener, Runnable {
 		
 	}
 	
+	
+	/**
+	 * moving to the goal position and releasing the ball, while beeing sure not to hit the beacons
+	 */
 	public void bringBallToGoal(){
 		//moveToPoint(goalPoint - 20cm x OR y)
 		//turn until perpendicular to workspace edge
@@ -28,7 +46,9 @@ public class CatchBall implements ThreadListener, Runnable {
 		MainActivity.robotSetBar((byte) 0);
 	}
 	
-	
+	/**
+	 * returning from the goal position back into the workspace and moving to the origin
+	 */
 	public void returnToWorkspaceOrigin() {
 		MainActivity.robotTurn(180);
 		MainActivity.robotDrive(20);
@@ -37,6 +57,10 @@ public class CatchBall implements ThreadListener, Runnable {
 		
 	}
 	
+	/**
+	 * searching the workspace:
+	 * first turning around, then using the exploreWorkspace method
+	 */
 	public void searchWorkspace(){
 		MainActivity.robotTurn(360);
 		if(ball)
@@ -67,7 +91,6 @@ public class CatchBall implements ThreadListener, Runnable {
 	
 	/**
 	 * Explores workspace ala "Zick-Zack".
-	 * Makes one turn and one driving distance per method call.
 	 * 
 	 * @see local sheets where this path was drawn & calculated
 	 */

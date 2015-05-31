@@ -1,3 +1,12 @@
+/**
+ * This class the self localization of the robot with the beacons.
+ * It implements a Thread Listener and Runnable.
+ *
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
+
 package com.example.iuas;
 
 import java.util.ArrayList;
@@ -41,7 +50,7 @@ public class Odometry implements ThreadListener, Runnable {
 			for(int i = 0; i < 2; i++) {
 				beaconCoordinatesImage[i] = new Vector2(beaconImgCoords.get(beaconPair[i]).x, beaconImgCoords.get(beaconPair[i]).y);
 				beaconCoordinatesEgocentric[i] = new Vector2(Utils.convertImageToGround(beaconCoordinatesImage[i]).x/10, Utils.convertImageToGround(beaconCoordinatesImage[i]).y/10);
-				beaconCoordinatesWorld[i] = new Vector2(BallCatchingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).x, BallCatchingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).y);
+				beaconCoordinatesWorld[i] = new Vector2(CameraFrameProcessingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).x, CameraFrameProcessingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).y);
 				beaconDistance[i] = Math.sqrt((Math.pow(beaconCoordinatesEgocentric[i].x, 2) + Math.pow(beaconCoordinatesEgocentric[i].y, 2)));
 			}
 			System.out.println("Debug: beacons: " + beaconPair);
@@ -111,6 +120,6 @@ public class Odometry implements ThreadListener, Runnable {
 
 	@Override
 	public void run() {
-		selfLocalize(BallCatchingActivity.ballDetection.getCurrentBeacons(), BallCatchingActivity.ballDetection.getBeaconImgCoords());	
+		selfLocalize(CameraFrameProcessingActivity.ballDetection.getCurrentBeacons(), CameraFrameProcessingActivity.ballDetection.getBeaconImgCoords());	
 	}
 }

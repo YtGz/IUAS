@@ -45,13 +45,13 @@
                 android:resource="@xml/device_filter" >
             </meta-data>
         </activity>
-        <activity android:name="com.example.iuas.ColorBlobDetectionActivity"
+        <activity android:name="com.example.iuas.Homography"
                   android:label="@string/color_blob_detection"
                   android:parentActivityName="com.example.iuas.MainActivity"
                   android:screenOrientation="landscape"
                   android:configChanges="keyboardHidden|orientation">
         </activity>
-        <activity android:name="com.example.iuas.BallCatchingActivity"
+        <activity android:name="com.example.iuas.CameraFrameProcessingActivity"
                   android:label="@string/catching_ball"
                   android:screenOrientation="landscape"
                   android:configChanges="keyboardHidden|orientation">

@@ -1,3 +1,13 @@
+
+/**
+ * This class holds all Beacons and Balls and decides if a object seen in the camera frame is a beacon or a ball.
+ * It extends Listenable and implements a Thread Listener and Runnable.
+ *
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
+
 package com.example.iuas;
 
 import java.util.ArrayList;
@@ -15,7 +25,7 @@ import android.util.Pair;
 public class BallAndBeaconDetection extends Listenable implements ThreadListener, Runnable {
 
     public enum		 	 	OBJECT_TYPE {BALL, BEACON};
-    public enum			 	COLOR {YELLOW, RED, GREEN, BLUE};
+    public enum			 	COLOR {YELLOW, RED, GREEN, BLUE, ORANGE};
     
     /*
      * lighter colors
@@ -27,7 +37,7 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
      * darker colors
      */
     public final HashMap<COLOR, Scalar> COLOR_VALUE = new HashMap<COLOR, Scalar>(){{put(COLOR.YELLOW, new Scalar(110, 86, 0)); put(COLOR.RED, new Scalar (89, 6, 0));
-     							 	put(COLOR.GREEN, new Scalar (77, 127, 33)); put(COLOR.BLUE, new Scalar(1, 69, 84));}}; 
+     							 	put(COLOR.GREEN, new Scalar (77, 127, 33)); put(COLOR.BLUE, new Scalar(1, 69, 84)); put(COLOR.ORANGE, new Scalar(255,97,7));}}; 
      							 	
     public enum			 	BEACON {YELLOW_RED, RED_YELLOW, BLUE_GREEN, RED_BLUE, BLUE_RED, BLUE_YELLOW, YELLOW_BLUE, RED_GREEN};
     
@@ -246,6 +256,6 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
 
 	@Override
 	public void run() {
-		detect(BallCatchingActivity.mRgba, BallCatchingActivity.mDetector);
+		detect(CameraFrameProcessingActivity.mRgba, CameraFrameProcessingActivity.mDetector);
 	}
 }

@@ -1,6 +1,6 @@
 /**
- * This class provides methods to explore, find and catch balls in workspace.
- * It extends the Main Activity.
+ * This class controls everything related with the camera and starts the catchBall Thread.
+ * It extends the Main Activity and implements the Camera view Listener.
  *
  * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
  * @date 2015
@@ -38,7 +38,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-public class BallCatchingActivity extends MainActivity implements CvCameraViewListener2 {
+public class CameraFrameProcessingActivity extends MainActivity implements CvCameraViewListener2 {
     public static Mat                  		mRgba;
     private Scalar               			mBlobColorHsv;
     public static ColorBlobDetector    		mDetector;

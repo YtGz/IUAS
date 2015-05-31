@@ -96,7 +96,7 @@ public class CopyOfBallCatchingActivity extends MainActivity implements CvCamera
         double[] c = intent.getDoubleArrayExtra("mBlobColorHsv");
         mBlobColorHsv = new Scalar(c);
         System.out.println("mBlobColorHsv: " + mBlobColorHsv);
-        homography = ColorBlobDetectionActivity.homography;
+        homography = Homography.homography;
         robotPosition = new Point(0, 0);
         robotRotation = 0;
 

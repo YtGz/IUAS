@@ -690,7 +690,7 @@ public class MainActivity extends Activity {
 	 * @param view
 	 */
 	public void switchActivity(View view) {
-		Intent intent = new Intent(this, ColorBlobDetectionActivity.class);
+		Intent intent = new Intent(this, Homography.class);
 		final int result=1;
 		startActivityForResult(intent, result);
 	}
@@ -713,7 +713,7 @@ public class MainActivity extends Activity {
 	 * @param view
 	 */
 	public void ballCatchingOnClick(View view) {
-		Intent intent = new Intent(this, BallCatchingActivity.class);
+		Intent intent = new Intent(this, CameraFrameProcessingActivity.class);
 		intent.putExtra("mBlobColorHsv", mBlobColorHsv.val);
 		startActivity(intent);
 	}

@@ -1,3 +1,10 @@
+/**
+ * This class provides some utils.
+ *
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
 package com.example.iuas;
 
 import org.opencv.core.Core;
@@ -11,6 +18,12 @@ import com.example.iuas.circle.Vector2;
 
 public class Utils {
 	public static Mat homography;
+	
+	/**
+	 * converts the Image Coordinates to Ground Coordinates
+	 * @param p
+	 * @return
+	 */
 
     public static Point convertImageToGround(Vector2 p){
     	Mat src =  new Mat(1, 1, CvType.CV_32FC2);
@@ -22,6 +35,12 @@ public class Utils {
         return dest_point;
     }
     
+    /**
+     * converts the Hsv color values to the Rgba color values
+     * @param hsvColor
+     * @return
+     */
+    
     public static Scalar converScalarHsv2Rgba(Scalar hsvColor) {
         Mat pointMatRgba = new Mat();
         Mat pointMatHsv = new Mat(1, 1, CvType.CV_8UC3, hsvColor);
@@ -29,6 +48,12 @@ public class Utils {
 
         return new Scalar(pointMatRgba.get(0, 0));
     }
+    
+    /**
+     * converts the Rgba color values to the Hsv color values
+     * @param rgbColor
+     * @return
+     */
     public static Scalar converScalarRgb2Hsv(Scalar rgbColor) {
         Mat pointMatHsv = new Mat();
         Mat pointMatRgba = new Mat(1, 1, CvType.CV_8UC3, rgbColor);
@@ -37,10 +62,30 @@ public class Utils {
         return new Scalar(pointMatHsv.get(0, 0));
     }
     
+    
+    /**
+     * checks if two double values are almost equal
+     * @param a
+     * @param b
+     * @param eps
+     * @return
+     */
     public static boolean almostEqual(double a, double b, double eps){
         return Math.abs(a-b)<eps;
     }
     
+    /**
+     * calculates the differences in the colorblob boundries
+     * @param xMin1
+     * @param xMax1
+     * @param xMin2
+     * @param xMax2
+     * @param yMin1
+     * @param yMax1
+     * @param yMin2
+     * @param yMax2
+     * @return
+     */
     public static Point calculateEps (double xMin1, double xMax1, double xMin2, double xMax2, double yMin1, double yMax1, double yMin2, double yMax2){
     	return new Point((((xMax1 - xMin1) + (xMax2 - xMin2))/2)*2, (((yMax1 - yMin1)+ (yMax2 - yMin2))/2)*.5);
     }

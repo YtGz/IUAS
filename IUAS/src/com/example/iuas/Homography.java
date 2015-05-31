@@ -46,7 +46,7 @@ import android.view.View.OnTouchListener;
 import com.example.iuas.BallAndBeaconDetection;
 import com.example.iuas.BallAndBeaconDetection.COLOR;
 
-public class ColorBlobDetectionActivity extends Activity implements CvCameraViewListener2 {
+public class Homography extends Activity implements CvCameraViewListener2 {
 	protected final boolean DEBUG = true; // enables debug messages
 	protected final int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append --> atm no textLog defined here, so only sysout available
 	protected final int USE_DEVICE = 1; // 1: USB, 2: Bluetooth
@@ -89,7 +89,7 @@ public class ColorBlobDetectionActivity extends Activity implements CvCameraView
     /**
      * Constructor.
      */
-    public ColorBlobDetectionActivity() {
+    public Homography() {
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
 

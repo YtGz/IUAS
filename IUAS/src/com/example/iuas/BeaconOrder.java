@@ -1,3 +1,10 @@
+/**
+ * This class provides the beacon pairs to check if the combination the camera sees is possible or not
+ *
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
 package com.example.iuas;
 
 import java.util.ArrayList;
