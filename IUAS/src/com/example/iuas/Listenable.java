@@ -31,4 +31,17 @@ public abstract class Listenable {
 				listener.onEvent();
 		}
 	}
+	
+	/**
+	 * inform a specific class
+	 * @param c
+	 */
+	protected void informListeners(Class c) {
+		if (listeners != null) {
+			for(ThreadListener listener : listeners) {
+				if(listener.getClass().equals(c))
+					listener.onEvent();
+			}
+		}
+	}
 }

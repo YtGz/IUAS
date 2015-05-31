@@ -68,7 +68,8 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
     private int						contoursCount = 0;
     private HashSet<BEACON>	 		currentBeacons = new HashSet<BEACON>();
     private HashMap<BEACON, Point> 	beaconImgCoords = new HashMap<BEACON, Point>();
-    private static COLOR					BALL_COLOR;
+    private Point					ballCoordinates;
+	private static COLOR					BALL_COLOR;
     
     protected final boolean DEBUG = true; // enables debug messages
 	protected final int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append --> atm no textLog defined here, so only sysout available
@@ -117,60 +118,35 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
      * @param it
      */
     public void identifyObjects(ArrayList<Pair<MatOfPoint, COLOR>> it) {
-    	double xMin1 = Integer.MAX_VALUE;
-    	double xMin2 = Integer.MAX_VALUE;
-    	double xMax1 = 0;
-    	double xMax2 = 0;
-    	double yMin1 = Integer.MAX_VALUE;
-    	double yMin2 = Integer.MAX_VALUE;
-    	double yMax1 = 0;
-    	double yMax2 = 0;
     	boolean[] isBeacon = new boolean[it.size()];
+    	ArrayList<Pair<double[], COLOR>> blobs = new ArrayList<Pair<double[], COLOR>>();
     	
     	currentBeacons.clear();
-    	contoursCount = it.size();   	
-    	
+    	contoursCount = it.size();
     	for(int i = 0; i < it.size(); i++ ){
-    		xMin1 = Integer.MAX_VALUE;
-        	xMax1 = 0;
-        	yMin1 = Integer.MAX_VALUE;
-        	yMax1 = 0;
-    		for(Point p : it.get(i).first.toArray()){
-    			xMin1 = p.x < xMin1 ? p.x : xMin1;
-    			xMax1 = p.x > xMax1 ? p.x : xMax1;
-    			yMin1 = p.y < yMin1 ? p.y : yMin1;
-    			yMax1 = p.y > yMax1 ? p.y : yMax1;
-    		}
-    		for(int j = i+1; j < it.size(); j++){
-    			xMin2 = Integer.MAX_VALUE;
-            	xMax2 = 0;
-            	yMin2 = Integer.MAX_VALUE;
-            	yMax2 = 0;
-    			for(Point p : it.get(j).first.toArray()){
-        			xMin2 = p.x < xMin2 ? p.x : xMin2;
-        			xMax2 = p.x > xMax2 ? p.x : xMax2;
-        			yMin2 = p.y < yMin2 ? p.y : yMin2;
-        			yMax2 = p.y > yMax2 ? p.y : yMax2;
-        		}
-	    		
-    			if(Utils.almostEqual(xMin1, xMin2, Utils.calculateEps(xMin1, xMax1, xMin2, xMax2, yMin1, yMax1, yMin2, yMax2).x)){
-    				if(Utils.almostEqual(xMax1, xMax2, Utils.calculateEps(xMin1, xMax1, xMin2, xMax2, yMin1, yMax1, yMin2, yMax2).x)){
-    					if(Utils.almostEqual(yMin1, yMax2, Utils.calculateEps(xMin1, xMax1, xMin2, xMax2, yMin1, yMax1, yMin2, yMax2).y) && yMax1 > yMax2) {
+    		blobs.add(new Pair<double[], COLOR>(calculateMatBounds(it.get(i).first), it.get(i).second));
+    	}
+    	
+    	for(int i = 0; i < blobs.size(); i++ ){
+    		for(int j = i+1; j < blobs.size(); j++){
+	    		if(Utils.almostEqual(blobs.get(i).first[0], blobs.get(j).first[0], Utils.calculateEps(blobs.get(i).first[0], blobs.get(i).first[1], blobs.get(j).first[0], blobs.get(j).first[1], blobs.get(i).first[2], blobs.get(i).first[3], blobs.get(j).first[2], blobs.get(j).first[3]).x)){
+    				if(Utils.almostEqual(blobs.get(i).first[1], blobs.get(j).first[1], Utils.calculateEps(blobs.get(i).first[0], blobs.get(i).first[1], blobs.get(j).first[0], blobs.get(j).first[1], blobs.get(i).first[2], blobs.get(i).first[3], blobs.get(j).first[2], blobs.get(j).first[3]).x)){
+    					if(Utils.almostEqual(blobs.get(i).first[2], blobs.get(j).first[3], Utils.calculateEps(blobs.get(i).first[0], blobs.get(i).first[1], blobs.get(j).first[0], blobs.get(j).first[1], blobs.get(i).first[2], blobs.get(i).first[3], blobs.get(j).first[2], blobs.get(j).first[3]).y) && blobs.get(i).first[3] > blobs.get(j).first[3]) {
     						if(COLORS_BEACON.containsKey(new Pair<COLOR, COLOR>(it.get(j).second, it.get(i).second))) {
     							BEACON beacon = COLORS_BEACON.get(new Pair<COLOR, COLOR>(it.get(j).second, it.get(i).second));
     							currentBeacons.add(beacon);
-    							beaconImgCoords.put(beacon, new Point((xMin2 + xMax2)/2, yMin2));
+    							beaconImgCoords.put(beacon, new Point((blobs.get(j).first[0] + blobs.get(j).first[1])/2, blobs.get(j).first[2]));
     							beaconCount = currentBeacons.size();
 	    						isBeacon[i] = true;
 	    						isBeacon[j] = true;
 	    						break;
     						}
     					}
-    					else if(Utils.almostEqual(yMin2, yMax1 , Utils.calculateEps(xMin1, xMax1, xMin2, xMax2, yMin1, yMax1, yMin2, yMax2).y) && yMax1 < yMax2) {
+    					else if(Utils.almostEqual(blobs.get(j).first[2], blobs.get(i).first[3] , Utils.calculateEps(blobs.get(i).first[0], blobs.get(i).first[1], blobs.get(j).first[0], blobs.get(j).first[1], blobs.get(i).first[2], blobs.get(i).first[3], blobs.get(j).first[2], blobs.get(j).first[3]).y) && blobs.get(i).first[3] < blobs.get(j).first[3]) {
     						if(COLORS_BEACON.containsKey(new Pair<COLOR, COLOR>(it.get(i).second, it.get(j).second))) {
     							BEACON beacon = COLORS_BEACON.get(new Pair<COLOR, COLOR>(it.get(i).second, it.get(j).second));
     							currentBeacons.add(beacon);
-    							beaconImgCoords.put(beacon, new Point((xMin1 + xMax1)/2, yMin1));
+    							beaconImgCoords.put(beacon, new Point((blobs.get(i).first[0] + blobs.get(i).first[1])/2, blobs.get(i).first[2]));
 	    						beaconCount = currentBeacons.size();
 	    						isBeacon[i] = true;
 	    						isBeacon[j] = true;
@@ -182,20 +158,41 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
     			
     		}
     	}
-    	
+    	double yMin = Integer.MAX_VALUE;
+    	Point temp = null;
     	for(int i = 0; i < isBeacon.length; i++){
     		if(!isBeacon[i]){
     			if(it.get(i).second == BALL_COLOR) {
     				ballCount++;
-        			//choose active ball
-        			//save ball coordinates
+    				if(blobs.get(i).first[2] < yMin) {
+    					temp = new Point((blobs.get(i).first[0]+blobs.get(i).first[1])/2, blobs.get(i).first[2]);
+    				}
     			}
     		}
+    	}
+    	if(temp != null) {
+        	setBallCoordinates(temp);
+        	informListeners(CatchBall.class);
+        	
     	}
     	System.out.println("Contours count: " + contoursCount);
     	System.out.println("Ball count: " + ballCount);
     	System.out.println("Beacon count: " + beaconCount);
-    	informListeners();
+    	informListeners(Odometry.class);
+    }
+    
+    private double[] calculateMatBounds(MatOfPoint mat) {
+    	double xMin = Integer.MAX_VALUE;
+    	double xMax = 0;
+    	double yMin = Integer.MAX_VALUE;
+    	double yMax = 0;
+    	for(Point p : mat.toArray()){
+			xMin = p.x < xMin ? p.x : xMin;
+			xMax = p.x > xMax ? p.x : xMax;
+			yMin = p.y < yMin ? p.y : yMin;
+			yMax = p.y > yMax ? p.y : yMax;
+		}
+    	return new double[] {xMin, xMax, yMin, yMax};
     }
     
     public synchronized int getBallCount() {
@@ -244,6 +241,13 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
 
 	public static synchronized void setBALL_COLOR(COLOR BALL_COLOR) {
 		BallAndBeaconDetection.BALL_COLOR = BALL_COLOR;
+	}
+	
+    public synchronized Point getBallCoordinates() {
+		return ballCoordinates;
+	}
+	public synchronized void setBallCoordinates(Point ballCoordinates) {
+		this.ballCoordinates = ballCoordinates;
 	}
 
 	@Override
