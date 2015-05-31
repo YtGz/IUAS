@@ -33,41 +33,15 @@ public class MainActivity extends Activity {
 	 * Define constants *
 	 **************************************************************************************************************************************/	
 
-	protected final static boolean DEBUG = true; // enables debug messages
-	protected final static int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append
-	protected final static int USE_DEVICE = 2; // 1: USB, 2: Bluetooth
+	public final static boolean DEBUG = true; // enables debug messages
+	public final static int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append
+	public final static int USE_DEVICE = 2; // 1: USB, 2: Bluetooth
 	
-	protected static FTDriver com;
 	protected static TextView textLog;
 	private EditText xIn; // x value input
 	private EditText yIn; // y value input
 	private EditText phiIn; // phi value input
 	private Spinner mySpinner;
-	public final static double velocityDriveCalibration = 53.8; // calibration factor for drive
-	public final static double velocityTurnCalibration = 10; // calibration factor for turn
-	public static double x = 0; // x pos. of robot
-	public static double y = 0; // y pos. of robot
-	public static double theta = 0; // theta of robot
-	public final static byte speed = 20; // speed of robot's wheels
-	
-//	protected final double K = 1.4; // offset correction for forward movement
-//	private final double K_DETAIL_SENSOR = 1.52; // offset correction for forward movement while measuring for obstacles
-//	protected final double L = 1.01; // offset correction for turning angle
-//	private final double L_DETAIL = 1.05; // offset correction for turning angle of 15 degrees
-//	private final double L_DETAIL_SENSOR = 1.467; // offset correction for turning angle of 15 degree while measuring for obstacles
-	
-	private final byte[] SENSOR_OFFSETS = { 1, 1, 1 }; // offsets of the individual sensors
-//	protected final double R_SPEED = 72; // The default turning speed of the robot in cm/s
-//	protected final double M_SPEED = 14.2; // The default velocity of the robot in cm/s
-//	private final int WHEEL_SPACING = 19; // space between the 2 wheels
-//	private final int DELTA_M = 10; // The distance to travel until robot measures for obstacle
-//	protected final int DELTA_R = 15; // The degrees to rotate until robot measures for obstacle
-//	private final int O = 10; // How far the robot should drive after the right sensor doesn't see the obstacle's edge anymore
-	
-	private Scalar mBlobColorHsv; // Needed for ColorBlobDetection
-	public static Context context;
-	public static BluetoothConnection btc;
-	
 	
 	
 	/**************************************************************************************************************************************
@@ -82,7 +56,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		textLog = (TextView) findViewById(R.id.textLog);
-		//programId = (EditText) findViewById(R.id.programId);
 		xIn = (EditText) findViewById(R.id.x);
 		yIn = (EditText) findViewById(R.id.y);
 		phiIn = (EditText) findViewById(R.id.phi);
@@ -97,16 +70,39 @@ public class MainActivity extends Activity {
 		        return;
 		    } 
 		}); 
-		
+		connect();
+	}
+	
+	public void connect() {
 		if (USE_DEVICE == 1) {
-			com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
+			RobotControl.com = new FTDriver((UsbManager) getSystemService(USB_SERVICE));
 			connectUSB();
 		}
 		
 		else if (USE_DEVICE == 2) {
-			if(btc == null)
+			if(RobotControl.btc == null)
 				connectBT();
 		}
+	}
+	
+	/**
+	 * Connects USB device.
+	 */
+	private void connectUSB() {
+		if (RobotControl.com.begin(FTDriver.BAUD9600)) {
+			System.out.println("Connected");
+		} else {
+			System.out.println("Not connected");
+		}
+	}
+	
+	/**
+	 * Connects Bluetooth device.
+	 */
+	private void connectBT() {
+		RobotControl.btc = new BluetoothConnection();
+		RobotControl.btc.setDeviceAddress("20:13:08:16:08:95");
+		RobotControl.btc.connect();
 	}
 	
 	/**
@@ -131,582 +127,10 @@ public class MainActivity extends Activity {
 			}
 		}
 	}
-	
-
-
-	/**************************************************************************************************************************************
-	 * Basic robot commands. *
-	 **************************************************************************************************************************************/
-	
-	/**
-	 * Connects USB device.
-	 */
-	public void connectUSB() {
-		if (com.begin(FTDriver.BAUD9600)) {
-			showLog("Connected\nWillkommen in der Unterwelt!");
-		} else {
-			showLog("Not connected");
-		}
-	}
-	
-	/**
-	 * Disconnects USB device.
-	 */
-	public void disconnect() {
-		com.end();
-		if (!com.isConnected()) {
-			showLog("Disconnected");
-		}
-	}
-	
-	/**
-	 * Connects Bluetooth device.
-	 */
-	public void connectBT() {
-		btc = new BluetoothConnection(context);
-		btc.setDeviceAddress("20:13:08:16:08:95");
-		btc.connect();
-	}
-	
-	/**
-	 * Send write() command to robot.
-	 * 
-	 * @param data
-	 */
-	public static void comWrite(byte[] data) {
-		if (USE_DEVICE == 1) {
-			if (com.isConnected()) {
-				com.write(data);
-			} else {
-				showLog("Not connected!");
-			}
-		}
-		else if (USE_DEVICE == 2) {
-			if (btc == null) {
-				showLog("BT Connection failed!");
-			}
-			else {
-				btc.write(data);
-			}
-		}
-	}
-	
-	/**
-	 * Send read() command to robot.
-	 * 
-	 * @return
-	 */
-	public String comRead() {
-		String s = "";
-		int i = 0;
-		int n = 0;
-		while (i < 3 || n > 0) {
-			byte[] buffer = new byte[256];
-			n = com.read(buffer);
-			s += new String(buffer, 0, n);
-			i++;
-		}
-		return s;
-	}
-	
-	/**
-	 * Send read() and write() command to robot.
-	 * Wait 100 ms between write() and read()
-	 * 
-	 * @param data
-	 * @return
-	 */
-	public String comReadWrite(byte[] data) {
-		if (USE_DEVICE == 1) {
-			com.write(data);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// ignore
-			}
-			return comRead();
-		}
-		else if (USE_DEVICE == 2) {
-			btc.write(data);
-			return "";
-		}
-		return "";
-	}
-	
-	/**
-	 * Lets robot drive a given distance in cm.
-	 * 
-	 * @param distance_cm
-	 */
-	public static void robotDrive(int distance_cm){
-		//robotDrive(distance_cm, K);
-		robotDrive(distance_cm, velocityDriveCalibration);
-	}
-	
-	/**
-	 * Lets robot drive a given distance in cm.
-	 * Also accepts a calibration factor to get the input distance in real world drive.
-	 * 
-	 * @param distance_cm
-	 * @param calib
-	 */
-	public static void robotDrive(double distance, double calib) {
-		boolean interruption = false;
-		robotSetVelocity((byte) speed, (byte) speed);
-		double startTime = System.currentTimeMillis();
-
-		try {
-			Thread.sleep((long) (Math.abs(distance) * calib * (20/Math.abs(speed))));
-		}
-		catch (InterruptedException e) {
-			showLog("Robot Drive Interruption!");
-			interruption = true;
-		}
-		finally {
-			if (interruption) {
-				x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1/calib) * (speed/20);
-				y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1/calib) * (speed/20);
-			}
-			else {
-				x += Math.cos(Math.toRadians(theta)) * distance;
-				y += Math.sin(Math.toRadians(theta)) * distance;
-			}
-		}
-		
-		//robotSetVelocity((byte) 0, (byte) 0);
-		robotStop();
-		showLog("Robot stopped");
-		startTime = 0;
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
-	}
-	
-	/**
-	 * Lets robot turn a given amount of degrees.
-	 * 
-	 * @param degree
-	 */
-	public static void robotTurn(int degree) {
-		robotTurn(degree, velocityTurnCalibration);
-	}
-
-	
-	/**
-	 * Lets robot turn a given amount of degrees.
-	 * Also accepts a calibration factor to get the input degrees in real world turning.
-	 * 
-	 * @param degree
-	 * @param calib
-	 */
-	public static void robotTurn(int degree, double calib) {
-		boolean interruption = false;
-		
-		if (degree >= 0) robotSetVelocity((byte) (-1 * speed), (byte) speed);
-		else if (degree < 0) robotSetVelocity((byte) speed, (byte) (-1 *speed));
-		
-		double startTime = System.currentTimeMillis();
-		
-		try {
-			Thread.sleep((long) (3.14159 * velocityTurnCalibration * (Math.abs(degree)/180) * velocityDriveCalibration * (20/Math.abs(speed))));
-		}
-		catch (InterruptedException e) {
-			showLog("Robot Turn Interruption!");
-			interruption = true;
-		}
-		finally {
-			if (interruption) {
-				double temp = (System.currentTimeMillis() - startTime) * (1/velocityDriveCalibration) * (180/(3.14159 * velocityTurnCalibration)) * (speed/20);
-				theta += temp;
-				System.out.println("Could only turn " + temp + "degrees");
-			}
-			else {
-				theta += degree;
-			}
-		}
-		theta = theta % 360;
-
-		//robotSetVelocity((byte) 0, (byte) 0);
-		robotStop();
-		showLog("Robot stopped");
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
-	}
-	
-	
-	/**
-	 * Method to set velocity.
-	 * @param left
-	 * @param right
-	 */
-	public static void robotSetVelocity(byte left, byte right) {
-		comWrite(new byte[] { 'i', left, right, '\r', '\n' });
-	}
-	
-	/**
-	 * Method to control the Bar.
-	 * @param value
-	 */
-	public static void robotSetBar(byte value) {
-		comWrite(new byte[] { 'o', value, '\r', '\n' });
-	}
-	
-	/**
-	 */
-	public void robotMoveForward() {
-		comWrite(new byte[] { 'w', '\r', '\n' });
-	}
-	
-	/**
-	 * Method to stop robot's movement.
-	 */
-	public static void robotStop() {
-		comWrite(new byte[] { 's', '\r', '\n' });
-	}
-	
-	/**
-	 * Method to set LEDs.
-	 * @param red
-	 * @param blue
-	 */
-	public void robotSetLeds(byte red, byte blue) {
-		comWrite(new byte[] { 'u', red, blue, '\r', '\n' });
-	}
-
-	/** Let the robot shortly lit the red led, blue led or a mix of both.
-	 * mode = 0: Show a mix of both LEDs.
-	 * mode = 1: Show red LEDs.
-	 * mode = 2: Show blue LEDs.
-	 * 
-	 * @param mode
-	 */
-	public void robotFlashLed(int mode) {
-		switch (mode) {
-		case 0:
-			for (int i = 0; i < 4; i++) {
-				robotSetLeds((byte) 0, (byte) 128);
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				robotSetLeds((byte) 255, (byte) 0);
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			robotSetLeds((byte) 0, (byte) 0);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			break;
-
-		case 1:
-			robotSetLeds((byte) 255, (byte) 0);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			robotSetLeds((byte) 0, (byte) 0);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			break;
-		case 2:
-			robotSetLeds((byte) 0, (byte) 128);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			robotSetLeds((byte) 0, (byte) 0);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			break;
-		}
-	}
-
-
-	/********************************************************************************************************************************************************
-	 * Exercise 3 *
-	 ********************************************************************************************************************************************************/
-
-	public String retrieveSensorData() {
-
-		/*
-		 * From the bachelor thesis:
-		 * 
-		 * "Sensor data can be retrieved via the ’q’ command. [...] The
-		 * returning string contains measurements of all sensors formated as
-		 * space separated hex values, each prepended with 0x."
-		 */
-
-		return comReadWrite(new byte[] { 'q', '\r', '\n' });
-	}
-	
-	/**
-	 * Parses string with sensor data.
-	 * 
-	 * @param dataString
-	 * @return
-	 */
-	public int[] parseDataString(String dataString) {
-		int[] values = new int[3];
-		String[] tokens = dataString.trim().split("\\s++");
-		for (int i = 0; i < tokens.length; i++) {
-			if (tokens[i].contains("0x")) {
-				for (int j = i; j < tokens.length; j++) {
-					tokens[j] = tokens[j].substring(2);
-				}
-				values[0] = (int) Integer.valueOf(tokens[i + 3], 16);
-				values[1] = (int) Integer.valueOf(tokens[i + 4], 16);
-				values[2] = (int) Integer.valueOf(tokens[i + 5], 16);
-				return values;
-			}
-		}
-		return values;
-	}
-	
-	/**
-	 * Displays values of the sensors.
-	 */
-	public void viewSensorOutput() {
-		/*int[] temp = parseDataString(retrieveSensorData());
-		showLog(String.valueOf(temp[0]) + " " + String.valueOf(temp[1]) + " " + String.valueOf(temp[2]));*/
-	}
-
-	/**
-	 * Returns true if there is an obstacle roughly ~8cm away from the robot.
-	 * 
-	 * @param which sensors to use
-	 * 
-	 * @return true if obstacle was detected, false else
-	 */
-	public boolean detectObstacle(boolean[] sensors) {
-		return detectObstacle(sensors, new int[] { 10, 50 });
-	}
-	
-	/**
-	 * Extended method which checks if sensors detect obstacles.
-	 * 
-	 * @param sensors
-	 * @param range
-	 * @return true if obstacle is detected, false else
-	 */
-	public boolean detectObstacle(boolean[] sensors, int[] range) {
-		boolean encounteredAnObstacle = false;
-		String sensorData = retrieveSensorData(); // get current sensor data
-		while (!sensorData.contains("0x")) { // do nothing as long as sensor data does not start (because retrieved string contains other values too; start only if 0x is found which means, that sensor data starts now)
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			sensorData = retrieveSensorData();
-		}
-		int[] dst = parseDataString(sensorData); // parse sensor data
-		for (int i = 0; i < 3; i++) {
-			if (sensors[i]) {
-				if (dst[i] >= range[0] && dst[i] <= range[1]) { // obstacle is in range & encountered
-					encounteredAnObstacle = true;
-				}
-			}
-		}
-		return encounteredAnObstacle;
-	}
-	
-	/**
-	 * Test method for detecting obstacles.
-	 * @param distance
-	 */
-	/*
-	public void stopAndGo(int distance) {
-		while (distance > DELTA_M) {
-			robotDrive(DELTA_M);
-			distance -= DELTA_M;
-			if (detectObstacle(new boolean[] { true, true, true })) {
-				robotFlashLed(0);
-				return;
-			}
-		}
-		robotDrive(distance);
-	}*/
-
-	/** 
-	 * Robot heads straight for the goal, ignoring obstacles, and in the end rotates according to theta.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param theta
-	 */
-	public void navigateIgnoringObstacles(int x, int y, int theta) {
-		int r = (int) Math.sqrt(x * x + y * y);
-		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
-		//showLog(phi);
-		phi *= -1;
-		robotTurn(phi);
-		robotDrive(r);
-		robotTurn(theta - phi);
-	}
-
-
-	
-	
-	/*****************************************************************************************************************************************
-	 * Bug algorithms. *
-	 *****************************************************************************************************************************************/
-	
-	/**
-	 * Permanently sleep 100ms, check for obstacles and then stop.
-	 * Not sure if this works.
-	 */
-	public void bugStop() {
-		for (;;) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// ignore
-			}
-			if (detectObstacle(new boolean[] { true, true, true })) {
-				robotStop();
-			}
-		}
-	}
-
-	/**
-	 * Bug 0 algorithm
-	 * 
-	 * @param r takes the remaining line to the goal as argument
-	 * @param phi
-	 * @return the new angle & distance to the obstacle
-	 */
-	/*
-	public int[] bugZero(int r, int phi) {
-		int r2 = 0;
-		int phi2 = 0;
-		if (detectObstacle(new boolean[] { true, true, true })) { // obstacle detected
-			robotFlashLed(0);
-			do {
-				robotTurn(DELTA_R, L_DETAIL_SENSOR); // turn away to avoid it
-				phi2 += DELTA_R;
-			} while (!detectObstacle(new boolean[] { true, true, false },
-					new int[] { 100, 255 })); // Turn until 90 degree to obstacle wall
-			do {
-				robotDrive(DELTA_M, K_DETAIL_SENSOR);
-				r2 += DELTA_M;
-			} while (detectObstacle(new boolean[] { false, false, true })); // check if right (left) sensor still pointing to obstacle wall
-
-			for (int i = 0; i < O; i += DELTA_M) { // Drive past the corner
-				robotDrive(DELTA_M, K_DETAIL_SENSOR);
-				r2 += DELTA_M;
-				detectObstacle(new boolean[] { false, false, true }); //temporary
-			}
-			
-			// recalculate line to goal
-			double x = r * Math.cos(Math.toRadians(90));
-			double y = r * Math.sin(Math.toRadians(90));
-			double x2 = r2 * Math.cos(Math.toRadians(90 + phi2));
-			double y2 = r2 * Math.sin(Math.toRadians(90 + phi2));
-
-			r = (int) Math.sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2));
-			showLog("BugZero: " + Math.toDegrees(Math.atan2((y - y2), (x - x2))));
-			showLog("BugZero: phi2: " + phi2);
-			int psi = (int) Math.ceil(Math.toDegrees(Math.toRadians(90) - Math.atan2((y - y2), (x - x2)))) + phi2;
-			psi *= -1;
-			showLog("BugZero: Psi: "+ psi);
-			robotTurn(psi,L_DETAIL_SENSOR); // let robot face the goal again
-			detectObstacle(new boolean[] { false, false, true }); //temporary
-			phi += phi2 + psi;
-		}
-		int[] returnVal = { r, phi };
-		return returnVal;
-	}*/
-	
-	/**
-	 * A test method to test rotation and caluclation if obstacle was detected and robot has to re-calculate his way to the goal.
-	 * 
-	 * @param r
-	 * @return
-	 */
-	/*
-	public int rotTest(int r) {
-		int r2 = 0;
-		int phi = 0;
-		for (int i = 1; i <= 90; i += DELTA_R) {
-			robotTurn(DELTA_R, L_DETAIL);
-			phi += DELTA_R;
-		}
-
-		for (int i = 0; i < O; i += DELTA_M) { // Drive past the corner
-			robotDrive(DELTA_M);
-			r2 += DELTA_M;
-		}
-
-		// recalculate line to goal
-		double x = r * Math.cos(Math.toRadians(90));
-		double y = r * Math.sin(Math.toRadians(90));
-		double x2 = r2 * Math.cos(Math.toRadians(90 + phi));
-		double y2 = r2 * Math.sin(Math.toRadians(90 + phi));
-
-		// showLog(String.valueOf("x: " + x + "y: " + y + "x2: " + x2 + "y2: " + y2 + "\n"));
-
-		r = (int) Math.sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2));
-		showLog("RotTest: " + Math.toDegrees(Math.atan2((y - y2), (x - x2))));
-		phi = (int) Math.ceil(Math.toDegrees(Math.toRadians(90) - Math.atan2((y - y2), (x - x2)))) + phi;
-		phi *= -1;
-
-		robotTurn(phi); // let robot face the goal again
-		int returnVal = r;
-		return returnVal;
-	}*/
-	
-
-	
 
 	/***************************************************************************************************************************************************
 	 * UI methods *
 	 ***************************************************************************************************************************************************/
-	
-	/**
-	 * Allows to switch Activities within the app.
-	 * 
-	 * @param view
-	 */
-	public void switchActivity(View view) {
-		Intent intent = new Intent(this, ColorBlobDetectionActivity.class);
-		final int result=1;
-		startActivityForResult(intent, result);
-	}
-	
-	/**
-	 * Sets the mBlobColorHsv on Activity result.
-	 */
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		double[] color = data.getDoubleArrayExtra("color");
-		for (double c : color) {
-			System.out.println(c);
-		}
-		mBlobColorHsv = new Scalar(color);
-	}
 	
 	/**
 	 * Starts ball catching activity on button click.
@@ -714,17 +138,7 @@ public class MainActivity extends Activity {
 	 */
 	public void ballCatchingOnClick(View view) {
 		Intent intent = new Intent(this, BallCatchingActivity.class);
-		intent.putExtra("mBlobColorHsv", mBlobColorHsv.val);
 		startActivity(intent);
-	}
-	
-	/**
-	 * Disconnects USB device.
-	 * 
-	 * @param view
-	 */
-	public void disconnectOnClick(View view) {
-		disconnect();
 	}
 	
 	/**
@@ -772,9 +186,5 @@ public class MainActivity extends Activity {
 		//robotFlashLed(0);
 		//robotDrive(Integer.parseInt(xIn.getText().toString()));
 		//robotFlashLed(0);
-		robotDrive(30);
-		robotTurn(180);
-		robotFlashLed(0);
-		System.out.println("Im the Hero! !!!");
 	}
 }
