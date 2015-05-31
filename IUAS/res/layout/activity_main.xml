@@ -76,7 +76,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:onClick="cameraFrameProcessing"
+        android:onClick="cameraFrameProcessingOnClick"
         android:text="Catch Ball" />
     
     <Button
@@ -87,7 +87,7 @@
         android:layout_alignLeft="@+id/cameraFrameProcessing"
         android:layout_below="@+id/cameraFrameProcessing"
         android:layout_marginTop="16dp"
-        android:onClick="homography"
+        android:onClick="homographyOnClick"
         android:text="Set Homography" />
 
     <Spinner
