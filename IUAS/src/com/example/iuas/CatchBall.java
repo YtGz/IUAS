@@ -31,7 +31,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * moving to the balls location and caging it with the bar
 	 */
 	public void catchBall(){
-		//moveToEgocentricPoint(currentBallPos);
+		moveToEgocentricPoint(CameraFrameProcessingActivity.localization.getOdometryData().first);
 		RobotControl.control("setBar", 0);	
 	}
 	
@@ -76,8 +76,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		RobotControl.control("turn", 180);
 		RobotControl.control("drive", 20);
 		setBall(false);
-		moveToEgocentricPoint(new Vector2(0, 0));
-		
+		moveToEgocentricPoint(new Vector2(0, 0));	
 	}
 	
 	/**
@@ -85,6 +84,8 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * first turning around, then using the exploreWorkspace method
 	 */
 	public void searchWorkspace(){
+		if(isBall())
+			return;
 		RobotControl.control("turn", 360);
 		if(isBall())
 			return;
@@ -121,6 +122,8 @@ public class CatchBall implements ThreadListener, Runnable {
 	public void exploreWorkspace() {
 		final int workspaceFactor = 1;
 		final double density = Math.sqrt(17);  	//Math.sqrt(5); for 2 crossings / Math.sqrt(17); for 4 crossings / Math.sqrt(65); for 8 crossings
+		if(isBall())
+			return;
 		RobotControl.control("turn", -45);
 		if(isBall())
 			return;
@@ -180,6 +183,8 @@ public class CatchBall implements ThreadListener, Runnable {
 		int r = (int) Math.sqrt(p.x * p.x + p.y * p.y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(p.y, p.x));
 		phi *= -1;
+		if(isBall())
+			return;
 		RobotControl.control("turn", phi);
 		if(isBall())
 			return;

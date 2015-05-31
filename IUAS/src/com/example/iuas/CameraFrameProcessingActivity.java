@@ -132,6 +132,10 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
         mDetector.setHsvColor(mBlobColorHsv);
         CONTOUR_COLOR = new Scalar(0,0,255,255);
         POINT_COLOR = new Scalar(255,0,0,255);
+        //Self-localization using beacons
+        localization = new Odometry();
+        //camera processing
+        ballDetection = new BallAndBeaconDetection();
     }
     
     /**
@@ -179,10 +183,6 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
     	
     	//DFSM controlling the robot
         dfsm = new CatchBall();
-        //Self-localization using beacons
-        localization = new Odometry();
-        //camera processing
-        ballDetection = new BallAndBeaconDetection();
     }
     
 }
