@@ -31,7 +31,7 @@ public class Odometry implements ThreadListener, Runnable {
 
 	
 	/**
-	 *calculating the roboter position with beacons 
+	 *calculating the robot position with beacons 
 	 *
 	 * @param beaconSet
 	 * @param beaconImgCoords

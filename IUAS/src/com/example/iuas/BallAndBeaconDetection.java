@@ -20,6 +20,8 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
+import com.example.iuas.circle.Vector2;
+
 import android.util.Pair;
 
 public class BallAndBeaconDetection extends Listenable implements ThreadListener, Runnable {
@@ -173,7 +175,7 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
     		}
     	}
     	if(temp != null) {
-        	setBallCoordinates(temp);
+        	setBallCoordinates(Utils.convertImageToGround(new Vector2(temp.x, temp.y)));
         	informListeners(CatchBall.class);
         	
     	}

@@ -25,6 +25,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		state = STATE.SEARCH_WORKSPACE;
 		Thread t = new Thread(this);
 		t.start();
+		System.out.println("DFSM started");
 	}
 	
 	/**
