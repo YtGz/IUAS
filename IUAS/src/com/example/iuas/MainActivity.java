@@ -42,6 +42,7 @@ public class MainActivity extends Activity {
 	private EditText yIn; // y value input
 	private EditText phiIn; // phi value input
 	private Spinner mySpinner;
+	public static Context context;
 	
 	
 	/**************************************************************************************************************************************
@@ -100,7 +101,7 @@ public class MainActivity extends Activity {
 	 * Connects Bluetooth device.
 	 */
 	private void connectBT() {
-		RobotControl.btc = new BluetoothConnection();
+		RobotControl.btc = new BluetoothConnection(context);
 		RobotControl.btc.setDeviceAddress("20:13:08:16:08:95");
 		RobotControl.btc.connect();
 	}
@@ -192,8 +193,7 @@ public class MainActivity extends Activity {
 		navigateIgnoringObstacles(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
 		robotTurn(-180);
 		robotDrive(106);*/
-		//robotFlashLed(0);
-		//robotDrive(Integer.parseInt(xIn.getText().toString()));
-		//robotFlashLed(0);
+		System.out.println("run");
+		RobotControl.control("flashLeds", 0);
 	}
 }

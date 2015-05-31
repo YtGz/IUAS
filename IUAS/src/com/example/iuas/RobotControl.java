@@ -12,6 +12,7 @@ public class RobotControl implements Runnable {
 		RobotControl.command = command;
 		RobotControl.values = values;
 		robotControlThread = new Thread(new RobotControl());
+		System.out.println("trying to start the thread");
 		robotControlThread.start();
 		try {
 			robotControlThread.join();
@@ -21,6 +22,7 @@ public class RobotControl implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println("Thread started");
 		if(command.equalsIgnoreCase("turn")) {
 			robotTurn(values[0]);
 		}
@@ -28,6 +30,7 @@ public class RobotControl implements Runnable {
 			robotDrive(values[0]);
 		}
 		else if(command.equalsIgnoreCase("flashLeds")) {
+			System.out.println("trying to flash leds");
 			robotFlashLed(values[0]);
 		}
 		
@@ -180,6 +183,7 @@ public class RobotControl implements Runnable {
 	 * @param mode
 	 */
 	public void robotFlashLed(int mode) {
+		System.out.println("Flashing leds!");
 		switch (mode) {
 		case 0:
 			for (int i = 0; i < 4; i++) {
@@ -253,6 +257,7 @@ public class RobotControl implements Runnable {
 				System.out.println("BT not connected!");
 			}
 			else {
+				System.out.println("Writing!");
 				btc.write(data);
 			}
 		}

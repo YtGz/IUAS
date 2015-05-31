@@ -24,7 +24,7 @@ public class BluetoothConnection {
 	private BluetoothDevice btDevice;
 	private BluetoothSocket btSocket;
 
-	public BluetoothConnection() {
+	public BluetoothConnection(Context context) {
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
 	}
 

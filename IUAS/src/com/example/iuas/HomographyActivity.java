@@ -158,7 +158,6 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
         mDetector = new ColorBlobDetector();
         CONTOUR_COLOR = new Scalar(0,0,255,255);
         POINT_COLOR = new Scalar(255,0,0,255);
-        ballDetection = new BallAndBeaconDetection();
     }
     
     /**
@@ -174,12 +173,6 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
     	if(!lockMrgba){
     		mRgba = inputFrame.rgba();
-
-    		ArrayList<ArrayList<MatOfPoint>> l = ballDetection.detect(mRgba, mDetector);
-    		ArrayList<MatOfPoint> contours = l.get(0);
-    		ArrayList<MatOfPoint> lowestTargetPoint = l.get(1);
-			Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
-			Imgproc.drawContours(mRgba, lowestTargetPoint, -1, POINT_COLOR);
     	}
         return mRgba;
     }
