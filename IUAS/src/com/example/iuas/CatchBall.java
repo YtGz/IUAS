@@ -18,9 +18,10 @@ public class CatchBall implements ThreadListener, Runnable {
 	private STATE state;
 	
 	/**
-	 * stars new thread a ball is seen
+	 * Starts new thread when object is created
 	 */
 	public CatchBall() {
+		state = STATE.SEARCH_WORKSPACE;
 		Thread t = new Thread(this);
 		t.start();
 	}
@@ -29,7 +30,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * moving to the balls location and caging it with the bar
 	 */
 	public void catchBall(){
-		//moveToPoint(currentBallPos);
+		//moveToEgocentricPoint(currentBallPos);
 		RobotControl.control("setBar", 0);	
 	}
 	
@@ -38,7 +39,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * moving to the goal position and releasing the ball, while beeing sure not to hit the beacons
 	 */
 	public void bringBallToGoal(){
-		//moveToPoint(goalPoint - 20cm x OR y)
+		//moveToEgocentricPoint(goalPoint - 20cm x OR y)
 		//turn until perpendicular to workspace edge
 		//move 20 cm in x OR y direction
 		RobotControl.control("setBar", 255);
@@ -51,7 +52,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		RobotControl.control("turn", 180);
 		RobotControl.control("drive", 20);
 		setBall(false);
-		moveToPoint(0, 0);
+		moveToEgocentricPoint(0, 0);
 		
 	}
 	
@@ -142,15 +143,6 @@ public class CatchBall implements ThreadListener, Runnable {
 		if(isBall())
 			return;
 		RobotControl.control("drive", (int) (Math.sqrt(31250)/workspaceFactor));
-		
-//		if(robotMove(-45, Math.sqrt(45000)/workspaceFactor, true)) return;
-//		if(robotMove(135, 300/workspaceFactor, true)) return;
-//		if(robotMove(Math.ceil((180 - (Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor, true)) return;
-//		if(robotMove(-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density)))))), Math.sqrt(95625)/workspaceFactor, true)) return;
-//		if(robotMove(Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor, true)) return;
-//		if(robotMove(-Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density))))), Math.sqrt(95625)/workspaceFactor, true)) return;
-//		if(robotMove(Math.ceil(180 - (Math.asin(Math.toRadians(75/density)))), 300/workspaceFactor, true)) return;
-//		robotMove(135, Math.sqrt(45000)/workspaceFactor, true);	
 	}
 	
 	
