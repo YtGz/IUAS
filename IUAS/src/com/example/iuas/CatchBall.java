@@ -39,9 +39,31 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * moving to the goal position and releasing the ball, while beeing sure not to hit the beacons
 	 */
 	public void bringBallToGoal(){
-		//moveToEgocentricPoint(goalPoint - 20cm x OR y)
-		//turn until perpendicular to workspace edge
-		//move 20 cm in x OR y direction
+		if(Math.abs(goalPoint.x)< 125 && Math.abs(goalPoint.y) < 125){
+			moveToEgocentricPoint(new Point(goalPoint.sub(CameraFrameProcessingActivity.localization.getOdometryData().first)));
+		}
+		else{
+			
+			int rotation;
+			if(goalPoint.x >= 125 ){
+				goalPoint.x = goalPoint.x - 20;
+				rotation = 0;
+			}
+			else if (goalPoint.x <= -125){
+				goalPoint.x = goalPoint.x -20;
+				rotation = 180;
+			}
+			else if(goalPoint.y >= 125){
+				goalPoint.y = goalPoint.y -20;
+				rotation = 90;
+			}
+			else if(goalPoint.y <= -125){
+				goalPoint.y = goalPoint.y -20;
+				rotation = 270;
+			}
+			moveToEgocentricPoint(new Point(goalPoint.sub(CameraFrameProcessingActivity.localization.getOdometryData().first)));
+			RobotControl.control("turn", rotation - (int) Math.floor(CameraFrameProcessingActivity.localization.getOdometryData().second));
+		}
 		RobotControl.control("setBar", 255);
 	}
 	
@@ -52,7 +74,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		RobotControl.control("turn", 180);
 		RobotControl.control("drive", 20);
 		setBall(false);
-		moveToEgocentricPoint(0, 0);
+		moveToEgocentricPoint(new Point(0, 0));
 		
 	}
 	
@@ -152,9 +174,9 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * @param x
 	 * @param y
 	 */
-	public void moveToEgocentricPoint(int x, int y) {
-		int r = (int) Math.sqrt(x * x + y * y);
-		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
+	public void moveToEgocentricPoint(Point p) {
+		int r = (int) Math.sqrt(p.x * p.x + p.y * p.y);
+		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(p.y, p.x));
 		phi *= -1;
 		RobotControl.control("turn", phi);
 		if(isBall())
