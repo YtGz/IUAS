@@ -8,7 +8,7 @@
 
 package com.example.iuas;
 
-import org.opencv.core.Point;
+import com.example.iuas.circle.Vector2;
 
 
 public class CatchBall implements ThreadListener, Runnable {
@@ -16,6 +16,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	private enum STATE {SEARCH_WORKSPACE, CATCH_BALL, BRING_BALL_TO_GOAL, RETURN_TO_ORIGIN};
 	private boolean ball;
 	private STATE state;
+	private final Vector2 GOAL_POSITION = new Vector2(140, 64.5);
 	
 	/**
 	 * Starts new thread when object is created
@@ -36,32 +37,33 @@ public class CatchBall implements ThreadListener, Runnable {
 	
 	
 	/**
-	 * moving to the goal position and releasing the ball, while beeing sure not to hit the beacons
+	 * moving to the goal position and releasing the ball, while being sure not to hit the beacons
 	 */
 	public void bringBallToGoal(){
-		if(Math.abs(goalPoint.x)< 125 && Math.abs(goalPoint.y) < 125){
-			moveToEgocentricPoint(new Point(goalPoint.sub(CameraFrameProcessingActivity.localization.getOdometryData().first)));
+		if(Math.abs(GOAL_POSITION.x) < 125 && Math.abs(GOAL_POSITION.y) < 125){
+			moveToEgocentricPoint(GOAL_POSITION.sub(CameraFrameProcessingActivity.localization.getOdometryData().first));
 		}
 		else{
 			
-			int rotation;
-			if(goalPoint.x >= 125 ){
-				goalPoint.x = goalPoint.x - 20;
+			int rotation = 0;
+			Vector2 goalPosition = new Vector2(GOAL_POSITION.x, GOAL_POSITION.y);
+			if(GOAL_POSITION.x >= 125 ){
+				goalPosition = new Vector2(GOAL_POSITION.x - 20, GOAL_POSITION.y);
 				rotation = 0;
 			}
-			else if (goalPoint.x <= -125){
-				goalPoint.x = goalPoint.x -20;
+			else if (GOAL_POSITION.x <= -125){
+				goalPosition = new Vector2(GOAL_POSITION.x - 20, GOAL_POSITION.y);
 				rotation = 180;
 			}
-			else if(goalPoint.y >= 125){
-				goalPoint.y = goalPoint.y -20;
+			else if(GOAL_POSITION.y >= 125){
+				goalPosition = new Vector2(GOAL_POSITION.x, GOAL_POSITION.y - 20);
 				rotation = 90;
 			}
-			else if(goalPoint.y <= -125){
-				goalPoint.y = goalPoint.y -20;
+			else if(GOAL_POSITION.y <= -125){
+				goalPosition = new Vector2(GOAL_POSITION.x, GOAL_POSITION.y - 20);
 				rotation = 270;
 			}
-			moveToEgocentricPoint(new Point(goalPoint.sub(CameraFrameProcessingActivity.localization.getOdometryData().first)));
+			moveToEgocentricPoint(goalPosition.sub(CameraFrameProcessingActivity.localization.getOdometryData().first));
 			RobotControl.control("turn", rotation - (int) Math.floor(CameraFrameProcessingActivity.localization.getOdometryData().second));
 		}
 		RobotControl.control("setBar", 255);
@@ -74,7 +76,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		RobotControl.control("turn", 180);
 		RobotControl.control("drive", 20);
 		setBall(false);
-		moveToEgocentricPoint(new Point(0, 0));
+		moveToEgocentricPoint(new Vector2(0, 0));
 		
 	}
 	
@@ -174,7 +176,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * @param x
 	 * @param y
 	 */
-	public void moveToEgocentricPoint(Point p) {
+	public void moveToEgocentricPoint(Vector2 p) {
 		int r = (int) Math.sqrt(p.x * p.x + p.y * p.y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(p.y, p.x));
 		phi *= -1;
@@ -198,7 +200,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		if(isBall() != true) {
 			setBall(true);
 			if(RobotControl.robotControlThread != null)
-				Thread.interrupt(RobotControl.robotControlThread);
+				RobotControl.robotControlThread.interrupt();
 		}
 	}
 

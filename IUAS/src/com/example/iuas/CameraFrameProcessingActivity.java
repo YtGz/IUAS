@@ -47,7 +47,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
     private Point				 			lowestTargetPoint;
 
     private CameraBridgeViewBase 			mOpenCvCameraView;
-    public	static Thread				 	DFSMThread;
+    public	static CatchBall			 	dfsm;
     public  static BallAndBeaconDetection 	ballDetection;
     public  static Odometry			 		localization;
     
@@ -165,7 +165,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
     }
     
     /**
-     * ??? Comment to be written ???
+     * Start the DFSM and environment observing processes
      * 
      * @param view
      */
@@ -178,8 +178,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
     	
     	
     	//DFSM controlling the robot
-        CatchBall dfsm = new CatchBall();
-        DFSMThread = new Thread(dfsm);
+        dfsm = new CatchBall();
         //Self-localization using beacons
         localization = new Odometry();
         //camera processing
