@@ -14,7 +14,7 @@ import org.opencv.core.Point;
 public class CatchBall implements ThreadListener, Runnable {
 	
 	private enum STATE {SEARCH_WORKSPACE, CATCH_BALL, BRING_BALL_TO_GOAL, RETURN_TO_ORIGIN};
-	private volatile boolean ball;
+	private boolean ball;
 	private STATE state;
 	
 	/**
@@ -30,9 +30,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	 */
 	public void catchBall(){
 		//moveToPoint(currentBallPos);
-		MainActivity.robotSetBar((byte) 255);
-		
-		
+		RobotControl.control("setBar", 0);	
 	}
 	
 	
@@ -43,17 +41,17 @@ public class CatchBall implements ThreadListener, Runnable {
 		//moveToPoint(goalPoint - 20cm x OR y)
 		//turn until perpendicular to workspace edge
 		//move 20 cm in x OR y direction
-		MainActivity.robotSetBar((byte) 0);
+		RobotControl.control("setBar", 255);
 	}
 	
 	/**
 	 * returning from the goal position back into the workspace and moving to the origin
 	 */
 	public void returnToWorkspaceOrigin() {
-		MainActivity.robotTurn(180);
-		MainActivity.robotDrive(20);
-		ball = false;
-		//moveToPoint(0, 0);
+		RobotControl.control("turn", 180);
+		RobotControl.control("drive", 20);
+		setBall(false);
+		moveToPoint(0, 0);
 		
 	}
 	
@@ -62,8 +60,8 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * first turning around, then using the exploreWorkspace method
 	 */
 	public void searchWorkspace(){
-		MainActivity.robotTurn(360);
-		if(ball)
+		RobotControl.control("turn", 360);
+		if(isBall())
 			return;
 		exploreWorkspace();
 	}
@@ -98,52 +96,52 @@ public class CatchBall implements ThreadListener, Runnable {
 	public void exploreWorkspace() {
 		final int workspaceFactor = 1;
 		final double density = Math.sqrt(17);  	//Math.sqrt(5); for 2 crossings / Math.sqrt(17); for 4 crossings / Math.sqrt(65); for 8 crossings
-		MainActivity.robotTurn(-45);
-		if(ball)
+		RobotControl.control("turn", -45);
+		if(isBall())
 			return;
-		MainActivity.robotDrive((int) (Math.sqrt(31250)/workspaceFactor));
-		if(ball)
+		RobotControl.control("drive", (int) (Math.sqrt(31250)/workspaceFactor));
+		if(isBall())
 			return;
-		MainActivity.robotTurn(135);
-		if(ball)
+		RobotControl.control("turn", 135);
+		if(isBall())
 			return;
-		MainActivity.robotDrive((int) 300/workspaceFactor);
-		if(ball)
+		RobotControl.control("drive", (int) 300/workspaceFactor);
+		if(isBall())
 			return;
-		MainActivity.robotTurn((int)(Math.ceil((180 - (Math.toRadians(75/density))))));
-		if(ball)
+		RobotControl.control("turn", (int)(Math.ceil((180 - (Math.toRadians(75/density))))));
+		if(isBall())
 			return;
-		MainActivity.robotDrive((int) (Math.sqrt(664062.5)/workspaceFactor));
-		if(ball)
+		RobotControl.control("drive", (int) (Math.sqrt(664062.5)/workspaceFactor));
+		if(isBall())
 			return;
-		MainActivity.robotTurn((int) (-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density))))))));
-		if(ball)
+		RobotControl.control("turn", (int) (-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density))))))));
+		if(isBall())
 			return;
-		MainActivity.robotDrive((int) (Math.sqrt(664062.5)/workspaceFactor));
-		if(ball)
+		RobotControl.control("drive", (int) (Math.sqrt(664062.5)/workspaceFactor));
+		if(isBall())
 			return;
-		MainActivity.robotTurn((int) (Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density)))))));
-		if(ball)
+		RobotControl.control("turn", (int) (Math.ceil(2*(90-(Math.asin(Math.toRadians(75/density)))))));
+		if(isBall())
 			return;
-		MainActivity.robotDrive((int)(Math.sqrt(664062.5)/workspaceFactor));
-		if(ball)
+		RobotControl.control("drive", (int)(Math.sqrt(664062.5)/workspaceFactor));
+		if(isBall())
 			return;
-		MainActivity.robotTurn((int) (-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density))))))));
-		if(ball)
+		RobotControl.control("turn", (int) (-Math.ceil((2*(90-(Math.asin(Math.toRadians(75/density))))))));
+		if(isBall())
 			return;
-		MainActivity.robotDrive((int) (Math.sqrt(664062.5)/workspaceFactor));
-		if(ball)
+		RobotControl.control("drive", (int) (Math.sqrt(664062.5)/workspaceFactor));
+		if(isBall())
 			return;
-		MainActivity.robotTurn((int)(Math.ceil((180 - (Math.toRadians(75/density))))));
-		if(ball)
+		RobotControl.control("turn", (int)(Math.ceil((180 - (Math.toRadians(75/density))))));
+		if(isBall())
 			return;
-		MainActivity.robotDrive((int) (Math.sqrt(664062.5)/workspaceFactor));
-		if(ball)
+		RobotControl.control("drive", (int) (Math.sqrt(664062.5)/workspaceFactor));
+		if(isBall())
 			return;
-		MainActivity.robotTurn(135);
-		if(ball)
+		RobotControl.control("turn", 135);
+		if(isBall())
 			return;
-		MainActivity.robotDrive((int) (Math.sqrt(31250)/workspaceFactor));
+		RobotControl.control("drive", (int) (Math.sqrt(31250)/workspaceFactor));
 		
 //		if(robotMove(-45, Math.sqrt(45000)/workspaceFactor, true)) return;
 //		if(robotMove(135, 300/workspaceFactor, true)) return;
@@ -157,30 +155,37 @@ public class CatchBall implements ThreadListener, Runnable {
 	
 	
 	/** 
-	 * Robot heads straight for the goal, ignoring obstacles, and in the end rotates according to theta.
+	 * Robot heads straight for the goal, ignoring obstacles.
 	 * 
 	 * @param x
 	 * @param y
-	 * @param theta
 	 */
-	public void navigateIgnoringObstacles(int x, int y, int theta) {
+	public void moveToEgocentricPoint(int x, int y) {
 		int r = (int) Math.sqrt(x * x + y * y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(y, x));
-		//showLog(phi);
 		phi *= -1;
-		robotTurn(phi);
-		robotDrive(r);
-		robotTurn(theta - phi);
+		RobotControl.control("turn", phi);
+		if(isBall())
+			return;
+		RobotControl.control("drive", r);
 	}
 	
+	private synchronized boolean isBall() {
+		return ball;
+	}
 
-
+	private synchronized void setBall(boolean ball) {
+		this.ball = ball;
+	}
 
 	/* a ball was detected */
 	@Override
 	public void onEvent() {
-		ball = true;
-		Thread.interrupt(RobotControl.robotControlThread);
+		if(isBall() != true) {
+			setBall(true);
+			if(RobotControl.robotControlThread != null)
+				Thread.interrupt(RobotControl.robotControlThread);
+		}
 	}
 
 }
