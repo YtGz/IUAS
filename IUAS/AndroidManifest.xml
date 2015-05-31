@@ -45,7 +45,7 @@
                 android:resource="@xml/device_filter" >
             </meta-data>
         </activity>
-        <activity android:name="com.example.iuas.Homography"
+        <activity android:name="com.example.iuas.HomographyActivity"
                   android:label="@string/color_blob_detection"
                   android:parentActivityName="com.example.iuas.MainActivity"
                   android:screenOrientation="landscape"

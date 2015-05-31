@@ -102,7 +102,7 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
     	}
     	identifyObjects(contoursAccepted);
         ArrayList<MatOfPoint> lowestTargetPoint = new ArrayList<MatOfPoint>();
-        lowestTargetPoint.add(new MatOfPoint(a));
+        lowestTargetPoint.add(new MatOfPoint(getBallCoordinates()));
         ArrayList<MatOfPoint> contoursOnly = new ArrayList<MatOfPoint>();
         for(Pair<MatOfPoint, COLOR> p : contoursAccepted) {
         	contoursOnly.add((MatOfPoint) p.first);

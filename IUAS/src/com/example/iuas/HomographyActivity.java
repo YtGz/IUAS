@@ -46,7 +46,7 @@ import android.view.View.OnTouchListener;
 import com.example.iuas.BallAndBeaconDetection;
 import com.example.iuas.BallAndBeaconDetection.COLOR;
 
-public class Homography extends Activity implements CvCameraViewListener2 {
+public class HomographyActivity extends Activity implements CvCameraViewListener2 {
 	protected final boolean DEBUG = true; // enables debug messages
 	protected final int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append --> atm no textLog defined here, so only sysout available
 	protected final int USE_DEVICE = 1; // 1: USB, 2: Bluetooth
@@ -54,15 +54,12 @@ public class Homography extends Activity implements CvCameraViewListener2 {
     private static final String  TAG              = "OCVSample::Activity";
 
     private Mat                  mRgba;
-    private Scalar               mBlobColorRgba;
-    private Scalar               mBlobColorHsv;
     private ColorBlobDetector    mDetector;
-    private Mat                  mSpectrum;
-    private Size                 SPECTRUM_SIZE;
     private Scalar               CONTOUR_COLOR;
     private Scalar				 POINT_COLOR;
     private boolean				 lockMrgba = false;
     private int					 contoursCountThreshold = 0;//25;
+    private BallAndBeaconDetection ballDetection;
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
@@ -89,7 +86,7 @@ public class Homography extends Activity implements CvCameraViewListener2 {
     /**
      * Constructor.
      */
-    public Homography() {
+    public HomographyActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
 
@@ -159,12 +156,9 @@ public class Homography extends Activity implements CvCameraViewListener2 {
     	showLog("Cam View: " + mOpenCvCameraView);
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
-        mSpectrum = new Mat();
-        mBlobColorRgba = new Scalar(255);
-        mBlobColorHsv = new Scalar(255);
-        SPECTRUM_SIZE = new Size(200, 64);
         CONTOUR_COLOR = new Scalar(0,0,255,255);
         POINT_COLOR = new Scalar(255,0,0,255);
+        ballDetection = new BallAndBeaconDetection();
     }
     
     /**
@@ -181,7 +175,7 @@ public class Homography extends Activity implements CvCameraViewListener2 {
     	if(!lockMrgba){
     		mRgba = inputFrame.rgba();
 
-    		ArrayList<ArrayList<MatOfPoint>> l = BallAndBeaconDetection.detect(mRgba, mDetector);
+    		ArrayList<ArrayList<MatOfPoint>> l = ballDetection.detect(mRgba, mDetector);
     		ArrayList<MatOfPoint> contours = l.get(0);
     		ArrayList<MatOfPoint> lowestTargetPoint = l.get(1);
 			Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
