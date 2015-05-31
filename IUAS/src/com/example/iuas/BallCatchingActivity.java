@@ -178,7 +178,7 @@ public class BallCatchingActivity extends MainActivity implements CvCameraViewLi
     	
     	
     	//DFSM controlling the robot
-        DFSM dfsm = new DFSM();
+        CatchBall dfsm = new CatchBall();
         DFSMThread = new Thread(dfsm);
         //Self-localization using beacons
         localization = new Odometry();
