@@ -16,7 +16,8 @@ public class CatchBall implements ThreadListener, Runnable {
 	private enum STATE {SEARCH_WORKSPACE, CATCH_BALL, BRING_BALL_TO_GOAL, RETURN_TO_ORIGIN};
 	private boolean ball;
 	private STATE state;
-	private final Vector2 GOAL_POSITION = new Vector2(140, 64.5);
+
+	private final Vector2 GOAL_POSITION = new Vector2(0, 0);
 	
 	/**
 	 * Starts new thread when object is created
@@ -74,8 +75,8 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * returning from the goal position back into the workspace and moving to the origin
 	 */
 	public void returnToWorkspaceOrigin() {
-		RobotControl.control("turn", 180);
-		RobotControl.control("drive", 20);
+//		RobotControl.control("turn", 180);
+//		RobotControl.control("drive", 20);
 		setBall(false);
 		moveToEgocentricPoint(Vector2.NULL);	
 	}
@@ -96,21 +97,23 @@ public class CatchBall implements ThreadListener, Runnable {
 	@Override
 	public void run() {
 		for(;;) {
-			switch(state) {
+			System.out.println("State: " + state);
+			switch(getState()) {
 			case SEARCH_WORKSPACE:
 				searchWorkspace();
 				break;
 			case CATCH_BALL:
 				catchBall();
-				state = STATE.BRING_BALL_TO_GOAL;
+				setState(STATE.BRING_BALL_TO_GOAL);
 				break;
 			case BRING_BALL_TO_GOAL:
 				bringBallToGoal();
-				state = STATE.RETURN_TO_ORIGIN;
+				setState(STATE.RETURN_TO_ORIGIN);
 				break;
 			case RETURN_TO_ORIGIN:
 				returnToWorkspaceOrigin();
-				state = STATE.SEARCH_WORKSPACE;
+				if(!isBall())
+					setState(STATE.SEARCH_WORKSPACE);
 				break;
 			}
 		}
@@ -202,12 +205,20 @@ public class CatchBall implements ThreadListener, Runnable {
 	private synchronized void setBall(boolean ball) {
 		this.ball = ball;
 	}
+	
+	private synchronized STATE getState() {
+		return state;
+	}
+
+	private synchronized void setState(STATE state) {
+		this.state = state;
+	}
 
 	/* a ball was detected */
 	@Override
 	public void onEvent() {
 		if(isBall() != true) {
-			state = STATE.CATCH_BALL;
+			setState(STATE.CATCH_BALL);
 			setBall(true);
 			if(RobotControl.robotControlThread != null)
 				RobotControl.robotControlThread.interrupt();

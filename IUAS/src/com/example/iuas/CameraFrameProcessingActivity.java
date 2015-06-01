@@ -174,14 +174,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
      * 
      * @param view
      */
-    public void catchBallOnClick(View view){
-    	////FOR TESTING ONLY/////
-    	//Odometry.selfLocalize(BallAndBeaconDetection.getCurrentBeacons(), BallAndBeaconDetection.getBeaconImgCoords());
-    	//System.out.println("ROBOT position: " + Odometry.getOdometryData().first);
-    	//System.out.println("ROBOT rotation: " + Odometry.getOdometryData().second);
-    	/////////////////////////
-    	
-    	
+    public void catchBallOnClick(View view){   	
     	//DFSM controlling the robot
         dfsm = new CatchBall();
         ballDetection.addListener(dfsm);

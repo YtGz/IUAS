@@ -1,5 +1,9 @@
 package com.example.iuas;
 
+import com.example.iuas.circle.Vector2;
+
+import android.media.CameraProfile;
+import android.util.Pair;
 import jp.ksksue.driver.serial.FTDriver;
 
 public class RobotControl implements Runnable {
@@ -12,10 +16,13 @@ public class RobotControl implements Runnable {
 		RobotControl.command = command;
 		RobotControl.values = values;
 		robotControlThread = new Thread(new RobotControl());
+		System.out.println("Thread started");
 		robotControlThread.start();
 		try {
 			robotControlThread.join();
+			System.out.println("Thread joined");
 		} catch (InterruptedException e) {
+			System.out.println("Thread was interrupted");
 		}
 	}
 
@@ -85,6 +92,7 @@ public class RobotControl implements Runnable {
 				x += Math.cos(Math.toRadians(theta)) * distance;
 				y += Math.sin(Math.toRadians(theta)) * distance;
 			}
+			CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
 			robotStop();
 			try {
 				Thread.sleep(50);
