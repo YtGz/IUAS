@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
 
 	public final static boolean DEBUG = true; // enables debug messages
 	public final static int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append
-	public final static int USE_DEVICE = 2; // 1: USB, 2: Bluetooth
+	public final static int USE_DEVICE = 1; // 1: USB, 2: Bluetooth
 	
 	protected static TextView textLog;
 	private EditText xIn; // x value input
@@ -193,7 +193,7 @@ public class MainActivity extends Activity {
 		navigateIgnoringObstacles(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
 		robotTurn(-180);
 		robotDrive(106);*/
-		System.out.println("run");
-		RobotControl.control("flashLeds", 0);
+		RobotControl.control("turn", Integer.parseInt(xIn.getText().toString()));
+		RobotControl.control("drive", Integer.parseInt(yIn.getText().toString()));
 	}
 }

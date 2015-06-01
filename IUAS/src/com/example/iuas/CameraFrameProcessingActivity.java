@@ -136,6 +136,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
         localization = new Odometry();
         //camera processing
         ballDetection = new BallAndBeaconDetection();
+        ballDetection.addListener(localization);
     }
     
     /**
@@ -183,6 +184,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
     	
     	//DFSM controlling the robot
         dfsm = new CatchBall();
+        ballDetection.addListener(dfsm);
     }
     
 }

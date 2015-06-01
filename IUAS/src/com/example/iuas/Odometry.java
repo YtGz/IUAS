@@ -43,59 +43,62 @@ public class Odometry implements ThreadListener, Runnable {
 				beacons.add(beacon);
 			}
 			BEACON[] beaconPair = BeaconOrder.getTwoNeighboredBeacons(beacons);
-			Vector2[] beaconCoordinatesImage = new Vector2[2];
-			Vector2[] beaconCoordinatesEgocentric = new Vector2[2];
-			Vector2[] beaconCoordinatesWorld = new Vector2[2];
-			double[] beaconDistance = new double[2];
-			for(int i = 0; i < 2; i++) {
-				beaconCoordinatesImage[i] = new Vector2(beaconImgCoords.get(beaconPair[i]).x, beaconImgCoords.get(beaconPair[i]).y);
-				beaconCoordinatesEgocentric[i] = new Vector2(Utils.convertImageToGround(beaconCoordinatesImage[i]).x/10, Utils.convertImageToGround(beaconCoordinatesImage[i]).y/10);
-				beaconCoordinatesWorld[i] = new Vector2(CameraFrameProcessingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).x, CameraFrameProcessingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).y);
-				beaconDistance[i] = Math.sqrt((Math.pow(beaconCoordinatesEgocentric[i].x, 2) + Math.pow(beaconCoordinatesEgocentric[i].y, 2)));
-			}
-			System.out.println("Debug: beacons: " + beaconPair);
-			System.out.println("Debug: circleOnepos:" + beaconCoordinatesWorld[0]);
-			System.out.println("Debug: beaconDistance " + beaconDistance[0]);
-			System.out.println("Debug: circleTwopos:" + beaconCoordinatesWorld[1]);
-			System.out.println("Debug: beaconTwoDistance " + beaconDistance[1]);
-			Circle[] circles = {new Circle(beaconCoordinatesWorld[0], beaconDistance[0]), new Circle(beaconCoordinatesWorld[1], beaconDistance[1])};
-			CircleCircleIntersection cci = new CircleCircleIntersection(circles[0], circles[1]);
-			Vector2[] intersectionPoints = cci.getIntersectionPoints();
-			Vector2 p;
-			if(intersectionPoints.length < 1) {
-				System.out.println("FATAL ERROR: No intersection points.");
-				return;
-			}
-			else if (intersectionPoints.length < 2) {
-				System.out.println("Only one intersection point!");
-				p = intersectionPoints[0];
-			}
-			else {
-				//Determine which intersection point to use
-				int near;
-				int far;
-				if(intersectionPoints[0].mod() < intersectionPoints[1].mod()) {
-					near = 0;
-					far = 1;
+			if(beaconPair != null) {
+				Vector2[] beaconCoordinatesImage = new Vector2[2];
+				Vector2[] beaconCoordinatesEgocentric = new Vector2[2];
+				Vector2[] beaconCoordinatesWorld = new Vector2[2];
+				double[] beaconDistance = new double[2];
+				for(int i = 0; i < 2; i++) {
+					beaconCoordinatesImage[i] = new Vector2(beaconImgCoords.get(beaconPair[i]).x, beaconImgCoords.get(beaconPair[i]).y);
+					beaconCoordinatesEgocentric[i] = new Vector2(Utils.convertImageToGround(beaconCoordinatesImage[i]).x/10, Utils.convertImageToGround(beaconCoordinatesImage[i]).y/10);
+					beaconCoordinatesWorld[i] = new Vector2(CameraFrameProcessingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).x, CameraFrameProcessingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).y);
+					beaconDistance[i] = Math.sqrt((Math.pow(beaconCoordinatesEgocentric[i].x, 2) + Math.pow(beaconCoordinatesEgocentric[i].y, 2)));
+				}
+				System.out.println("Debug: beacons: " + beaconPair[0] + " | " + beaconPair[1]);
+				System.out.println("Debug: circleOnepos:" + beaconCoordinatesWorld[0]);
+				System.out.println("Debug: beaconDistance " + beaconDistance[0]);
+				System.out.println("Debug: circleTwopos:" + beaconCoordinatesWorld[1]);
+				System.out.println("Debug: beaconTwoDistance " + beaconDistance[1]);
+				Circle[] circles = {new Circle(beaconCoordinatesWorld[0], beaconDistance[0]), new Circle(beaconCoordinatesWorld[1], beaconDistance[1])};
+				CircleCircleIntersection cci = new CircleCircleIntersection(circles[0], circles[1]);
+				Vector2[] intersectionPoints = cci.getIntersectionPoints();
+				Vector2 p;
+				if(intersectionPoints.length < 1) {
+					System.out.println("FATAL ERROR: No intersection points.");
+					return;
+				}
+				else if (intersectionPoints.length < 2) {
+					System.out.println("Only one intersection point!");
+					p = intersectionPoints[0];
 				}
 				else {
-					near = 1;
-					far = 0;
+					System.out.println("Two intersection points");
+					//Determine which intersection point to use
+					int near;
+					int far;
+					if(intersectionPoints[0].mod() < intersectionPoints[1].mod()) {
+						near = 0;
+						far = 1;
+					}
+					else {
+						near = 1;
+						far = 0;
+					}
+					if(beaconCoordinatesEgocentric[0].x > beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
+						p = intersectionPoints[far];
+					}
+					else {
+						p = intersectionPoints[near];
+					}
 				}
-				if(beaconCoordinatesEgocentric[0].x > beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
-					p = intersectionPoints[far];
-				}
-				else {
-					p = intersectionPoints[near];
-				}
+				//calculate angle
+				Vector2 robotToLeftBeacon = beaconCoordinatesWorld[0].sub(p);
+				double r = Math.toDegrees(Math.acos(robotToLeftBeacon.dot(Vector2.X)/(robotToLeftBeacon.mod()* Vector2.X.mod())));
+				double phi =  Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x))-90;
+				r = r - phi;
+				setOdometryData(new Pair<Vector2, Double>(p, r));
+				System.out.println("Current odometry:   x: " + p.x + "  y: " + p.y + "  theta: " + r);
 			}
-			//calculate angle
-			Vector2 robotToLeftBeacon = beaconCoordinatesWorld[0].sub(p);
-			Vector2 worldXvector = new Vector2 (1,0);
-			double r = Math.toDegrees(Math.acos(robotToLeftBeacon.dot(worldXvector)/(robotToLeftBeacon.mod()* worldXvector.mod())));
-			double phi =  Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x))-90;
-			r = r - phi;
-			setOdometryData(new Pair<Vector2, Double>(p, r));			
 		}
 		else {
 			System.out.println("Only found " + beaconSet.size() + " beacons. No localization possible.");
@@ -112,7 +115,8 @@ public class Odometry implements ThreadListener, Runnable {
 
 	@Override
 	public void onEvent() {
-		if(t == null | !t.isAlive()) {
+		System.out.println("start odometry");
+		if(t == null || !t.isAlive()) {
 			t = new Thread(this);
 			t.start();
 		}

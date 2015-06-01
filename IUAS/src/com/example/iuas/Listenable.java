@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public abstract class Listenable {
 	
-	protected ArrayList<ThreadListener> listeners;
+	protected ArrayList<ThreadListener> listeners = new ArrayList<ThreadListener>();
 	
 	/**
 	 * every Activity that extends Listenable is able to add listener
@@ -39,6 +39,7 @@ public abstract class Listenable {
 	protected void informListeners(Class c) {
 		if (listeners != null) {
 			for(ThreadListener listener : listeners) {
+				System.out.println("Listener class: " + listener.getClass());
 				if(listener.getClass().equals(c))
 					listener.onEvent();
 			}

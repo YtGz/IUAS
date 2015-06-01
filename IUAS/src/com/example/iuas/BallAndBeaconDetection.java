@@ -24,7 +24,7 @@ import com.example.iuas.circle.Vector2;
 
 import android.util.Pair;
 
-public class BallAndBeaconDetection extends Listenable implements ThreadListener, Runnable {
+public class BallAndBeaconDetection extends Listenable {
 
     public enum		 	 	OBJECT_TYPE {BALL, BEACON};
     public enum			 	COLOR {YELLOW, RED, GREEN, BLUE, ORANGE};
@@ -33,7 +33,7 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
      * lighter colors
      */
 //    public final HashMap<COLOR, Scalar> COLOR_VALUE = new HashMap<COLOR, Scalar>(){{put(COLOR.YELLOW, new Scalar(144, 155, 48)); put(COLOR.RED, new Scalar (155, 44, 50));
-//    put(COLOR.GREEN, new Scalar (33, 153, 109)); put(COLOR.BLUE, new Scalar(0, 182, 255));}}; 
+//    put(COLOR.GREEN, new Scalar (33, 153, 109)); put(COLOR.BLUE, new Scalar(0, 182, 255)); put(COLOR.ORANGE, new Scalar(255,97,7));}}; 
     
     /*
      * darker colors
@@ -182,6 +182,7 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
     	System.out.println("Contours count: " + contoursCount);
     	System.out.println("Ball count: " + ballCount);
     	System.out.println("Beacon count: " + beaconCount);
+    	System.out.println("inform odometry");
     	informListeners(Odometry.class);
     }
     
@@ -252,18 +253,5 @@ public class BallAndBeaconDetection extends Listenable implements ThreadListener
 	}
 	public synchronized void setBallCoordinates(Point ballCoordinates) {
 		this.ballCoordinates = ballCoordinates;
-	}
-
-	@Override
-	public void onEvent() {
-		if(t == null | !t.isAlive()) {
-			t = new Thread(this);
-			t.start();
-		}
-	}
-
-	@Override
-	public void run() {
-		detect(CameraFrameProcessingActivity.mRgba, CameraFrameProcessingActivity.mDetector);
 	}
 }

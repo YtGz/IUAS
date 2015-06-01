@@ -12,7 +12,6 @@ public class RobotControl implements Runnable {
 		RobotControl.command = command;
 		RobotControl.values = values;
 		robotControlThread = new Thread(new RobotControl());
-		System.out.println("trying to start the thread");
 		robotControlThread.start();
 		try {
 			robotControlThread.join();
@@ -22,7 +21,6 @@ public class RobotControl implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("Thread started");
 		if(command.equalsIgnoreCase("turn")) {
 			robotTurn(values[0]);
 		}
@@ -30,7 +28,6 @@ public class RobotControl implements Runnable {
 			robotDrive(values[0]);
 		}
 		else if(command.equalsIgnoreCase("flashLeds")) {
-			System.out.println("trying to flash leds");
 			robotFlashLed(values[0]);
 		}
 		
@@ -54,12 +51,12 @@ public class RobotControl implements Runnable {
 	
 	public static FTDriver com;
 	public static BluetoothConnection btc;
-	private final static double velocityDriveCalibration = 53.8; // calibration factor for drive
-	private final static double velocityTurnCalibration = 10; // calibration factor for turn
+	private final static double velocityOffset = 53.8; // calibration factor for drive
+	private final static double velocityTurnCalibration = 9.51; // calibration factor for turn
 	private static double x = 0; // x pos. of robot
 	private static double y = 0; // y pos. of robot
 	private static double theta = 0; // theta of robot
-	private final static byte speed = 20; // speed of robot's wheels
+	private final static double speed = 20; // speed of robot's wheels
 	
 	/**
 	 * Robot drives a given distance in cm.
@@ -74,15 +71,15 @@ public class RobotControl implements Runnable {
 		double startTime = System.currentTimeMillis();
 
 		try {
-			Thread.sleep((long) (Math.abs(distance) * velocityDriveCalibration * (20/Math.abs(speed))));
+			Thread.sleep((long) (Math.abs(distance) * velocityOffset * (20.0/Math.abs(speed))));
 		}
 		catch (InterruptedException e) {
 			interruption = true;
 		}
 		finally {
 			if (interruption) {
-				x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1/velocityDriveCalibration) * (speed/20);
-				y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1/velocityDriveCalibration) * (speed/20);
+				x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (speed/20.0);
+				y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (speed/20.0);
 			}
 			else {
 				x += Math.cos(Math.toRadians(theta)) * distance;
@@ -115,14 +112,14 @@ public class RobotControl implements Runnable {
 		double startTime = System.currentTimeMillis();
 		
 		try {
-			Thread.sleep((long) (3.14159 * velocityTurnCalibration * (Math.abs(degree)/180) * velocityDriveCalibration * (20/Math.abs(speed))));
+			Thread.sleep((long) (3.14159 * velocityTurnCalibration * (Math.abs(degree)/180.0) * velocityOffset * (20.0/Math.abs(speed))));
 		}
 		catch (InterruptedException e) {
 			interruption = true;
 		}
 		finally {
 			if (interruption) {
-				double temp = (System.currentTimeMillis() - startTime) * (1/velocityDriveCalibration) * (180/(3.14159 * velocityTurnCalibration)) * (speed/20);
+				double temp = (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (speed/20.0);
 				theta += temp;
 				System.out.println("Could only turn " + temp + "degrees");
 			}
@@ -131,6 +128,7 @@ public class RobotControl implements Runnable {
 			}
 			theta = theta % 360;
 			robotStop();
+			//robotSetVelocity((byte) 0, (byte) 0);
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
@@ -183,7 +181,6 @@ public class RobotControl implements Runnable {
 	 * @param mode
 	 */
 	public void robotFlashLed(int mode) {
-		System.out.println("Flashing leds!");
 		switch (mode) {
 		case 0:
 			for (int i = 0; i < 4; i++) {
@@ -257,7 +254,6 @@ public class RobotControl implements Runnable {
 				System.out.println("BT not connected!");
 			}
 			else {
-				System.out.println("Writing!");
 				btc.write(data);
 			}
 		}

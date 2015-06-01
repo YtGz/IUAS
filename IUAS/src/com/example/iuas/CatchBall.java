@@ -121,7 +121,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	 */
 	
 	public void exploreWorkspace() {
-		final int workspaceFactor = 1;
+		final double workspaceFactor = 4;
 		final double density = Math.sqrt(17);  	//Math.sqrt(5); for 2 crossings / Math.sqrt(17); for 4 crossings / Math.sqrt(65); for 8 crossings
 		if(isBall())
 			return;
@@ -134,7 +134,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		RobotControl.control("turn", 135);
 		if(isBall())
 			return;
-		RobotControl.control("drive", (int) 300/workspaceFactor);
+		RobotControl.control("drive", (int) (300/workspaceFactor));
 		if(isBall())
 			return;
 		RobotControl.control("turn", (int)(Math.ceil((180 - (Math.toRadians(75/density))))));
