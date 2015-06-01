@@ -2,7 +2,6 @@ package com.example.iuas;
 
 import com.example.iuas.circle.Vector2;
 
-import android.media.CameraProfile;
 import android.util.Pair;
 import jp.ksksue.driver.serial.FTDriver;
 

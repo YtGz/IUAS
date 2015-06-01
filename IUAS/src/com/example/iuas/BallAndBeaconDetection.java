@@ -33,7 +33,8 @@ public class BallAndBeaconDetection extends Listenable {
      * lighter colors
      */
 //    public final HashMap<COLOR, Scalar> COLOR_VALUE = new HashMap<COLOR, Scalar>(){{put(COLOR.YELLOW, new Scalar(144, 155, 48)); put(COLOR.RED, new Scalar (155, 44, 50));
-//    put(COLOR.GREEN, new Scalar (33, 153, 109)); put(COLOR.BLUE, new Scalar(0, 182, 255)); put(COLOR.ORANGE, new Scalar(255,97,7));}}; 
+//    put(COLOR.GREEN, new Scalar (33, 153, 109)); put(COLOR.BLUE, new Scalar(0, 182, 255)); put(COLOR.ORANGE, new Scalar(255,97,7));
+//    put(COLOR.WHITE, new Scalar (255, 255, 255));}}; 
     
     /*
      * darker colors
@@ -66,13 +67,13 @@ public class BallAndBeaconDetection extends Listenable {
 	 */
     public final HashMap<BEACON, Point> BEACON_LOC = new HashMap<BEACON, Point>(){{put(BEACON.YELLOW_BLUE, new Point(-64.5, 64.5)); put(BEACON.RED_BLUE, new Point(0, 64.5)); put(BEACON.YELLOW_RED, new Point(64.5, 64.5)); put(BEACON.BLUE_GREEN, new Point(-64.5, 0)); put(BEACON.RED_GREEN, new Point(64.5, 0)); put(BEACON.BLUE_YELLOW, new Point(-64.5, -64.5)); put(BEACON.BLUE_RED, new Point(0, -64.5)); put(BEACON.RED_YELLOW, new Point(64.5, -64.5));}};
 
-	private int 				 		ballCount = 0;
+	private int 				 	ballCount = 0;
     private int						beaconCount = 0;
     private int						contoursCount = 0;
     private HashSet<BEACON>	 		currentBeacons = new HashSet<BEACON>();
     private HashMap<BEACON, Point> 	beaconImgCoords = new HashMap<BEACON, Point>();
     private Point					ballCoordinates;
-	private static COLOR					BALL_COLOR;
+	private static COLOR			BALL_COLOR;
     
     protected final boolean DEBUG = true; // enables debug messages
 	protected final int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append --> atm no textLog defined here, so only sysout available
@@ -173,6 +174,7 @@ public class BallAndBeaconDetection extends Listenable {
     					temp = new Point((blobs.get(i).first[0]+blobs.get(i).first[1])/2, blobs.get(i).first[2]);
     				}
     			}
+    			
     		}
     	}
     	if(temp != null) {

@@ -8,9 +8,6 @@
 package com.example.iuas;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-
 import com.example.iuas.BallAndBeaconDetection.BEACON;
 
 public class BeaconOrder {

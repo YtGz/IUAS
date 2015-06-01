@@ -11,8 +11,6 @@ package com.example.iuas;
 
 import jp.ksksue.driver.serial.FTDriver;
 
-import org.opencv.core.Scalar;
-
 import com.example.iuas.BallAndBeaconDetection.COLOR;
 
 import android.app.Activity;
