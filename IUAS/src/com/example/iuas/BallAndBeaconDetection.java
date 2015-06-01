@@ -27,7 +27,7 @@ import android.util.Pair;
 public class BallAndBeaconDetection extends Listenable {
 
     public enum		 	 	OBJECT_TYPE {BALL, BEACON};
-    public enum			 	COLOR {YELLOW, RED, GREEN, BLUE, ORANGE};
+    public enum			 	COLOR {YELLOW, RED, GREEN, BLUE, ORANGE, WHITE};
     
     /*
      * lighter colors
@@ -39,7 +39,8 @@ public class BallAndBeaconDetection extends Listenable {
      * darker colors
      */
     public final HashMap<COLOR, Scalar> COLOR_VALUE = new HashMap<COLOR, Scalar>(){{put(COLOR.YELLOW, new Scalar(110, 86, 0)); put(COLOR.RED, new Scalar (89, 6, 0));
-     							 	put(COLOR.GREEN, new Scalar (77, 127, 33)); put(COLOR.BLUE, new Scalar(1, 69, 84)); put(COLOR.ORANGE, new Scalar(255,97,7));}}; 
+     							 	put(COLOR.GREEN, new Scalar (77, 127, 33)); put(COLOR.BLUE, new Scalar(1, 69, 84)); put(COLOR.ORANGE, new Scalar(255,97,7));
+     							 	put(COLOR.WHITE, new Scalar (255, 255, 255));}}; 
      							 	
     public enum			 	BEACON {YELLOW_RED, RED_YELLOW, BLUE_GREEN, RED_BLUE, BLUE_RED, BLUE_YELLOW, YELLOW_BLUE, RED_GREEN};
     
