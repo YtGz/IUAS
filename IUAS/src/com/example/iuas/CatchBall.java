@@ -77,7 +77,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		RobotControl.control("turn", 180);
 		RobotControl.control("drive", 20);
 		setBall(false);
-		moveToEgocentricPoint(new Vector2(0, 0));	
+		moveToEgocentricPoint(Vector2.NULL);	
 	}
 	
 	/**
@@ -102,12 +102,15 @@ public class CatchBall implements ThreadListener, Runnable {
 				break;
 			case CATCH_BALL:
 				catchBall();
+				state = STATE.BRING_BALL_TO_GOAL;
 				break;
 			case BRING_BALL_TO_GOAL:
 				bringBallToGoal();
+				state = STATE.RETURN_TO_ORIGIN;
 				break;
 			case RETURN_TO_ORIGIN:
 				returnToWorkspaceOrigin();
+				state = STATE.SEARCH_WORKSPACE;
 				break;
 			}
 		}
@@ -204,6 +207,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	@Override
 	public void onEvent() {
 		if(isBall() != true) {
+			state = STATE.CATCH_BALL;
 			setBall(true);
 			if(RobotControl.robotControlThread != null)
 				RobotControl.robotControlThread.interrupt();
