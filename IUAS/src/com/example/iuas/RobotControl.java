@@ -1,3 +1,11 @@
+/**
+ * This class is responsible for the basic commands of the robot
+ * It implements Runnable
+ * 
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
 package com.example.iuas;
 
 import com.example.iuas.circle.Vector2;
@@ -248,7 +256,7 @@ public class RobotControl implements Runnable {
 	 * 
 	 * @param data
 	 */
-	public void comWrite(byte[] data) {
+	public static void comWrite(byte[] data) {
 		if (MainActivity.USE_DEVICE == 1) {
 			if (com.isConnected()) {
 				com.write(data);
