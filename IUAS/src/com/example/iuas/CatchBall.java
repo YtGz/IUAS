@@ -220,8 +220,8 @@ public class CatchBall implements ThreadListener, Runnable {
 		if(isBall() != true) {
 			setState(STATE.CATCH_BALL);
 			setBall(true);
-			if(RobotControl.robotControlThread != null)
-				RobotControl.robotControlThread.interrupt();
+			if(RobotControl.getRobotControlThread() != null)
+				RobotControl.getRobotControlThread().interrupt();
 		}
 	}
 

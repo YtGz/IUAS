@@ -149,6 +149,13 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 	
+	public void robotStopOnClick(View view) {
+		if (RobotControl.getRobotControlThread() != null) {
+			RobotControl.getRobotControlThread().interrupt();
+			System.out.println("Thread killed. Robot stopped");
+		}
+	}
+	
 	/**
 	 * Starts various actions in Main Activity by clicking "Run" Button.
 	 * 
@@ -191,7 +198,9 @@ public class MainActivity extends Activity {
 		navigateIgnoringObstacles(Integer.parseInt(xIn.getText().toString()), Integer.parseInt(yIn.getText().toString()), Integer.parseInt(phiIn.getText().toString()));
 		robotTurn(-180);
 		robotDrive(106);*/
-		RobotControl.control("turn", Integer.parseInt(xIn.getText().toString()));
-		RobotControl.control("drive", Integer.parseInt(yIn.getText().toString()));
+		if(Integer.parseInt(xIn.getText().toString()) > 0)
+			Calibration.calibrate("drive", Integer.parseInt(xIn.getText().toString()), Float.parseFloat(phiIn.getText().toString()));
+		else
+			Calibration.calibrate("turn", Integer.parseInt(yIn.getText().toString()), Float.parseFloat(phiIn.getText().toString()));
 	}
 }

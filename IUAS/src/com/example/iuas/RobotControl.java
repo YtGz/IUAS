@@ -17,16 +17,22 @@ public class RobotControl implements Runnable {
 	
 	private static String command;
 	private static int[] values;
-	public static Thread robotControlThread;
+	private static Thread robotControlThread;
+	private static synchronized String getCommand() {return command;}
+	private static synchronized void setCommand(String command) {RobotControl.command = command;}
+	private static synchronized int[] getValues() {return values;}
+	private static synchronized void setValues(int[] values) {RobotControl.values = values;}
+	public static synchronized Thread getRobotControlThread() {return robotControlThread;}
+	private static synchronized void setRobotControlThread(Thread robotControlThread) {RobotControl.robotControlThread = robotControlThread;}
 	
 	public static void control(String command, int... values) {
-		RobotControl.command = command;
-		RobotControl.values = values;
-		robotControlThread = new Thread(new RobotControl());
+		setCommand(command);
+		setValues(values);
+		setRobotControlThread(new Thread(new RobotControl()));
 		System.out.println("Thread started");
-		robotControlThread.start();
+		getRobotControlThread().start();
 		try {
-			robotControlThread.join();
+			getRobotControlThread().join();
 			System.out.println("Thread joined");
 		} catch (InterruptedException e) {
 			System.out.println("Thread was interrupted");
@@ -65,8 +71,8 @@ public class RobotControl implements Runnable {
 	
 	public static FTDriver com;
 	public static BluetoothConnection btc;
-	private final static double velocityOffset = 53.8; // calibration factor for drive
-	private final static double velocityTurnCalibration = 9.51; // calibration factor for turn
+	public static double velocityOffset = 53.8; // calibration factor for drive
+	public static double velocityTurnCalibration = 9.51; // calibration factor for turn
 	private static double x = 0; // x pos. of robot
 	private static double y = 0; // y pos. of robot
 	private static double theta = 0; // theta of robot
@@ -118,7 +124,7 @@ public class RobotControl implements Runnable {
 	
 	
 	/**
-	 * Robot turns a given amount of degrees.
+	 * Robot turns a giveCalibrationn amount of degrees.
 	 * Also accepts a calibration factor to match the input degrees with the degrees turned in real world.
 	 * 
 	 * @param degree
