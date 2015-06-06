@@ -80,33 +80,39 @@ public class RobotControl implements Runnable {
 	 * @param calib
 	 */
 	public void robotDrive(int distance) {
-		boolean interruption = false;
-		robotSetVelocity((byte) speed, (byte) speed);
-		double startTime = System.currentTimeMillis();
-
-		try {
-			Thread.sleep((long) (Math.abs(distance) * velocityOffset * (20.0/Math.abs(speed))));
-		}
-		catch (InterruptedException e) {
-			interruption = true;
-		}
-		finally {
-			if (interruption) {
-				x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (speed/20.0);
-				y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (speed/20.0);
+		if(distance != 0) {
+			boolean interruption = false;
+			if(distance == 10 || distance == 13) {
+				++distance;
 			}
-			else {
-				x += Math.cos(Math.toRadians(theta)) * distance;
-				y += Math.sin(Math.toRadians(theta)) * distance;
-			}
-			CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
-			robotStop();
+			if (distance > 0) robotSetVelocity((byte) speed, (byte) speed);
+			else if (distance < 0) robotSetVelocity((byte) (-1 * speed), (byte) (-1 *speed));
+			double startTime = System.currentTimeMillis();
+	
 			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				Thread.sleep((long) (Math.abs(distance) * velocityOffset * (20.0/Math.abs(speed))));
 			}
-			System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
+			catch (InterruptedException e) {
+				interruption = true;
+			}
+			finally {
+				if (interruption) {
+					x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (speed/20.0);
+					y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (speed/20.0);
+				}
+				else {
+					x += Math.cos(Math.toRadians(theta)) * distance;
+					y += Math.sin(Math.toRadians(theta)) * distance;
+				}
+				//CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
+				robotStop();
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
+			}
 		}
 	}
 	
@@ -119,37 +125,41 @@ public class RobotControl implements Runnable {
 	 * @param calib
 	 */
 	public void robotTurn(int degree) {
-		boolean interruption = false;
-		
-		if (degree >= 0) robotSetVelocity((byte) (-1 * speed), (byte) speed);
-		else if (degree < 0) robotSetVelocity((byte) speed, (byte) (-1 *speed));
-		
-		double startTime = System.currentTimeMillis();
-		
-		try {
-			Thread.sleep((long) (3.14159 * velocityTurnCalibration * (Math.abs(degree)/180.0) * velocityOffset * (20.0/Math.abs(speed))));
-		}
-		catch (InterruptedException e) {
-			interruption = true;
-		}
-		finally {
-			if (interruption) {
-				double temp = (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (speed/20.0);
-				theta += temp;
-				System.out.println("Could only turn " + temp + "degrees");
+		if(degree != 0) {
+			boolean interruption = false;
+			if(degree == 10 || degree == 13) {
+				++degree;
 			}
-			else {
-				theta += degree;
-			}
-			theta = theta % 360;
-			robotStop();
-			//robotSetVelocity((byte) 0, (byte) 0);
+			if (degree > 0) robotSetVelocity((byte) (-1 * speed), (byte) speed);
+			else if (degree < 0) robotSetVelocity((byte) speed, (byte) (-1 *speed));
+			
+			double startTime = System.currentTimeMillis();
+			
 			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				Thread.sleep((long) (3.14159 * velocityTurnCalibration * (Math.abs(degree)/180.0) * velocityOffset * (20.0/Math.abs(speed))));
 			}
-			System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
+			catch (InterruptedException e) {
+				interruption = true;
+			}
+			finally {
+				if (interruption) {
+					double temp = (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (speed/20.0);
+					theta += temp;
+					System.out.println("Could only turn " + temp + "degrees");
+				}
+				else {
+					theta += degree;
+				}
+				theta = theta % 360;
+				robotStop();
+				//robotSetVelocity((byte) 0, (byte) 0);
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
+			}
 		}
 	}
 	

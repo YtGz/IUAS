@@ -14,11 +14,11 @@ public class SensorData{
 		/*
 		* From the bachelor thesis:
 		*
-		* "Sensor data can be retrieved via the ’q’ command. [...] The
+		* "Sensor data can be retrieved via the ï¿½qï¿½ command. [...] The
 		* returning string contains measurements of all sensors formated as
 		* space separated hex values, each prepended with 0x."
 		*/
-		return RobotControl.comWrite(new byte[] { 'q', '\r', '\n' });
+		return "";//RobotControl.comWrite(new byte[] { 'q', '\r', '\n' });
 	}
 	
 	
