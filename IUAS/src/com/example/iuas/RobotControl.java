@@ -29,13 +29,13 @@ public class RobotControl implements Runnable {
 		setCommand(command);
 		setValues(values);
 		setRobotControlThread(new Thread(new RobotControl()));
-		System.out.println("Thread started");
+		Utils.showLog("Thread started");
 		getRobotControlThread().start();
 		try {
 			getRobotControlThread().join();
-			System.out.println("Thread joined");
+			Utils.showLog("Thread joined");
 		} catch (InterruptedException e) {
-			System.out.println("Thread was interrupted");
+			Utils.showLog("Thread was interrupted");
 		}
 	}
 

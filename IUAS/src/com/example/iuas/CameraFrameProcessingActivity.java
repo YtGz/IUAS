@@ -55,7 +55,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                 {
-                	showLog("OpenCV loaded successfully");
+                	Utils.showLog("OpenCV loaded successfully");
                     mOpenCvCameraView.enableView(); // enable camera view
                 } break;
                 default:
@@ -71,7 +71,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        System.out.println("called onCreate");
+        Utils.showLog("called onCreate");
         super.onBallCatchingActivityCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -83,7 +83,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
         Intent intent = getIntent();
         double[] c = intent.getDoubleArrayExtra("mBlobColorHsv");
         mBlobColorHsv = new Scalar(c);
-        System.out.println("mBlobColorHsv: " + mBlobColorHsv);
+        Utils.showLog("mBlobColorHsv: " + mBlobColorHsv);
 
         mOpenCvCameraView = (Tutorial3View) findViewById(R.id.ball_catching_activity_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
@@ -122,7 +122,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
      * Set camera view components on start.
      */
     public void onCameraViewStarted(int width, int height) {
-    	showLog("Cam View: " + mOpenCvCameraView);
+    	Utils.showLog("Cam View: " + mOpenCvCameraView);
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         mDetector.setHsvColor(mBlobColorHsv);

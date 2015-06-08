@@ -51,25 +51,25 @@ public class Odometry implements ThreadListener, Runnable {
 					beaconCoordinatesWorld[i] = new Vector2(CameraFrameProcessingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).x, CameraFrameProcessingActivity.ballDetection.BEACON_LOC.get(beaconPair[i]).y);
 					beaconDistance[i] = Math.sqrt((Math.pow(beaconCoordinatesEgocentric[i].x, 2) + Math.pow(beaconCoordinatesEgocentric[i].y, 2)));
 				}
-				System.out.println("Debug: beacons: " + beaconPair[0] + " | " + beaconPair[1]);
-				System.out.println("Debug: circleOnepos:" + beaconCoordinatesWorld[0]);
-				System.out.println("Debug: beaconDistance " + beaconDistance[0]);
-				System.out.println("Debug: circleTwopos:" + beaconCoordinatesWorld[1]);
-				System.out.println("Debug: beaconTwoDistance " + beaconDistance[1]);
+				Utils.showLog("Debug: beacons: " + beaconPair[0] + " | " + beaconPair[1]);
+				Utils.showLog("Debug: circleOnepos:" + beaconCoordinatesWorld[0]);
+				Utils.showLog("Debug: beaconDistance " + beaconDistance[0]);
+				Utils.showLog("Debug: circleTwopos:" + beaconCoordinatesWorld[1]);
+				Utils.showLog("Debug: beaconTwoDistance " + beaconDistance[1]);
 				Circle[] circles = {new Circle(beaconCoordinatesWorld[0], beaconDistance[0]), new Circle(beaconCoordinatesWorld[1], beaconDistance[1])};
 				CircleCircleIntersection cci = new CircleCircleIntersection(circles[0], circles[1]);
 				Vector2[] intersectionPoints = cci.getIntersectionPoints();
 				Vector2 p;
 				if(intersectionPoints.length < 1) {
-					System.out.println("FATAL ERROR: No intersection points.");
+					Utils.showLog("FATAL ERROR: No intersection points.");
 					return;
 				}
 				else if (intersectionPoints.length < 2) {
-					System.out.println("Only one intersection point!");
+					Utils.showLog("Only one intersection point!");
 					p = intersectionPoints[0];
 				}
 				else {
-					System.out.println("Two intersection points");
+					Utils.showLog("Two intersection points");
 					//Determine which intersection point to use
 					int near;
 					int far;
@@ -112,7 +112,7 @@ public class Odometry implements ThreadListener, Runnable {
 
 	@Override
 	public void onEvent() {
-		System.out.println("start odometry");
+		Utils.showLog("start odometry");
 		if(t == null || !t.isAlive()) {
 			t = new Thread(this);
 			t.start();

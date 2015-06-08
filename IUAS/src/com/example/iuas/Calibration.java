@@ -11,7 +11,7 @@ public class Calibration implements Runnable {
 			Calibration.command = command;
 			Calibration.values = values;
 			calibrationThread = new Thread(new Calibration());
-			System.out.println("Thread started");
+			Utils.showLog("Thread started");
 			calibrationThread.start();
 		}
 	}

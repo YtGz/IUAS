@@ -182,10 +182,10 @@ public class BallAndBeaconDetection extends Listenable {
         	informListeners(CatchBall.class);
         	
     	}
-    	System.out.println("Contours count: " + contoursCount);
-    	System.out.println("Ball count: " + ballCount);
-    	System.out.println("Beacon count: " + beaconCount);
-    	System.out.println("inform odometry");
+    	Utils.showLog("Contours count: " + contoursCount);
+    	Utils.showLog("Ball count: " + ballCount);
+    	Utils.showLog("Beacon count: " + beaconCount);
+    	Utils.showLog("inform odometry");
     	informListeners(Odometry.class);
     }
     

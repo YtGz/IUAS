@@ -1,5 +1,5 @@
 /**
- * This class provides some utils.
+0 * This class provides some utils.
  *
  * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
  * @date 2015
@@ -18,6 +18,9 @@ import com.example.iuas.circle.Vector2;
 
 public class Utils {
 	public static Mat homography;
+	public final static boolean DEBUG = true; // enables debug messages
+	public final static int DEBUG_DEVICE = 1; // 1: sysout, 2: textLog.append
+	public final static int USE_DEVICE = 2; // 1: USB, 2: Bluetooth
 	
 	/**
 	 * converts the Image Coordinates to Ground Coordinates
@@ -89,4 +92,18 @@ public class Utils {
     public static Point calculateEps (double xMin1, double xMax1, double xMin2, double xMax2, double yMin1, double yMax1, double yMin2, double yMax2){
     	return new Point((((xMax1 - xMin1) + (xMax2 - xMin2))/2)*2, (((yMax1 - yMin1)+ (yMax2 - yMin2))/2)*.5);
     }
+    
+	/**
+	 * Write debug log on console or mobile phone.
+	 */
+	public static void showLog(Object text) {
+		if (DEBUG) {
+			if (DEBUG_DEVICE == 1) {
+				System.out.println(text);
+			}
+			else if (DEBUG_DEVICE == 2) {
+				//textLog.append(text + "\n");
+			}
+		}
+	}
 }

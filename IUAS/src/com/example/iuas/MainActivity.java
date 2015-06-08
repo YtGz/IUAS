@@ -112,20 +112,6 @@ public class MainActivity extends Activity {
 	public void onBallCatchingActivityCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
-	/**
-	 * Write debug log on console or mobile phone.
-	 */
-	public static void showLog(Object text) {
-		if (DEBUG) {
-			if (DEBUG_DEVICE == 1) {
-				System.out.println(text);
-			}
-			else if (DEBUG_DEVICE == 2) {
-				textLog.append(text + "\n");
-			}
-		}
-	}
 
 	/***************************************************************************************************************************************************
 	 * UI methods *
@@ -152,7 +138,7 @@ public class MainActivity extends Activity {
 	public void robotStopOnClick(View view) {
 		if (RobotControl.getRobotControlThread() != null) {
 			RobotControl.getRobotControlThread().interrupt();
-			System.out.println("Thread killed. Robot stopped");
+			Utils.showLog("Thread killed. Robot stopped");
 		}
 	}
 	

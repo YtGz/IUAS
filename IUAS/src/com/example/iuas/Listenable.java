@@ -39,7 +39,7 @@ public abstract class Listenable {
 	protected void informListeners(Class c) {
 		if (listeners != null) {
 			for(ThreadListener listener : listeners) {
-				System.out.println("Listener class: " + listener.getClass());
+				Utils.showLog("Listener class: " + listener.getClass());
 				if(listener.getClass().equals(c))
 					listener.onEvent();
 			}

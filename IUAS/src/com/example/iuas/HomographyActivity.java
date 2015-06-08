@@ -95,20 +95,6 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         
     }
-    
-	/**
-	 * Write debug log on console or mobile phone.
-	 */
-	public void showLog(Object text) {
-		if (DEBUG) {
-			if (DEBUG_DEVICE == 1) {
-				System.out.println(text);
-			}
-			/*else if (DEBUG_DEVICE == 2) {
-				textLog.append(text + "\n");
-			}*/
-		}
-	}
 
     /**
      * On pause camera is disabled.
@@ -142,7 +128,7 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
      * Set camera view components on start.
      */
     public void onCameraViewStarted(int width, int height) {
-    	showLog("Cam View: " + mOpenCvCameraView);
+    	Utils.showLog("Cam View: " + mOpenCvCameraView);
         mRgba = new Mat(height, width, CvType.CV_8UC4);
         mDetector = new ColorBlobDetector();
         CONTOUR_COLOR = new Scalar(0,0,255,255);
@@ -204,7 +190,7 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
     	 
     	  // Calculate homography:
     	  if (mPatternWasFound) {
-    		System.out.println("Homography is ready!");
+    		  Utils.showLog("Homography is ready!");
     		lockMrgba = true;
     	    Calib3d.drawChessboardCorners(mRgba, mPatternSize, mCorners, mPatternWasFound); //for visualization
     	    return Calib3d.findHomography(mCorners, RealWorldC);
