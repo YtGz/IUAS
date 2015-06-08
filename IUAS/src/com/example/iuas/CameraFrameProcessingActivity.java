@@ -24,7 +24,9 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import android.content.Intent;
+import android.hardware.Camera;
 import android.os.Bundle;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -37,8 +39,9 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
     private Scalar               			CONTOUR_COLOR;
     private Scalar				 			POINT_COLOR;
     private Point				 			lowestTargetPoint;
+    private final int						resolutionHeight = 320; //camera height resolution
 
-    private CameraBridgeViewBase 			mOpenCvCameraView;
+    private Tutorial3View		 			mOpenCvCameraView;
     public	static CatchBall			 	dfsm;
     public  static BallAndBeaconDetection 	ballDetection;
     public  static Odometry			 		localization;
@@ -82,8 +85,9 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
         mBlobColorHsv = new Scalar(c);
         System.out.println("mBlobColorHsv: " + mBlobColorHsv);
 
-        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.ball_catching_activity_view);
+        mOpenCvCameraView = (Tutorial3View) findViewById(R.id.ball_catching_activity_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
+        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
     }
     
     /**
@@ -124,6 +128,11 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
         mDetector.setHsvColor(mBlobColorHsv);
         CONTOUR_COLOR = new Scalar(0,0,255,255);
         POINT_COLOR = new Scalar(255,0,0,255);
+        for(Camera.Size s : mOpenCvCameraView.getResolutionList()) {
+        	if(s.height == resolutionHeight) {
+        		mOpenCvCameraView.setResolution(s);
+        	}
+        }
         //Self-localization using beacons
         localization = new Odometry();
         //camera processing

@@ -76,7 +76,7 @@ public class RobotControl implements Runnable {
 	private static double x = 0; // x pos. of robot
 	private static double y = 0; // y pos. of robot
 	private static double theta = 0; // theta of robot
-	private final static double speed = 20; // speed of robot's wheels
+	private final static double speed = 2; // speed of robot's wheels
 	
 	/**
 	 * Robot drives a given distance in cm.

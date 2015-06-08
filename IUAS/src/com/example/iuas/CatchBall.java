@@ -33,8 +33,8 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * moving to the balls location and caging it with the bar
 	 */
 	public void catchBall(){
-		moveToEgocentricPoint(CameraFrameProcessingActivity.localization.getOdometryData().first);
-		RobotControl.control("setBar", 0);	
+		//moveToEgocentricPoint(CameraFrameProcessingActivity.localization.getOdometryData().first);
+		//RobotControl.control("setBar", 0);	
 	}
 	
 	
@@ -91,7 +91,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		RobotControl.control("turn", 360);
 		if(isBall())
 			return;
-		exploreWorkspace();
+		//exploreWorkspace();
 	}
 
 	@Override
@@ -104,7 +104,8 @@ public class CatchBall implements ThreadListener, Runnable {
 				break;
 			case CATCH_BALL:
 				catchBall();
-				setState(STATE.BRING_BALL_TO_GOAL);
+				setState(STATE.SEARCH_WORKSPACE);
+				//setState(STATE.BRING_BALL_TO_GOAL);
 				break;
 			case BRING_BALL_TO_GOAL:
 				bringBallToGoal();

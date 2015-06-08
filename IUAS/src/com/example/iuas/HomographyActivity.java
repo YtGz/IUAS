@@ -25,8 +25,10 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import android.app.Activity;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -45,8 +47,9 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
     private boolean				 lockMrgba = false;
     private int					 contoursCountThreshold = 0;//25;
     private BallAndBeaconDetection ballDetection;
+    private final int			 resolutionHeight = 320; // camera height resolution
 
-    private CameraBridgeViewBase mOpenCvCameraView;
+    private Tutorial3View mOpenCvCameraView;
 
     /**
      * Internal private class for starting OpenCV.
@@ -87,8 +90,9 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
 
         setContentView(R.layout.color_blob_detection_surface_view);
 
-        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.color_blob_detection_activity_surface_view);
+        mOpenCvCameraView = (Tutorial3View) findViewById(R.id.color_blob_detection_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
+        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         
     }
     
@@ -143,6 +147,11 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
         mDetector = new ColorBlobDetector();
         CONTOUR_COLOR = new Scalar(0,0,255,255);
         POINT_COLOR = new Scalar(255,0,0,255);
+        for(Camera.Size s : mOpenCvCameraView.getResolutionList()) {
+        	if(s.height == resolutionHeight) {
+        		mOpenCvCameraView.setResolution(s);
+        	}
+        }
     }
     
     /**
