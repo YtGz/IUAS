@@ -76,7 +76,8 @@ public class RobotControl implements Runnable {
 	private static double x = 0; // x pos. of robot
 	private static double y = 0; // y pos. of robot
 	private static double theta = 0; // theta of robot
-	private final static double speed = 2; // speed of robot's wheels
+	private final static double driveSpeed = 20; // speed of robot's wheels on driving
+	private final static double turnSpeed = 5; // speed of robot's wheels on turning
 	
 	/**
 	 * Robot drives a given distance in cm.
@@ -91,20 +92,20 @@ public class RobotControl implements Runnable {
 			if(distance == 10 || distance == 13) {
 				++distance;
 			}
-			if (distance > 0) robotSetVelocity((byte) speed, (byte) speed);
-			else if (distance < 0) robotSetVelocity((byte) (-1 * speed), (byte) (-1 *speed));
+			if (distance > 0) robotSetVelocity((byte) driveSpeed, (byte) driveSpeed);
+			else if (distance < 0) robotSetVelocity((byte) (-1 * driveSpeed), (byte) (-1 * driveSpeed));
 			double startTime = System.currentTimeMillis();
 	
 			try {
-				Thread.sleep((long) (Math.abs(distance) * velocityOffset * (20.0/Math.abs(speed))));
+				Thread.sleep((long) (Math.abs(distance) * velocityOffset * (20.0/Math.abs(driveSpeed))));
 			}
 			catch (InterruptedException e) {
 				interruption = true;
 			}
 			finally {
 				if (interruption) {
-					x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (speed/20.0);
-					y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (speed/20.0);
+					x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (driveSpeed/20.0);
+					y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (driveSpeed/20.0);
 				}
 				else {
 					x += Math.cos(Math.toRadians(theta)) * distance;
@@ -136,20 +137,20 @@ public class RobotControl implements Runnable {
 			if(degree == 10 || degree == 13) {
 				++degree;
 			}
-			if (degree > 0) robotSetVelocity((byte) (-1 * speed), (byte) speed);
-			else if (degree < 0) robotSetVelocity((byte) speed, (byte) (-1 *speed));
+			if (degree > 0) robotSetVelocity((byte) (-1 * turnSpeed), (byte) turnSpeed);
+			else if (degree < 0) robotSetVelocity((byte) turnSpeed, (byte) (-1 * turnSpeed));
 			
 			double startTime = System.currentTimeMillis();
 			
 			try {
-				Thread.sleep((long) (3.14159 * velocityTurnCalibration * (Math.abs(degree)/180.0) * velocityOffset * (20.0/Math.abs(speed))));
+				Thread.sleep((long) (3.14159 * velocityTurnCalibration * (Math.abs(degree)/180.0) * velocityOffset * (20.0/Math.abs(turnSpeed))));
 			}
 			catch (InterruptedException e) {
 				interruption = true;
 			}
 			finally {
 				if (interruption) {
-					double temp = (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (speed/20.0);
+					double temp = (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (turnSpeed/20.0);
 					theta += temp;
 					System.out.println("Could only turn " + temp + "degrees");
 				}
