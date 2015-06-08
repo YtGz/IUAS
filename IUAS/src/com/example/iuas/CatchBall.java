@@ -104,7 +104,7 @@ public class CatchBall implements ThreadListener, Runnable {
 				break;
 			case CATCH_BALL:
 				catchBall();
-				setState(STATE.SEARCH_WORKSPACE);
+				//setState(STATE.SEARCH_WORKSPACE);
 				//setState(STATE.BRING_BALL_TO_GOAL);
 				break;
 			case BRING_BALL_TO_GOAL:
