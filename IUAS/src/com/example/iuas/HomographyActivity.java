@@ -49,7 +49,7 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
     private BallAndBeaconDetection ballDetection;
     private final int			 resolutionHeight = 320; // camera height resolution
 
-    private Tutorial3View mOpenCvCameraView;
+    private CameraResolutionView mOpenCvCameraView;
 
     /**
      * Internal private class for starting OpenCV.
@@ -90,7 +90,7 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
 
         setContentView(R.layout.color_blob_detection_surface_view);
 
-        mOpenCvCameraView = (Tutorial3View) findViewById(R.id.color_blob_detection_activity_surface_view);
+        mOpenCvCameraView = (CameraResolutionView) findViewById(R.id.color_blob_detection_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         

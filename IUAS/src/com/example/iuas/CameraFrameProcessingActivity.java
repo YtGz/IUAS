@@ -41,7 +41,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
     private Point				 			lowestTargetPoint;
     private final int						resolutionHeight = 320; //camera height resolution
 
-    private Tutorial3View		 			mOpenCvCameraView;
+    private CameraResolutionView		 			mOpenCvCameraView;
     public	static CatchBall			 	dfsm;
     public  static BallAndBeaconDetection 	ballDetection;
     public  static Odometry			 		localization;
@@ -85,7 +85,7 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
         mBlobColorHsv = new Scalar(c);
         Utils.showLog("mBlobColorHsv: " + mBlobColorHsv);
 
-        mOpenCvCameraView = (Tutorial3View) findViewById(R.id.ball_catching_activity_view);
+        mOpenCvCameraView = (CameraResolutionView) findViewById(R.id.ball_catching_activity_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
     }

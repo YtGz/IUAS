@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <com.example.iuas.Tutorial3View
+    <com.example.iuas.CameraResolutionView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/color_blob_detection_activity_surface_view" />

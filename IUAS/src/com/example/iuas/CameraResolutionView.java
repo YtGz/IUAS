@@ -9,12 +9,12 @@ import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.AttributeSet;
 
-public class Tutorial3View extends JavaCameraView {
+public class CameraResolutionView extends JavaCameraView {
 
     private static final String TAG = "Sample::Tutorial3View";
     private String mPictureFileName;
 
-    public Tutorial3View(Context context, AttributeSet attrs) {
+    public CameraResolutionView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
