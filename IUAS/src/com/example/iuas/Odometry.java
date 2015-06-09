@@ -1,5 +1,5 @@
 /**
- * This class the self localization of the robot with the beacons.
+ * This class handles the self localization of the robot with the beacons.
  * It implements a Thread Listener and Runnable.
  *
  * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)

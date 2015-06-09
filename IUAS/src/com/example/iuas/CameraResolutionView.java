@@ -1,3 +1,11 @@
+/**
+ * This class allows to to actions on the mobile phone camera.
+ * We use it to decrease the camera resolution.
+ *
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
 package com.example.iuas;
 
 import java.util.List;
@@ -11,7 +19,7 @@ import android.util.AttributeSet;
 
 public class CameraResolutionView extends JavaCameraView {
 
-    private static final String TAG = "Sample::Tutorial3View";
+    private static final String TAG = "Sample::CameraResolutionView";
     private String mPictureFileName;
 
     public CameraResolutionView(Context context, AttributeSet attrs) {

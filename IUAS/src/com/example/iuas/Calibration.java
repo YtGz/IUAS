@@ -1,3 +1,10 @@
+/**
+ * This class provides calibration methods to calibrate the robot.
+ *
+ * @author Martin Agreiter, Sabrina Schmitzer, Philipp Wirtenberger (alphabetical order)
+ * @date 2015
+ */
+
 package com.example.iuas;
 
 public class Calibration implements Runnable {
