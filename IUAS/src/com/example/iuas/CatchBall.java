@@ -34,7 +34,8 @@ public class CatchBall implements ThreadListener, Runnable {
 	 */
 	public void catchBall(){
 		//moveToEgocentricPoint(CameraFrameProcessingActivity.localization.getOdometryData().first);
-		//RobotControl.control("setBar", 0);	
+		//RobotControl.control("setBar", 0);
+		Utils.showLog("Detected ball!");
 	}
 	
 	
