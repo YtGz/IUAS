@@ -93,7 +93,7 @@ public class Odometry implements ThreadListener, Runnable {
 				double r = Math.toDegrees(Math.acos(robotToLeftBeacon.dot(Vector2.X)/(robotToLeftBeacon.mod()* Vector2.X.mod())));
 				double phi =  Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x))-90;
 				r = r - phi;
-				//setOdometryData(new Pair<Vector2, Double>(p, r));
+				setOdometryData(new Pair<Vector2, Double>(p, r));
 				System.out.println("Current odometry:   x: " + p.x + "  y: " + p.y + "  theta: " + r);
 			}
 		}

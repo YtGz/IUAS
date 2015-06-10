@@ -33,9 +33,11 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * moving to the balls location and caging it with the bar
 	 */
 	public void catchBall(){
-		//moveToEgocentricPoint(CameraFrameProcessingActivity.localization.getOdometryData().first);
-		//RobotControl.control("setBar", 0);
-		Utils.showLog("Detected ball!");
+		System.out.println("Ball coordinates:" + CameraFrameProcessingActivity.ballDetection.getBallCoordinates());
+		moveToEgocentricPoint(new Vector2(CameraFrameProcessingActivity.ballDetection.getBallCoordinates().x, CameraFrameProcessingActivity.ballDetection.getBallCoordinates().y ), true);
+		RobotControl.control("setBar", 0);
+		//Utils.showLog("Detected ball!");
+		state = STATE.SEARCH_WORKSPACE;
 	}
 	
 	
@@ -44,7 +46,7 @@ public class CatchBall implements ThreadListener, Runnable {
 	 */
 	public void bringBallToGoal(){
 		if(Math.abs(GOAL_POSITION.x) < 125 && Math.abs(GOAL_POSITION.y) < 125){
-			moveToEgocentricPoint(GOAL_POSITION.sub(CameraFrameProcessingActivity.localization.getOdometryData().first));
+			moveToEgocentricPoint(GOAL_POSITION.sub(CameraFrameProcessingActivity.localization.getOdometryData().first), true);
 		}
 		else{
 			
@@ -66,7 +68,7 @@ public class CatchBall implements ThreadListener, Runnable {
 				goalPosition = new Vector2(GOAL_POSITION.x, GOAL_POSITION.y - 20);
 				rotation = 270;
 			}
-			moveToEgocentricPoint(goalPosition.sub(CameraFrameProcessingActivity.localization.getOdometryData().first));
+			moveToEgocentricPoint(goalPosition.sub(CameraFrameProcessingActivity.localization.getOdometryData().first), true);
 			RobotControl.control("turn", rotation - (int) Math.floor(CameraFrameProcessingActivity.localization.getOdometryData().second));
 		}
 		RobotControl.control("setBar", 255);
@@ -76,10 +78,10 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * returning from the goal position back into the workspace and moving to the origin
 	 */
 	public void returnToWorkspaceOrigin() {
-//		RobotControl.control("turn", 180);
+		RobotControl.control("turn", 180);
 //		RobotControl.control("drive", 20);
 		setBall(false);
-		moveToEgocentricPoint(Vector2.NULL);	
+		moveToEgocentricPoint(Vector2.NULL, false);	
 	}
 	
 	/**
@@ -188,14 +190,14 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * @param x
 	 * @param y
 	 */
-	public void moveToEgocentricPoint(Vector2 p) {
+	public void moveToEgocentricPoint(Vector2 p, boolean ignoreBall) {
 		int r = (int) Math.sqrt(p.x * p.x + p.y * p.y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(p.y, p.x));
 		phi *= -1;
-		if(isBall())
+		if(isBall() && !ignoreBall)
 			return;
 		RobotControl.control("turn", phi);
-		if(isBall())
+		if(isBall() && !ignoreBall)
 			return;
 		RobotControl.control("drive", r);
 	}
