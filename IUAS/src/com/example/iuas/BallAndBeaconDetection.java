@@ -43,7 +43,7 @@ public class BallAndBeaconDetection extends Listenable {
      							 	put(COLOR.GREEN, new Scalar (77, 127, 33)); put(COLOR.BLUE, new Scalar(1, 69, 84)); put(COLOR.ORANGE, new Scalar(255,97,7));
      							 	put(COLOR.WHITE, new Scalar (255, 255, 255));}}; 
      							 	
-    public enum			 	BEACON {YELLOW_RED, RED_YELLOW, BLUE_GREEN, RED_BLUE, BLUE_RED, BLUE_YELLOW, YELLOW_BLUE, RED_GREEN};
+    public enum			 	BEACON {RED_GREEN, YELLOW_RED, RED_BLUE, YELLOW_BLUE, BLUE_GREEN, BLUE_YELLOW, BLUE_RED, RED_YELLOW};
     
     public final HashMap<BEACON, Pair<COLOR, COLOR>> BEACON_COLORS = new HashMap<BEACON, Pair<COLOR, COLOR>>() {{put(BEACON.YELLOW_RED, new Pair(COLOR.YELLOW, COLOR.RED));
     							 	put(BEACON.RED_YELLOW, new Pair(COLOR.RED, COLOR.YELLOW)); put(BEACON.BLUE_RED, new Pair(COLOR.BLUE, COLOR.RED));

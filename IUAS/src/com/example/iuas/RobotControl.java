@@ -73,9 +73,6 @@ public class RobotControl implements Runnable {
 	public static BluetoothConnection btc;
 	public static double velocityOffset = 53.8; // calibration factor for drive
 	public static double velocityTurnCalibration = 9.51; // calibration factor for turn
-	private static double x = 0; // x pos. of robot
-	private static double y = 0; // y pos. of robot
-	private static double theta = 0; // theta of robot
 	private final static double driveSpeed = 20; // speed of robot's wheels on driving
 	private final static double turnSpeed = 20; // speed of robot's wheels on turning
 	
@@ -104,21 +101,25 @@ public class RobotControl implements Runnable {
 			}
 			finally {
 				if (interruption) {
-					x += Math.cos(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (driveSpeed/20.0);
-					y += Math.sin(Math.toRadians(theta)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (driveSpeed/20.0);
+					double x = CameraFrameProcessingActivity.localization.getOdometryData().first.x + Math.cos(Math.toRadians(CameraFrameProcessingActivity.localization.getOdometryData().second)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (driveSpeed/20.0);
+					double y = CameraFrameProcessingActivity.localization.getOdometryData().first.y + Math.sin(Math.toRadians(CameraFrameProcessingActivity.localization.getOdometryData().second)) * (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (driveSpeed/20.0);
+					double theta = CameraFrameProcessingActivity.localization.getOdometryData().second;
+					CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
 				}
 				else {
-					x += Math.cos(Math.toRadians(theta)) * distance;
-					y += Math.sin(Math.toRadians(theta)) * distance;
+					double x = Math.cos(Math.toRadians(CameraFrameProcessingActivity.localization.getOdometryData().second)) * distance;
+					double y = Math.sin(Math.toRadians(CameraFrameProcessingActivity.localization.getOdometryData().second)) * distance;
+					double theta = CameraFrameProcessingActivity.localization.getOdometryData().second;
+					CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
 				}
-				//CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
+				//CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(CameraFrameProcessingActivity.localization.getOdometryData().first.x, CameraFrameProcessingActivity.localization.getOdometryData().first.y), CameraFrameProcessingActivity.localization.getOdometryData().second));
 				robotStop();
 				try {
 					Thread.sleep(50);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
+				System.out.println("Current position: x: " + CameraFrameProcessingActivity.localization.getOdometryData().first.x + ", y: " + CameraFrameProcessingActivity.localization.getOdometryData().first.y + ", theta: " + CameraFrameProcessingActivity.localization.getOdometryData().second);
 			}
 		}
 	}
@@ -150,14 +151,20 @@ public class RobotControl implements Runnable {
 			}
 			finally {
 				if (interruption) {
-					double temp = (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (turnSpeed/20.0);
-					theta += temp;
-					System.out.println("Could only turn " + temp + "degrees");
+					double x = CameraFrameProcessingActivity.localization.getOdometryData().first.x;
+					double y = CameraFrameProcessingActivity.localization.getOdometryData().first.y;
+					double theta = (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (turnSpeed/20.0);
+					theta %= 360;
+					CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
+					System.out.println("Could only turn " + theta + "degrees");
 				}
 				else {
-					theta += degree;
+					double x = CameraFrameProcessingActivity.localization.getOdometryData().first.x;
+					double y = CameraFrameProcessingActivity.localization.getOdometryData().first.y;
+					double theta = degree;
+					theta %= 360;
+					CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
 				}
-				theta = theta % 360;
 				robotStop();
 				//robotSetVelocity((byte) 0, (byte) 0);
 				try {
@@ -165,7 +172,7 @@ public class RobotControl implements Runnable {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				System.out.println("Current position: x: " + x + ", y: " + y + ", theta: " + theta);
+				System.out.println("Current position: x: " + CameraFrameProcessingActivity.localization.getOdometryData().first.x + ", y: " + CameraFrameProcessingActivity.localization.getOdometryData().first.y + ", theta: " + CameraFrameProcessingActivity.localization.getOdometryData().second);
 			}
 		}
 	}

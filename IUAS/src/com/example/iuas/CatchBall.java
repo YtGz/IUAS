@@ -194,6 +194,7 @@ public class CatchBall implements ThreadListener, Runnable {
 		int r = (int) Math.sqrt(p.x * p.x + p.y * p.y);
 		int phi = (int) Math.toDegrees(Math.toRadians(90) - Math.atan2(p.y, p.x));
 		phi *= -1;
+		Utils.showLog("To egocentric point: r " + r + "phi " + phi);
 		if(isBall() && !ignoreBall)
 			return;
 		RobotControl.control("turn", phi);
