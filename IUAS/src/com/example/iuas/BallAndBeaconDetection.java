@@ -107,7 +107,7 @@ public class BallAndBeaconDetection extends Listenable {
     	identifyObjects(contoursAccepted);
         ArrayList<MatOfPoint> lowestTargetPoint = new ArrayList<MatOfPoint>();
         if(getBallCoordinates() != null){
-        	lowestTargetPoint.add(new MatOfPoint(getBallCoordinates()));
+        	lowestTargetPoint.add(new MatOfPoint(new Point(getBallCoordinates().x*10, getBallCoordinates().y*10)));
         }
         ArrayList<MatOfPoint> contoursOnly = new ArrayList<MatOfPoint>();
         for(Pair<MatOfPoint, COLOR> p : contoursAccepted) {
@@ -178,7 +178,8 @@ public class BallAndBeaconDetection extends Listenable {
     		}
     	}
     	if(temp != null) {
-        	setBallCoordinates(Utils.convertImageToGround(new Vector2(temp.x, temp.y)));
+    		Point p = Utils.convertImageToGround(new Vector2(temp.x, temp.y));
+        	setBallCoordinates(new Point(p.x/10, p.y/10));
         	informListeners(CatchBall.class);
         	
     	}

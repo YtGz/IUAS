@@ -73,6 +73,8 @@ public class Odometry implements ThreadListener, Runnable {
 					//Determine which intersection point to use
 					int near;
 					int far;
+					Utils.showLog("Betrag Vektor intersection point 1: " + intersectionPoints[0].mod());
+					Utils.showLog("Betrag Vektor intersection point 2: " + intersectionPoints[1].mod());
 					if(intersectionPoints[0].mod() < intersectionPoints[1].mod()) {
 						near = 0;
 						far = 1;
@@ -81,7 +83,8 @@ public class Odometry implements ThreadListener, Runnable {
 						near = 1;
 						far = 0;
 					}
-					if(beaconCoordinatesEgocentric[0].x > beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
+					if(beaconCoordinatesEgocentric[0].x < beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
+						Utils.showLog("WARNING: robot outside of field");
 						p = intersectionPoints[far];
 					}
 					else {
