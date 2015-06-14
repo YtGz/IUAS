@@ -79,7 +79,7 @@ public class Odometry implements ThreadListener, Runnable {
 					int far;
 					Utils.showLog("Betrag Vektor intersection point 1: " + intersectionPoints[0].mod());
 					Utils.showLog("Betrag Vektor intersection point 2: " + intersectionPoints[1].mod());
-					if(intersectionPoints[0].mod() < intersectionPoints[1].mod()) {
+					if(intersectionPoints[0].mod() > intersectionPoints[1].mod()) {
 						near = 0;
 						far = 1;
 					}
@@ -87,7 +87,7 @@ public class Odometry implements ThreadListener, Runnable {
 						near = 1;
 						far = 0;
 					}
-					if(beaconCoordinatesEgocentric[0].x > beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
+					if(beaconCoordinatesEgocentric[0].x < beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
 						Utils.showLog("WARNING: robot outside of field");
 						p = intersectionPoints[far];
 					}
@@ -100,20 +100,11 @@ public class Odometry implements ThreadListener, Runnable {
 				//calculate angle
 				//winkel beacon zu welt-x achse + (90 - Winkel beacon zu robot-x achse) bzw. winkel beacon zu welt-x achse + Winkel beacon zu robot-y achse
 				double beaconWorldAngle = 45 * beaconPair[0].ordinal();
-				//double beaconWorldAngle = Math.toDegrees(Math.acos(Vector2.X.dot(beaconCoordinatesWorld[0])/(Vector2.X.mod() * beaconCoordinatesWorld[0].mod())));
-				double beaconEgocentricAngle = Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x))-90;
+				double beaconEgocentricAngle = 90 - Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x));
 				double theta = beaconWorldAngle + beaconEgocentricAngle;
 				System.out.println("beaconWorldAngle: " + beaconWorldAngle);
 				System.out.println("beaconEgocentricAngle: " + beaconEgocentricAngle);
-				
-				/*Vector2 robotToLeftBeacon = beaconCoordinatesWorld[0].sub(p);
-				double r = Math.toDegrees(Math.acos(robotToLeftBeacon.dot(Vector2.X)/(robotToLeftBeacon.mod()* Vector2.X.mod())));
-				double phi =  Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x))-90;
-				Utils.showLog("r before: "+r);
-				Utils.showLog("phi before: "+phi);
-				r = r - (phi - r); // phi = winkel von lokaler x-achse zum beacon; r = winkel vom roboter zum beacon ==> phi-r = differenz
-				Utils.showLog("new r: "+r);*/
-				setOdometryData(new Pair<Vector2, Double>(p, theta));
+				//setOdometryData(new Pair<Vector2, Double>(p, theta));
 				System.out.println("Current odometry:   x: " + p.x + "  y: " + p.y + "  theta: " + theta);
 				Utils.showLog("Beacon 1 coordinates: " + beaconCoordinatesEgocentric[0]);
 				Utils.showLog("Beacon 2 coordinates: " + beaconCoordinatesEgocentric[1]);

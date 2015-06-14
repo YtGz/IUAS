@@ -112,7 +112,6 @@ public class RobotControl implements Runnable {
 					double theta = CameraFrameProcessingActivity.localization.getOdometryData().second;
 					CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
 				}
-				//CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(CameraFrameProcessingActivity.localization.getOdometryData().first.x, CameraFrameProcessingActivity.localization.getOdometryData().first.y), CameraFrameProcessingActivity.localization.getOdometryData().second));
 				robotStop();
 				try {
 					Thread.sleep(50);
@@ -153,7 +152,7 @@ public class RobotControl implements Runnable {
 				if (interruption) {
 					double x = CameraFrameProcessingActivity.localization.getOdometryData().first.x;
 					double y = CameraFrameProcessingActivity.localization.getOdometryData().first.y;
-					double theta = (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (turnSpeed/20.0);
+					double theta = CameraFrameProcessingActivity.localization.getOdometryData().second + (System.currentTimeMillis() - startTime) * (1.0/velocityOffset) * (180.0/(3.14159 * velocityTurnCalibration)) * (turnSpeed/20.0);
 					theta %= 360;
 					CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
 					System.out.println("Could only turn " + theta + "degrees");
@@ -161,12 +160,11 @@ public class RobotControl implements Runnable {
 				else {
 					double x = CameraFrameProcessingActivity.localization.getOdometryData().first.x;
 					double y = CameraFrameProcessingActivity.localization.getOdometryData().first.y;
-					double theta = degree;
+					double theta = CameraFrameProcessingActivity.localization.getOdometryData().second + degree;
 					theta %= 360;
 					CameraFrameProcessingActivity.localization.setOdometryData(new Pair<Vector2, Double>(new Vector2(x, y), theta));
 				}
 				robotStop();
-				//robotSetVelocity((byte) 0, (byte) 0);
 				try {
 					Thread.sleep(50);
 				} catch (InterruptedException e) {
@@ -193,6 +191,10 @@ public class RobotControl implements Runnable {
 	 */
 	public void robotSetBar(int value) {
 		comWrite(new byte[] { 'o', (byte) value, '\r', '\n' });
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+		}
 	}
 	
 
