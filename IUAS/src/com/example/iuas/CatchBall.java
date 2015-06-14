@@ -33,6 +33,12 @@ public class CatchBall implements ThreadListener, Runnable {
 	 * moving to the balls location and caging it with the bar
 	 */
 	public void catchBall(){
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("Ball coordinates:" + CameraFrameProcessingActivity.ballDetection.getBallCoordinates());
 		moveToEgocentricPoint(new Vector2(CameraFrameProcessingActivity.ballDetection.getBallCoordinates().x, CameraFrameProcessingActivity.ballDetection.getBallCoordinates().y ), true);
 		RobotControl.control("setBar", 0);

@@ -62,11 +62,15 @@ public class Odometry implements ThreadListener, Runnable {
 				Vector2 p;
 				if(intersectionPoints.length < 1) {
 					Utils.showLog("FATAL ERROR: No intersection points.");
+					Utils.showLog("Beacon 1 coordinates: " + beaconCoordinatesEgocentric[0]);
+					Utils.showLog("Beacon 2 coordinates: " + beaconCoordinatesEgocentric[1]);
 					return;
 				}
 				else if (intersectionPoints.length < 2) {
 					Utils.showLog("Only one intersection point!");
 					p = intersectionPoints[0];
+					Utils.showLog("Beacon 1 coordinates: " + beaconCoordinatesEgocentric[0]);
+					Utils.showLog("Beacon 2 coordinates: " + beaconCoordinatesEgocentric[1]);
 				}
 				else {
 					Utils.showLog("Two intersection points");
@@ -111,6 +115,8 @@ public class Odometry implements ThreadListener, Runnable {
 				Utils.showLog("new r: "+r);*/
 				setOdometryData(new Pair<Vector2, Double>(p, theta));
 				System.out.println("Current odometry:   x: " + p.x + "  y: " + p.y + "  theta: " + theta);
+				Utils.showLog("Beacon 1 coordinates: " + beaconCoordinatesEgocentric[0]);
+				Utils.showLog("Beacon 2 coordinates: " + beaconCoordinatesEgocentric[1]);
 			}
 		}
 		else {

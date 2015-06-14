@@ -87,7 +87,6 @@ public class BallAndBeaconDetection extends Listenable {
     	ballCount = 0;
     	contoursCount = 0;
     	beaconCount = 0;
-    	Point a = new Point();
     	ArrayList<Pair<MatOfPoint, COLOR>>  contoursAccepted = new ArrayList<Pair<MatOfPoint, COLOR>>();
     	for(COLOR c : COLOR.values()){
     		//mDetector.setColorRadius(new Scalar(25,120,120,0));
@@ -171,7 +170,7 @@ public class BallAndBeaconDetection extends Listenable {
     			if(it.get(i).second == BALL_COLOR) {
     				ballCount++;
     				if(blobs.get(i).first[2] < yMin) {
-    					temp = new Point((blobs.get(i).first[0]+blobs.get(i).first[1])/2, blobs.get(i).first[2]);
+    		temp = new Point((blobs.get(i).first[0]+blobs.get(i).first[1])/2, blobs.get(i).first[2]);
     				}
     			}
     			
@@ -185,6 +184,7 @@ public class BallAndBeaconDetection extends Listenable {
     	}
     	Utils.showLog("Contours count: " + contoursCount);
     	Utils.showLog("Ball count: " + ballCount);
+    	Utils.showLog("Ball coordinates:" + ballCoordinates);
     	Utils.showLog("Beacon count: " + beaconCount);
     	Utils.showLog("inform odometry");
     	informListeners(Odometry.class);

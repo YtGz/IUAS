@@ -164,20 +164,20 @@ public class HomographyActivity extends Activity implements CvCameraViewListener
      * @return
      */
     public Mat getHomographyMatrix(Mat mRgba) {
-    	  final Size mPatternSize = new Size(6, 9); // number of inner corners in the used chessboard pattern 
-    	  float x = 195f; // coordinates of first detected inner corner on chessboard
-    	  float y = -130f;
+    	  final Size mPatternSize = new Size(9, 6); // number of inner corners in the used chessboard pattern 
     	  float delta = 25.0f; // size of a single square edge in chessboard
+    	  float y = 185f+5*delta; // coordinates of first detected inner corner on chessboard
+    	  float x;
     	  LinkedList<Point> PointList = new LinkedList<Point>();
     	 
     	  // Define real-world coordinates for given chessboard pattern:
     	  for (int i = 0; i < mPatternSize.height; i++) {		//swap the loops when switching between landscape and portrait mode
-    	    x = 195f;
+    		  x = -131.2f;
     	    for (int j = 0; j < mPatternSize.width; j++) {
-    	      PointList.addLast(new Point(x,y));
+    	      PointList.addLast(new Point(x, y));
     	      x += delta;
     	    }
-    	    y += delta;
+    	    y -= delta;
     	  }
     	  MatOfPoint2f RealWorldC = new MatOfPoint2f();
     	  RealWorldC.fromList(PointList);
