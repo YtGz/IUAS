@@ -87,7 +87,7 @@ public class Odometry implements ThreadListener, Runnable {
 						near = 1;
 						far = 0;
 					}
-					if(beaconCoordinatesEgocentric[0].x < beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
+					if(beaconCoordinatesEgocentric[0].x > beaconCoordinatesEgocentric[1].x) {	// Robot outside of test area
 						Utils.showLog("WARNING: robot outside of field");
 						p = intersectionPoints[far];
 					}
@@ -101,7 +101,7 @@ public class Odometry implements ThreadListener, Runnable {
 				//winkel beacon zu welt-x achse + (90 - Winkel beacon zu robot-x achse) bzw. winkel beacon zu welt-x achse + Winkel beacon zu robot-y achse
 				double beaconWorldAngle = 45 * beaconPair[0].ordinal();
 				//double beaconWorldAngle = Math.toDegrees(Math.acos(Vector2.X.dot(beaconCoordinatesWorld[0])/(Vector2.X.mod() * beaconCoordinatesWorld[0].mod())));
-				double beaconEgocentricAngle = Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x));
+				double beaconEgocentricAngle = Math.toDegrees(Math.atan2(beaconCoordinatesEgocentric[0].y, beaconCoordinatesEgocentric[0].x))-90;
 				double theta = beaconWorldAngle + beaconEgocentricAngle;
 				System.out.println("beaconWorldAngle: " + beaconWorldAngle);
 				System.out.println("beaconEgocentricAngle: " + beaconEgocentricAngle);
