@@ -10,7 +10,7 @@ public class SensorData{
 
 	 
 
-	public String retrieveSensorData() {
+	public static String retrieveSensorData() {
 		/*
 		* From the bachelor thesis:
 		*
@@ -18,7 +18,7 @@ public class SensorData{
 		* returning string contains measurements of all sensors formated as
 		* space separated hex values, each prepended with 0x."
 		*/
-		return "";//RobotControl.comWrite(new byte[] { 'q', '\r', '\n' });
+		return RobotControl.comReadWrite(new byte[] { 'q', '\r', '\n' });
 	}
 	
 	
@@ -28,7 +28,7 @@ public class SensorData{
 	* @param dataString
 	* @return
 	*/
-	public int[] parseDataString(String dataString) {
+	public static int[] parseDataString(String dataString) {
 		int[] values = new int[3];
 		String[] tokens = dataString.trim().split("\\s++");
 		for (int i = 0; i < tokens.length; i++) {
@@ -49,7 +49,7 @@ public class SensorData{
 	/**
 	* Displays values of the sensors.
 	*/
-	public void viewSensorOutput() {
+	public static void viewSensorOutput() {
 		/*int[] temp = parseDataString(retrieveSensorData());
 		showLog(String.valueOf(temp[0]) + " " + String.valueOf(temp[1]) + " " + String.valueOf(temp[2]));*/
 	}
@@ -61,7 +61,7 @@ public class SensorData{
 	* @param which sensors to use
 	* @return true if obstacle was detected, false else
 	*/
-	public boolean detectObstacle(boolean[] sensors) {
+	public static boolean detectObstacle(boolean[] sensors) {
 		return detectObstacle(sensors, new int[] { 10, 50 });
 	}
 	
@@ -74,7 +74,7 @@ public class SensorData{
 	* @param range
 	* @return true if obstacle is detected, false else
 	*/
-	public boolean detectObstacle(boolean[] sensors, int[] range) {
+	public static boolean detectObstacle(boolean[] sensors, int[] range) {
 		boolean encounteredAnObstacle = false;
 		String sensorData = retrieveSensorData(); // get current sensor data
 		while (!sensorData.contains("0x")) { // do nothing as long as sensor data does not start (because retrieved string contains other values too; start only if 0x is found which means, that sensor data starts now)

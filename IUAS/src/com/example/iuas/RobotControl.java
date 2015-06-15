@@ -175,6 +175,92 @@ public class RobotControl implements Runnable {
 		}
 	}
 	
+	/**
+	 * Returns true if there is an obstacle roughly ~8cm away from the robot.
+	 * 
+	 * @param which
+	 *            sensors to use
+	 * @return
+	 */
+	public boolean detectObstacle(boolean[] sensors) {
+		return detectObstacle(sensors, new int[] { 10, 50 });
+	}
+
+	public boolean detectObstacle(boolean[] sensors, int[] range) {
+		boolean encounteredAnObstacle = false;
+		String sensorData = SensorData.retrieveSensorData();
+		while (!sensorData.contains("0x")) {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			sensorData = SensorData.retrieveSensorData();
+		}
+		int[] dst = SensorData.parseDataString(sensorData);
+		for (int i = 0; i < 3; i++) {
+			if (sensors[i]) {
+				if (dst[i] >= range[0] && dst[i] <= range[1]) {
+					encounteredAnObstacle = true;
+				}
+			}
+		}
+		return encounteredAnObstacle;
+	}
+	
+	/**
+	 * Bug 0 algorithm
+	 * 
+	 * @param r
+	 *            takes the remaining line to the goal as argument
+	 * @param phi
+	 * @return the new angle & distance to the obstacle
+	 */
+	public int[] bugZero(int r, int phi) {
+		int r2 = 0;
+		int phi2 = 0;
+		int DELTA_R = 15;
+		int DELTA_M = 10;
+		int O = 10; // value needs checking
+		if (detectObstacle(new boolean[] { true, true, true })) {
+			robotFlashLed(0);
+			do {
+				control("turn", DELTA_R);
+				phi2 += DELTA_R;
+			} while (!detectObstacle(new boolean[] { true, true, false },
+					new int[] { 100, 255 })); // Turn until 90 degree to obstacle wall
+			do {
+				control("drive", DELTA_M);
+				r2 += DELTA_M;
+			} while (detectObstacle(new boolean[] { false, false, true })); 
+			for (int i = 0; i < O; i += DELTA_M) { // Drive past the corner
+				control("drive", DELTA_M);
+				r2 += DELTA_M;
+				detectObstacle(new boolean[] { false, false, true }); //temporary
+			}
+			// recalculate line to goal
+			double x = r * Math.cos(Math.toRadians(90));
+			double y = r * Math.sin(Math.toRadians(90));
+			double x2 = r2 * Math.cos(Math.toRadians(90 + phi2));
+			double y2 = r2 * Math.sin(Math.toRadians(90 + phi2));
+
+			r = (int) Math.sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2));
+			System.out.println(Math.toDegrees(Math.atan2((y - y2), (x - x2))));
+			System.out.println(phi2);
+			int psi = (int) Math.ceil(Math.toDegrees(Math.toRadians(90)
+					- Math.atan2((y - y2), (x - x2))))
+					+ phi2;
+			psi *= -1;
+			System.out.println(psi);
+			// let robot face the goal again
+			control("turn", psi);
+			detectObstacle(new boolean[] { false, false, true }); //temporary
+			phi += phi2 + psi;
+		}
+		int[] returnVal = { r, phi };
+		return returnVal;
+	}
+	
 	
 	/**
 	 * Method to set velocity.
@@ -298,6 +384,29 @@ public class RobotControl implements Runnable {
 				btc.write(data);
 			}
 		}
+	}
+	
+	public static String comRead() {
+		String s = "";
+		int i = 0;
+		int n = 0;
+		while (i < 3 || n > 0) {
+			byte[] buffer = new byte[256];
+			n = com.read(buffer);
+			s += new String(buffer, 0, n);
+			i++;
+		}
+		return s;
+	}
+	
+	public static String comReadWrite(byte[] data) {
+		com.write(data);
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// ignore
+		}
+		return comRead();
 	}
 
 }
