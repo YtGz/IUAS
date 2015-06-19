@@ -62,6 +62,12 @@ public class RobotControl implements Runnable {
 		else if(command.equalsIgnoreCase("setVelocity")){
 			robotSetVelocity(values[0], values[1]);
 		}
+		else if(command.equalsIgnoreCase("stop")){
+			robotStop();
+		}
+		else if(command.equalsIgnoreCase("bugZero")){
+			bugZero(values[0], values[1]);
+		}
 		
 	}
 	

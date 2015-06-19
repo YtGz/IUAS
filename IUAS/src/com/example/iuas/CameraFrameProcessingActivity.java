@@ -175,7 +175,9 @@ public class CameraFrameProcessingActivity extends MainActivity implements CvCam
      * 
      * @param view
      */
-    public void catchBallOnClick(View view){   	
+    public void catchBallOnClick(View view){ 
+    	//Obstacle avoidance
+    	new Thread(new SensorData()).start();
     	//DFSM controlling the robot
         dfsm = new CatchBall();
         ballDetection.addListener(dfsm);

@@ -2,10 +2,14 @@ package com.example.iuas;
 
 
 
-public class SensorData{
+public class SensorData implements Runnable {
 	
 	
 	 private final byte[] SENSOR_OFFSETS = { 1, 1, 1 }; // offsets of the individual sensors
+	 
+	 
+	 
+	 
 	 
 
 	 
@@ -94,6 +98,22 @@ public class SensorData{
 			}
 		}
 		return encounteredAnObstacle;
+	}
+
+
+	@Override
+	public void run() {
+		if(detectObstacle(new boolean[] { true, true, true })) {
+			RobotControl.control("stop");
+			try {
+				Thread.sleep(2000);	 //see if obstacle moves away
+			} catch (InterruptedException e) {
+			}
+			if(detectObstacle(new boolean[] { true, true, true })) {
+				RobotControl.control("bugZero", 20, 0);	//Try to move around obstacle
+			}
+		}
+		
 	}
 
 }
